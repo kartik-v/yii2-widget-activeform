@@ -24,6 +24,8 @@ Extends and enhances the [Yii ActiveForm widget](https://github.com/yiisoft/yii2
 	* Horizontal Form
 	* Radio List
 	* Display Options
+    
+In addition, the extension adds a separate input widget **Html5Input** that enhances using HTML5 inputs in your forms. 
 
 > NOTE: This extension is a sub repo split of [yii2-widgets](https://github.com/kartik-v/yii2-widgets). The split has been done since 08-Nov-2014 to allow developers to install this specific widget in isolation if needed. One can also use the extension the previous way with the whole suite of [yii2-widgets](http://demos.krajee.com/widgets).
 
@@ -51,7 +53,11 @@ to the ```require``` section of your `composer.json` file.
 
 ### Demo
 
-You can refer detailed documentation and demos for [ActiveForm](http://demos.krajee.com/widget-details/active-form) or [ActiveField](http://demos.krajee.com/widget-details/active-field) for understanding the usage of the extension.
+You can refer detailed documentation and demos for understanding the usage of the extension at these links below:
+
+- [ActiveForm](http://demos.krajee.com/widget-details/active-form) 
+- [ActiveField](http://demos.krajee.com/widget-details/active-field) 
+- [Html5Input](http://demos.krajee.com/html5-demo) 
 
 ### Usage
 
@@ -120,6 +126,18 @@ echo $form->field($model, 'phone', [
     ]
 ]);
 ```
+
+
+#### Html5Input
+```php
+use kartik\form\Html5Input;
+
+echo Html5Input::widget([
+    'type' => 'range',
+    'width' => '200px'
+]);
+```
+
 ## License
 
 **yii2-widget-activeform** is released under the BSD 3-Clause License. See the bundled `LICENSE.md` for details.
