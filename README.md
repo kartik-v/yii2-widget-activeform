@@ -25,8 +25,6 @@ Extends and enhances the [Yii ActiveForm widget](https://github.com/yiisoft/yii2
 	* Radio List
 	* Display Options
     
-In addition, the extension adds a separate input widget **Html5Input** that enhances using HTML5 inputs in your forms. 
-
 > NOTE: This extension is a sub repo split of [yii2-widgets](https://github.com/kartik-v/yii2-widgets). The split has been done since 08-Nov-2014 to allow developers to install this specific widget in isolation if needed. One can also use the extension the previous way with the whole suite of [yii2-widgets](http://demos.krajee.com/widgets).
 
 ## Installation
@@ -124,17 +122,6 @@ echo $form->field($model, 'phone', [
         ]
         'asButton' => true
     ]
-]);
-```
-
-
-### Html5Input
-```php
-use kartik\form\Html5Input;
-
-echo Html5Input::widget([
-    'type' => 'range',
-    'width' => '200px'
 ]);
 ```
 
