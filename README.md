@@ -63,22 +63,22 @@ use kartik\form\ActiveForm;
 
 // Vertical Form
 $form = ActiveForm::begin([
-'id' => 'form-signup',
-'type' => ActiveForm::TYPE_VERTICAL
+    'id' => 'form-signup',
+    'type' => ActiveForm::TYPE_VERTICAL
 ]);
 
 // Inline Form
 $form = ActiveForm::begin([
-'id' => 'form-login', 
-'type' => ActiveForm::TYPE_INLINE,
-'fieldConfig' => ['autoPlaceholder'=>true]
+    'id' => 'form-login', 
+    'type' => ActiveForm::TYPE_INLINE,
+    'fieldConfig' => ['autoPlaceholder'=>true]
 ]);
 
 // Horizontal Form Configuration
 $form = ActiveForm::begin([
-'id' => 'form-signup', 
-'type' => ActiveForm::TYPE_HORIZONTAL,
-'formConfig' => ['labelSpan' => 3, 'deviceSize' => ActiveForm::SIZE_SMALL]
+    'id' => 'form-signup', 
+    'type' => ActiveForm::TYPE_HORIZONTAL,
+    'formConfig' => ['labelSpan' => 3, 'deviceSize' => ActiveForm::SIZE_SMALL]
 ]);
 ```
 
