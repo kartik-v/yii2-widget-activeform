@@ -51,7 +51,7 @@ to the ```require``` section of your `composer.json` file.
 
 > NOTE: The latest version of the module is v1.0.0 released on 08-Nov-2014. Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-widget-activeform/blob/master/CHANGE.md) for details.
 
-### Demo
+## Demo
 
 You can refer detailed documentation and demos for understanding the usage of the extension at these links below:
 
@@ -59,9 +59,9 @@ You can refer detailed documentation and demos for understanding the usage of th
 - [ActiveField](http://demos.krajee.com/widget-details/active-field) 
 - [Html5Input](http://demos.krajee.com/html5-demo) 
 
-### Usage
+## Usage
 
-#### ActiveForm
+### ActiveForm
 
 ```php
 // add this in your view
@@ -88,7 +88,7 @@ $form = ActiveForm::begin([
 ]);
 ```
 
-#### ActiveField
+### ActiveField
 ```php
 // Prepend an addon text
 echo $form->field($model, 'email', ['addon' => ['prepend' => ['content'=>'@']]]);
@@ -128,7 +128,7 @@ echo $form->field($model, 'phone', [
 ```
 
 
-#### Html5Input
+### Html5Input
 ```php
 use kartik\form\Html5Input;
 
