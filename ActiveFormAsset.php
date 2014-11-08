@@ -7,7 +7,7 @@
  * @version 1.0.0
  */
 
-namespace kartik\widgets;
+namespace kartik\form;
 
 /**
  * Asset bundle for ActiveForm Widget

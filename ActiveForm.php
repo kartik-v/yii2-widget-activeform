@@ -7,7 +7,7 @@
  * @version 1.0.0
  */
 
-namespace kartik\widgets;
+namespace kartik\form;
 
 use yii\base\InvalidConfigException;
 use yii\helpers\Html;

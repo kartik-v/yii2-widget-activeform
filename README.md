@@ -59,7 +59,7 @@ You can refer detailed documentation and demos for [ActiveForm](http://demos.kra
 
 ```php
 // add this in your view
-use kartik\widgets\ActiveForm;
+use kartik\form\ActiveForm;
 
 // Vertical Form
 $form = ActiveForm::begin([

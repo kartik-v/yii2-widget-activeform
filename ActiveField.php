@@ -7,7 +7,7 @@
  * @version 1.0.0
  */
 
-namespace kartik\widgets;
+namespace kartik\form;
 
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
