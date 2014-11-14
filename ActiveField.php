@@ -282,8 +282,8 @@ class ActiveField extends \yii\widgets\ActiveField
     /** 
      * Generates a toggle field (checkbox or radio)
      * @param string $type the toggle input type 'checkbox' or 'radio'.
-     * @param array $items the data item used to generate the checkboxes.
-     * The array values are the labels, while the array keys are the corresponding checkbox values.
+     * @param array $items the data item used to generate the checkboxes / radios.
+     * The array values are the labels, while the array keys are the corresponding checkbox / radio values.
      * @param array $options options (name => config) for the toggle input list container tag.
      * @return ActiveField object
      */    
@@ -313,15 +313,15 @@ class ActiveField extends \yii\widgets\ActiveField
     
     /** 
      * Renders a list of checkboxes / radio buttons.
-     * The selection of the checkbox/ radio buttons is taken from the value of the model attribute.
+     * The selection of the checkbox / radio buttons is taken from the value of the model attribute.
      *
      * @param string $type the toggle input type 'checkbox' or 'radio'.
-     * @param array $items the data item used to generate the checkbox/ radio buttons.
-     * The array keys are the labels, while the array values are the corresponding checkbox/ radio button values.
+     * @param array $items the data item used to generate the checkbox / radio buttons.
+     * The array keys are the labels, while the array values are the corresponding checkbox / radio button values.
      * Note that the labels will NOT be HTML-encoded, while the values will.
-     * @param array $options options (name => config) for the checkbox/ radio button list. The following options are specially handled:
+     * @param array $options options (name => config) for the checkbox / radio button list. The following options are specially handled:
      *
-     * - unselect: string, the value that should be submitted when none of the checkbox/ radio buttons is selected.
+     * - unselect: string, the value that should be submitted when none of the checkbox / radio buttons is selected.
      *   By setting this option, a hidden input will be generated.
      * - separator: string, the HTML code that separates items.
      * - inline: boolean, whether the list should be displayed as a series on the same line, default is false
