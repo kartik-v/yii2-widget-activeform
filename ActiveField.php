@@ -267,7 +267,7 @@ class ActiveField extends \yii\widgets\ActiveField
     public function dropDownList($items, $options = [])
     {
         Html::addCssClass($options, $this->addClass);
-        return parent::dropDownList($items, $options = []);
+        return parent::dropDownList($items, $options);
     }
     
     /**
@@ -276,7 +276,7 @@ class ActiveField extends \yii\widgets\ActiveField
     public function listBox($items, $options = [])
     {
         Html::addCssClass($options, $this->addClass);
-        return parent::listBox($items, $options = []);
+        return parent::listBox($items, $options);
     }
     
     /** 
