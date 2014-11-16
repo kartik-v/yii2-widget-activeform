@@ -5,6 +5,7 @@ version 1.1.0
 
 - (enh #1): Enhance ActiveField inputs to include bootstrap default styles.
 - Clean up invalid assets, unneeded classes, and refactor code.
+- (enh #5): Add special styling for bootstrap input group button addons for success and error states.
 
 version 1.0.0
 =============
