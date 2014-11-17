@@ -14,6 +14,10 @@
     margin-top: -10px;
 }
 
+.form-inline > .form-group {
+    vertical-align: top;
+}
+
 .input-multiselect {
     overflow: auto;
     min-height: 145px !important;
