@@ -4,7 +4,7 @@
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 namespace kartik\form;
@@ -291,16 +291,19 @@ class ActiveField extends \yii\widgets\ActiveField
         $this->_offset = true;
         $inputType = 'active' . ucfirst($type);
         $container = ArrayHelper::remove($options, 'container', ['class'=>$type]);
-        $this->parts['{label}'] = '';
-        if (!$enclosedByLabel) {
+        if ($enclosedByLabel) {
+            $this->parts['{label}'] = '';
+        } else {
             if (isset($options['label']) && !isset($this->parts['{label}'])) {
                 $this->parts['label'] = $options['label'];
                 if (!empty($options['labelOptions'])) {
                     $this->labelOptions = $options['labelOptions'];
                 }
             }
+            $options['label'] = null;
+            $container = false;
+            unset($options['labelOptions']);
         }
-        unset($options['label'], $options['labelOptions'], $options['container']);
         $input = Html::$inputType($this->model, $this->attribute, $options);
         if (is_array($container)) {
             $tag = ArrayHelper::remove($container, 'tag', 'div');

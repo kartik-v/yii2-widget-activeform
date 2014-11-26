@@ -1,6 +1,12 @@
+version 1.2.0
+=============
+**Date:** 26-Nov-2014
+
+- (enh #7): Fix custom labels rendering for checkboxes
+- Set release to stable
+
 version 1.1.0
 =============
-
 **Date:** 17-Nov-2014
 
 - (enh #1): Enhance ActiveField inputs to include bootstrap default styles.
@@ -10,7 +16,6 @@ version 1.1.0
 
 version 1.0.0
 =============
-
 **Date:** 08-Nov-2014
 
 - Initial release 
