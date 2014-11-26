@@ -2,7 +2,7 @@ version 1.2.0
 =============
 **Date:** 26-Nov-2014
 
-- (enh #7): Fix custom labels rendering for checkboxes
+- (bug #7): Fix custom labels rendering for checkboxes
 - Set release to stable
 
 version 1.1.0
