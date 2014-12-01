@@ -1,3 +1,12 @@
+version 1.3.0
+=============
+**Date:** 01-Dec-2014
+
+- (enh #9): Enhance support for labels and horizontal form layouts
+    - Allow labels to be set to `false` to hide them completely
+    - Enhance HORIZONTAL forms to style labels appropriately when they are blank/empty.
+    - Enhance HORIZONTAL forms to style labels, hints, and errors appropriately when they are set to false to fill the container width
+
 version 1.2.0
 =============
 **Date:** 26-Nov-2014

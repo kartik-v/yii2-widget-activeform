@@ -4,7 +4,7 @@
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.2.0
+ * @version 1.3.0
  */
 
 namespace kartik\form;
@@ -181,9 +181,15 @@ class ActiveField extends \yii\widgets\ActiveField
         $showErrors = isset($this->showErrors) ? $this->showErrors : ArrayHelper::getValue($form->formConfig, 'showErrors', true);
         if ($form->hasInputCss()) {
             $class = ($this->_offset) ? $offsetDivClass : $inputDivClass;
-            $input = $showLabels ? "<div class='{$class}'>{input}</div>" : "{input}";
             $error = $showErrors ? "{error}\n" : "";
             $hint = "{hint}";
+            if (!$showLabels) {
+                $size = ArrayHelper::getValue($this->form->formConfig, 'deviceSize', ActiveForm::SIZE_MEDIUM);
+                $class = "col-{$size}-{$this->form->fullSpan}";
+                $error = "<div class='{$class}'>{$error}</div>"; 
+                $hint = "<div class='{$class}'>{$hint}</div>"; 
+            }
+            $input = "<div class='{$class}'>{input}</div>"; 
             if ($form->hasOffsetCss() && $showLabels) {
                 $error = $showErrors ? "<div class='{$offsetDivClass}'>{error}</div>\n" : "";
                 $hint = "<div class='{$offsetDivClass}'>{hint}</div>";
@@ -507,5 +513,16 @@ class ActiveField extends \yii\widgets\ActiveField
         $container['tabindex'] = 0;
         $this->_multiselect = Html::tag('div', '{input}', $container);
         return $selector == self::TYPE_RADIO ? $this->radioList($items, $options) : $this->checkboxList($items, $options);
+    }
+    
+    /**
+     * @inherit doc
+     */
+    public function label($label = null, $options = [])
+    {
+        if ($label === false) {
+            $this->showLabels = false;
+        }
+        return parent::label($label, $options);
     }
 }
