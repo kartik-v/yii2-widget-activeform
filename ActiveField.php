@@ -110,6 +110,7 @@ class ActiveField extends \yii\widgets\ActiveField
         $this->initTemplate();
         $this->initPlaceholder($this->inputOptions);
         $this->initAddon();
+        $this->initDisability($this->inputOptions);
         return parent::render($content);
     }
 
@@ -156,6 +157,7 @@ class ActiveField extends \yii\widgets\ActiveField
 
     /**
      * Initializes placeholder based on $autoPlaceholder
+     * @param array $options the HTML attributes for the input
      */
     protected function initPlaceholder(&$options)
     {
@@ -166,6 +168,20 @@ class ActiveField extends \yii\widgets\ActiveField
         }
     }
 
+    /**
+     * Validates and sets disabled or readonly inputs
+     * @param array $options the HTML attributes for the input
+     */
+    protected function initDisability(&$options)
+    {
+        if ($this->form->disabled && !isset($options['disabled'])) {
+            $options['disabled'] = true;
+        }
+        if ($this->form->readonly && !isset($options['readonly'])) {
+            $options['readonly'] = true;
+        }
+    }
+    
     /**
      * Initializes template for bootstrap 3 specific styling
      */
@@ -234,6 +250,7 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($type != 'range' || $type != 'color') {
             Html::addCssClass($options, $this->addClass);
         }
+        $this->initDisability($options);
         return parent::input($type, $options);
     }
 
@@ -244,6 +261,7 @@ class ActiveField extends \yii\widgets\ActiveField
     {
         $this->initPlaceholder($options);
         Html::addCssClass($options, $this->addClass);
+        $this->initDisability($options);
         return parent::textInput($options);
     }
 
@@ -254,6 +272,7 @@ class ActiveField extends \yii\widgets\ActiveField
     {
         $this->initPlaceholder($options);
         Html::addCssClass($options, $this->addClass);
+        $this->initDisability($options);
         return parent::passwordInput($options);
     }
 
@@ -264,6 +283,7 @@ class ActiveField extends \yii\widgets\ActiveField
     {
         $this->initPlaceholder($options);
         Html::addCssClass($options, $this->addClass);
+        $this->initDisability($options);
         return parent::textarea($options);
     }
     
@@ -272,6 +292,7 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public function dropDownList($items, $options = [])
     {
+        $this->initDisability($options);
         Html::addCssClass($options, $this->addClass);
         return parent::dropDownList($items, $options);
     }
@@ -281,6 +302,7 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public function listBox($items, $options = [])
     {
+        $this->initDisability($options);
         Html::addCssClass($options, $this->addClass);
         return parent::listBox($items, $options);
     }
@@ -294,9 +316,13 @@ class ActiveField extends \yii\widgets\ActiveField
      * @return ActiveField object
      */    
     protected function getToggleField($type = self::TYPE_CHECKBOX, $options = [], $enclosedByLabel = true) {
+        $this->initDisability($options);
         $this->_offset = true;
         $inputType = 'active' . ucfirst($type);
-        $container = ArrayHelper::remove($options, 'container', ['class'=>$type]);
+        $disabled = ArrayHelper::getValue($options, 'disabled', false);
+        $readonly = ArrayHelper::getValue($options, 'readonly', false);
+        $css = $disabled ? $type . ' disabled' : $type;
+        $container = ArrayHelper::remove($options, 'container', ['class'=>$css]);
         if ($enclosedByLabel) {
             $this->parts['{label}'] = '';
         } else {
@@ -349,13 +375,19 @@ class ActiveField extends \yii\widgets\ActiveField
     protected function getToggleFieldList($type, $items, $options = []) {
         $inline = ArrayHelper::remove($options, 'inline', false);
         $inputType = "{$type}List";
-        if ($inline && !isset($options['itemOptions'])) {
-            $options['itemOptions'] = [
-                'labelOptions' => ['class' => "{$type}-inline"],
-            ];
+        $this->initDisability($options['itemOptions']);
+        $css = $this->form->disabled ? ' disabled' : '';
+        $css = $this->form->readonly ? $css . ' readonly': $css;
+        if ($inline && !isset($options['itemOptions']['labelOptions']['class'])) {
+            $options['itemOptions']['labelOptions']['class'] = "{$type}-inline{$css}";
         }  elseif (!isset($options['item'])) {
             $options['item'] = function ($index, $label, $name, $checked, $value) use ($type) {
-                return "<div class='{$type}'>" . Html::$type($name, $checked, ['label' => $label, 'value' => $value]) . "</div>";
+                return "<div class='{$type}{$css}'>" . Html::$type($name, $checked, [
+                    'label' => $label, 
+                    'value' => $value, 
+                    'disabled'=>$this->form->disabled,
+                    'readonly'=>$this->form->readonly,
+                ]) . "</div>";
             };
         }
         return parent::$inputType($items, $options);
@@ -504,6 +536,7 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public function multiselect($items, $options = [])
     {
+        $this->initDisability($options);
         $options['encode'] = false;
         $height = ArrayHelper::remove($options, 'height', self::MULTI_SELECT_HEIGHT);
         $selector = ArrayHelper::remove($options, 'selector', self::TYPE_CHECKBOX);
@@ -513,6 +546,16 @@ class ActiveField extends \yii\widgets\ActiveField
         $container['tabindex'] = 0;
         $this->_multiselect = Html::tag('div', '{input}', $container);
         return $selector == self::TYPE_RADIO ? $this->radioList($items, $options) : $this->checkboxList($items, $options);
+    }
+    
+    /**
+     * @inherit doc
+     */
+    public function widget($class, $config = []) {
+        if (property_exists($class, 'disabled') && property_exists($class, 'readonly')) {
+            $this->initDisability($config);
+        }
+        return parent::widget($class, $config);
     }
     
     /**

@@ -66,7 +66,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
      * Defaults to 'vertical'.
      */
     public $type;
-
+    
     /**
      * @var int set the bootstrap grid width. Defaults to [[ActiveForm::FULL_SPAN]].
      */
@@ -85,7 +85,17 @@ class ActiveForm extends \yii\widgets\ActiveForm
      * ```
      */
     public $formConfig = [];
-
+    
+    /**
+     * @var boolean whether all inputs in form are to be disabled
+     */
+    public $disabled = false;
+    
+    /**
+     * @var boolean whether all inputs in form are to be readonly
+     */
+    public $readonly = false;
+    
     /**
      * @var string the extra input container css class for horizontal forms
      * and special inputs like checkbox and radio.
@@ -112,13 +122,13 @@ class ActiveForm extends \yii\widgets\ActiveForm
             'labelSpan' => self::DEFAULT_LABEL_SPAN,
             'deviceSize' => self::SIZE_MEDIUM,
             'showLabels' => true,
-            'showErrors' => true,
+            'showErrors' => true
         ],
         self::TYPE_INLINE => [
             'labelSpan' => self::NOT_SET,
             'deviceSize' => self::NOT_SET,
             'showLabels' => false,
-            'showErrors' => false,
+            'showErrors' => false
         ],
     ];
 
@@ -131,7 +141,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
         if (!isset($this->type) || strlen($this->type) == 0) {
             $this->type = self::TYPE_VERTICAL;
         }
-        $this->formConfig = ArrayHelper::merge($this->_config[$this->type], $this->formConfig);
+        $this->formConfig = array_replace_recursive($this->_config[$this->type], $this->formConfig);
         if (!isset($this->fieldConfig['class'])) {
             $this->fieldConfig['class'] = ActiveField::className();
         }
