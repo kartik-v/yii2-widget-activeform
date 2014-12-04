@@ -73,14 +73,19 @@ class ActiveForm extends \yii\widgets\ActiveForm
     public $fullSpan = self::FULL_SPAN;
 
     /**
-     * @var array the configuration for the form
-     *
+     * @var array the configuration for the form. Takes in the following properties
+     * - labelSpan: int, the bootstrap grid column width (usually between 1 to 12)
+     * - deviceSize: string, one of the bootstrap sizes (refer the ActiveForm::SIZE constants)
+     * - showLabels: boolean|string, whether to show labels (true), hide labels (false), or display only
+     *   for screen reader (ActiveForm::SCREEN_READER). This is mainly useful for inline forms.
+     * - showErrors: boolean, whether to show errors (true) or hide errors (false).
+     *   This is mainly useful for inline forms.
      * ```
      * [
-     *      'labelSpan' => 2, // must be between 1 and 12
-     *      'deviceSize' => ActiveForm::SIZE_MEDIUM, // must be one of the SIZE modifiers
-     *      'showLabels' => true, // show or hide labels (mainly useful for inline type form)
-     *      'showErrors' => true // show or hide errors (mainly useful for inline type form)
+     *      'labelSpan' => 2,
+     *      'deviceSize' => ActiveForm::SIZE_MEDIUM,
+     *      'showLabels' => true,
+     *      'showErrors' => true 
      * ],
      * ```
      */
@@ -127,7 +132,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
         self::TYPE_INLINE => [
             'labelSpan' => self::NOT_SET,
             'deviceSize' => self::NOT_SET,
-            'showLabels' => false,
+            'showLabels' => self::SCREEN_READER,
             'showErrors' => false
         ],
     ];
@@ -198,7 +203,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
             $this->fieldConfig['template'] = "{label}\n{input}\n{error}\n{hint}";
         }
 
-        if ($config['showLabels'] === false) {
+        if ($config['showLabels'] === self::SCREEN_READER) {
             Html::addCssClass($this->fieldConfig['labelOptions'], self::SCREEN_READER);
         } elseif ($labelCss != self::NOT_SET) {
             Html::addCssClass($this->fieldConfig['labelOptions'], $labelCss);

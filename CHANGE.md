@@ -6,7 +6,11 @@ version 1.3.0
     - Allow labels to be set to `false` to hide them completely
     - Enhance HORIZONTAL forms to style labels appropriately when they are blank/empty.
     - Enhance HORIZONTAL forms to style labels, hints, and errors appropriately when they are set to false to fill the container width
-- (enh #12): Include new `disabled` and `readonly` properties in ActiveForm.    
+- (enh #12): Include new `disabled` and `readonly` properties in ActiveForm.
+- (enh #13): Allow `showLabels` property in ActiveForm & ActiveField to be tristate:
+    - `true`: show labels
+    - `false`: hide labels
+    - `ActiveForm::SCREEN_READER`: show in screen reader only (hide from normal display)
     
 version 1.2.0
 =============

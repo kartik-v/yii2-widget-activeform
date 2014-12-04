@@ -62,7 +62,11 @@ class ActiveField extends \yii\widgets\ActiveField
     public $addClass = 'form-control';
 
     /**
-     * @var boolean whether to show labels for the field
+     * @var boolean|string whether to show labels for the field. Should
+     * be one of the following values:
+     * - `true`: show labels for the field
+     * - `false`: hide labels for the field
+     * - `ActiveForm::SCREEN_READER`: show in screen reader only (hide from normal display)
      */
     public $showLabels;
 
@@ -99,6 +103,9 @@ class ActiveField extends \yii\widgets\ActiveField
         }
         if ($this->form->type === ActiveForm::TYPE_HORIZONTAL) {
             Html::addCssClass($this->labelOptions, 'control-label');
+        }
+        if ($this->showLabels === ActiveForm::SCREEN_READER) {
+            Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
         }
     }
 
@@ -199,14 +206,14 @@ class ActiveField extends \yii\widgets\ActiveField
             $class = ($this->_offset) ? $offsetDivClass : $inputDivClass;
             $error = $showErrors ? "{error}\n" : "";
             $hint = "{hint}";
-            if (!$showLabels) {
+            if ($showLabels === false) {
                 $size = ArrayHelper::getValue($this->form->formConfig, 'deviceSize', ActiveForm::SIZE_MEDIUM);
                 $class = "col-{$size}-{$this->form->fullSpan}";
                 $error = "<div class='{$class}'>{$error}</div>"; 
                 $hint = "<div class='{$class}'>{$hint}</div>"; 
             }
             $input = "<div class='{$class}'>{input}</div>"; 
-            if ($form->hasOffsetCss() && $showLabels) {
+            if ($form->hasOffsetCss() && $showLabels === true) {
                 $error = $showErrors ? "<div class='{$offsetDivClass}'>{error}</div>\n" : "";
                 $hint = "<div class='{$offsetDivClass}'>{hint}</div>";
             }
@@ -219,7 +226,7 @@ class ActiveField extends \yii\widgets\ActiveField
         if (!$showErrors) {
             $this->template = str_replace("{error}\n", "", $this->template);
         }
-        if (!$showLabels || $this->autoPlaceholder) {
+        if ($showLabels === false || ($this->autoPlaceholder && $showLabels !== ActiveForm::SCREEN_READER)) {
             $this->template = str_replace("{label}\n", "", $this->template);
         }
         if ($this->_multiselect != '') {
