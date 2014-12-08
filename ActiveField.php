@@ -388,7 +388,7 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($inline && !isset($options['itemOptions']['labelOptions']['class'])) {
             $options['itemOptions']['labelOptions']['class'] = "{$type}-inline{$css}";
         }  elseif (!isset($options['item'])) {
-            $options['item'] = function ($index, $label, $name, $checked, $value) use ($type) {
+            $options['item'] = function ($index, $label, $name, $checked, $value) use ($type, $css) {
                 return "<div class='{$type}{$css}'>" . Html::$type($name, $checked, [
                     'label' => $label, 
                     'value' => $value, 
