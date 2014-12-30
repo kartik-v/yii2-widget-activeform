@@ -118,9 +118,9 @@ echo $form->field($model, 'phone', [
 echo $form->field($model, 'phone', [
     'addon' => [
         'prepend' => [
-            'content' => Html::button('Go', ['class'=>'btn btn-primary'])
+            'content' => Html::button('Go', ['class'=>'btn btn-primary']),
+            'asButton' => true
         ]
-        'asButton' => true
     ]
 ]);
 ```
