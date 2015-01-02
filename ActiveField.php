@@ -81,6 +81,12 @@ class ActiveField extends \yii\widgets\ActiveField
     public $autoPlaceholder;
 
     /**
+     * @var int bootstrap css col width for div which encloses input.
+     * Will be converted to col-<form-size-modifier>-<$this->inputSpan>
+     */
+    public $inputSpan;
+
+    /**
      * @var boolean whether the input is to be offset (like for checkbox or radio).
      */
     private $_offset = false;
@@ -188,7 +194,18 @@ class ActiveField extends \yii\widgets\ActiveField
             $options['readonly'] = true;
         }
     }
-    
+
+    /**
+     * @param $options
+     */
+    protected function initInputSpan(&$options)
+    {
+        if(isset($options['inputSpan'])) {
+            $this->inputSpan = $options['inputSpan'];
+            unset($options['inputSpan']);
+        }
+    }
+
     /**
      * Initializes template for bootstrap 3 specific styling
      */
@@ -212,7 +229,11 @@ class ActiveField extends \yii\widgets\ActiveField
                 $error = "<div class='{$class}'>{$error}</div>"; 
                 $hint = "<div class='{$class}'>{$hint}</div>"; 
             }
-            $input = "<div class='{$class}'>{input}</div>"; 
+            $inputDivClass = $class;
+            if (isset($this->inputSpan) && is_int($this->inputSpan)) {
+                $inputDivClass = 'col-' . $form->getDeviceSize() . '-' . $this->inputSpan;
+            }
+            $input = "<div class='{$inputDivClass}'>{input}</div>";
             if ($form->hasOffsetCss() && $showLabels === true) {
                 $error = $showErrors ? "<div class='{$offsetDivClass}'>{error}</div>\n" : "";
                 $hint = "<div class='{$offsetDivClass}'>{hint}</div>";
@@ -254,6 +275,7 @@ class ActiveField extends \yii\widgets\ActiveField
     public function input($type, $options = [])
     {
         $this->initPlaceholder($options);
+        $this->initInputSpan($options);
         if ($type != 'range' || $type != 'color') {
             Html::addCssClass($options, $this->addClass);
         }
@@ -267,6 +289,7 @@ class ActiveField extends \yii\widgets\ActiveField
     public function textInput($options = [])
     {
         $this->initPlaceholder($options);
+        $this->initInputSpan($options);
         Html::addCssClass($options, $this->addClass);
         $this->initDisability($options);
         return parent::textInput($options);
@@ -278,6 +301,7 @@ class ActiveField extends \yii\widgets\ActiveField
     public function passwordInput($options = [])
     {
         $this->initPlaceholder($options);
+        $this->initInputSpan($options);
         Html::addCssClass($options, $this->addClass);
         $this->initDisability($options);
         return parent::passwordInput($options);
@@ -289,6 +313,7 @@ class ActiveField extends \yii\widgets\ActiveField
     public function textarea($options = [])
     {
         $this->initPlaceholder($options);
+        $this->initInputSpan($options);
         Html::addCssClass($options, $this->addClass);
         $this->initDisability($options);
         return parent::textarea($options);
@@ -300,6 +325,7 @@ class ActiveField extends \yii\widgets\ActiveField
     public function dropDownList($items, $options = [])
     {
         $this->initDisability($options);
+        $this->initInputSpan($options);
         Html::addCssClass($options, $this->addClass);
         return parent::dropDownList($items, $options);
     }
@@ -310,6 +336,7 @@ class ActiveField extends \yii\widgets\ActiveField
     public function listBox($items, $options = [])
     {
         $this->initDisability($options);
+        $this->initInputSpan($options);
         Html::addCssClass($options, $this->addClass);
         return parent::listBox($items, $options);
     }
