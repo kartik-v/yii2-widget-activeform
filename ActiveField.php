@@ -4,7 +4,7 @@
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.3.0
+ * @version 1.4.0
  */
 
 namespace kartik\form;
@@ -52,6 +52,16 @@ class ActiveField extends \yii\widgets\ActiveField
     const MULTI_SELECT_HEIGHT = '145px';
 
     /**
+     * @var string content to be placed before input
+     */
+    public $contentBeforeInput = '';
+    
+    /**
+     * @var string content to be placed after input
+     */
+    public $contentAfterInput = '';
+    
+    /**
      * @var array addon options for text and password inputs
      */
     public $addon = [];
@@ -74,6 +84,11 @@ class ActiveField extends \yii\widgets\ActiveField
      * @var boolean whether to show errors for the field
      */
     public $showErrors;
+
+    /**
+     * @var boolean whether to show errors for the field
+     */
+    public $showHints;
 
     /**
      * @var boolean whether the label is to be hidden and auto-displayed as a placeholder
@@ -118,9 +133,12 @@ class ActiveField extends \yii\widgets\ActiveField
         $this->initPlaceholder($this->inputOptions);
         $this->initAddon();
         $this->initDisability($this->inputOptions);
+        $this->template = strtr($this->template, [
+            '{input}' => $this->contentBeforeInput . '{input}' . $this->contentAfterInput
+        ]);
         return parent::render($content);
     }
-
+    
     /**
      * Parses and returns addon content
      *
@@ -202,6 +220,7 @@ class ActiveField extends \yii\widgets\ActiveField
         $offsetDivClass = $form->getOffsetCss();
         $showLabels = isset($this->showLabels) ? $this->showLabels : ArrayHelper::getValue($form->formConfig, 'showLabels', true);
         $showErrors = isset($this->showErrors) ? $this->showErrors : ArrayHelper::getValue($form->formConfig, 'showErrors', true);
+        $showHints = isset($this->showHints) ? $this->showHints : ArrayHelper::getValue($form->formConfig, 'showHints', true);
         if ($form->hasInputCss()) {
             $class = ($this->_offset) ? $offsetDivClass : $inputDivClass;
             $error = $showErrors ? "{error}\n" : "";
@@ -219,12 +238,15 @@ class ActiveField extends \yii\widgets\ActiveField
             }
             $this->template = strtr($this->template, [
                 '{input}' => $input,
-                '{error}' => $error,
-                '{hint}' => $hint
+                '{error}' => $showErrors ? $error : '',
+                '{hint}' => $showHints ? $hint : ''
             ]);
         }
         if (!$showErrors) {
             $this->template = str_replace("{error}\n", "", $this->template);
+        }
+        if (!$showHints) {
+            $this->template = str_replace("{hint}\n", "", $this->template);
         }
         if ($showLabels === false || ($this->autoPlaceholder && $showLabels !== ActiveForm::SCREEN_READER)) {
             $this->template = str_replace("{label}\n", "", $this->template);

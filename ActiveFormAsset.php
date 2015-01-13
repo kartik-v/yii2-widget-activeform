@@ -4,7 +4,7 @@
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.3.0
+ * @version 1.4.0
  */
 
 namespace kartik\form;
@@ -17,6 +17,9 @@ namespace kartik\form;
  */
 class ActiveFormAsset extends \kartik\base\AssetBundle
 {
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         $this->setSourcePath(__DIR__ . '/assets');

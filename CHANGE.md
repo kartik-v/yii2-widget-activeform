@@ -1,3 +1,10 @@
+version 1.4.0
+=============
+**Date:** 14-Jan-2015
+
+- (enh #19): Add new `showHints` property to ActiveField configuration.
+- (enh #20): Ability to add markup before and after ActiveField Input.
+
 version 1.3.0
 =============
 **Date:** 04-Dec-2014
