@@ -174,7 +174,6 @@ class ActiveForm extends \yii\widgets\ActiveForm
         $this->initForm();
         $config = $this->formConfig;
         $span = $config['labelSpan'];
-        $size = $config['deviceSize'];
         $formStyle = $this->getFormLayoutStyle();
         $labelCss = $formStyle['labelCss'];
         $this->_inputCss = $formStyle['inputCss'];
@@ -188,10 +187,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
                 $span = self::DEFAULT_LABEL_SPAN;
             }
 
-            /* Validate if invalid deviceSize is passed - else default to medium */
-            if ($size == self::NOT_SET) {
-                $size = self::SIZE_MEDIUM;
-            }
+            $size = $this->getDeviceSize();
 
             $prefix = "col-{$size}-";
             $labelCss = $prefix . $span;
@@ -215,7 +211,6 @@ class ActiveForm extends \yii\widgets\ActiveForm
     public function getFormLayoutStyle() {
         $config = $this->formConfig;
         $span = $config['labelSpan'];
-        $size = $config['deviceSize'];
         $labelCss = $inputCss = $offsetCss = self::NOT_SET;
 
         if ($span != self::NOT_SET && intval($span) > 0) {
@@ -226,10 +221,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
                 $span = self::DEFAULT_LABEL_SPAN;
             }
 
-            /* Validate if invalid deviceSize is passed - else default to medium */
-            if ($size == self::NOT_SET) {
-                $size = self::SIZE_MEDIUM;
-            }
+            $size = $this->getDeviceSize();
 
             $prefix = "col-{$size}-";
             $labelCss = $prefix . $span;
@@ -302,5 +294,20 @@ class ActiveForm extends \yii\widgets\ActiveForm
     {
         $view = $this->getView();
         ActiveFormAsset::register($view);
+    }
+
+    /**
+     * @return string device size
+     */
+    public function getDeviceSize()
+    {
+        $config = $this->formConfig;
+        $size = $config['deviceSize'];
+
+        /* Validate if invalid deviceSize is passed - else default to medium */
+        if ($size == self::NOT_SET) {
+            $size = self::SIZE_MEDIUM;
+        }
+        return $size;
     }
 }
