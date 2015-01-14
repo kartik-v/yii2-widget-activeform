@@ -87,7 +87,7 @@ class ActiveField extends \yii\widgets\ActiveField
     public $showErrors;
 
     /**
-     * @var boolean whether to show errors for the field
+     * @var boolean whether to show hints for the field
      */
     public $showHints;
 

@@ -80,8 +80,8 @@ class ActiveForm extends \yii\widgets\ActiveForm
      *   for screen reader (ActiveForm::SCREEN_READER). This is mainly useful for inline forms.
      * - showErrors: boolean, whether to show errors (true) or hide errors (false).
      *   This is mainly useful for inline forms.
-     * - showHints: boolean, whether to show hints (true) or hide errors (false).
-     *   This defaults to `false` for Horizontal and Inline forms.
+     * - showHints: boolean, whether to show hints (true) or hide errors (false). Defaults to `true`.
+     *   The hint will be rendered only if a valid hint has been set through the `hint()` method.
      * ```
      * [
      *      'labelSpan' => 2,
@@ -139,7 +139,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
             'deviceSize' => self::NOT_SET,
             'showLabels' => self::SCREEN_READER,
             'showErrors' => false,
-            'showHints' => false
+            'showHints' => true
         ],
     ];
 
