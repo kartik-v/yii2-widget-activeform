@@ -4,7 +4,7 @@
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2014
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.4.0
+ * @version 1.3.0
  */
 
 namespace kartik\form;
@@ -267,6 +267,8 @@ class ActiveField extends \yii\widgets\ActiveField
         Html::addCssClass($options, 'form-control-static');
         $content = isset($this->model[Html::getAttributeName($this->attribute)]) ? $this->model[Html::getAttributeName($this->attribute)] : '-';
         $this->parts['{input}'] = Html::tag('p', $content, $options);
+        $this->parts['{error}'] = '';
+        $this->parts['{hint}'] = '';
         return $this;
     }
 
