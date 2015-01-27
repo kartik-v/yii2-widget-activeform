@@ -128,7 +128,10 @@ class ActiveField extends \yii\widgets\ActiveField
     /**
      * Renders a static input (display only).
      *
-     * @param array $options the tag options in terms of name-value pairs.
+     * @param array $options the tag options in terms of name-value pairs. The 
+     * following special options are recognized:
+     * - $showError bool, whether to show error for the static input. Defaults to `false`.
+     * - $showHint bool, whether to show hint for the static input. Defaults to `false`.
      *
      * @return ActiveField object
      */
@@ -136,9 +139,15 @@ class ActiveField extends \yii\widgets\ActiveField
     {
         Html::addCssClass($options, 'form-control-static');
         $content = isset($this->model[Html::getAttributeName($this->attribute)]) ? $this->model[Html::getAttributeName($this->attribute)] : '-';
+        $showError = ArrayHelper::remove($options, 'showError', false);
+        $showHint = ArrayHelper::remove($options, 'showHint', false);
         $this->parts['{input}'] = Html::tag('p', $content, $options);
-        $this->parts['{error}'] = '';
-        $this->parts['{hint}'] = '';
+        if (!$showError) {
+            $this->parts['{error}'] = '';
+        }
+        if (!$showHint) {
+            $this->parts['{hint}'] = '';
+        }
         return $this;
     }
 
@@ -527,6 +536,10 @@ class ActiveField extends \yii\widgets\ActiveField
     public function render($content = null)
     {
         $this->initTemplate();
+        if ($this->form->staticOnly === true) {
+            $field = $this->staticInput();
+            return parent::render(null);
+        }
         $this->initPlaceholder($this->inputOptions);
         $this->initAddon();
         $this->initDisability($this->inputOptions);

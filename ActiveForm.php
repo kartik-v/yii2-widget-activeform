@@ -95,6 +95,11 @@ class ActiveForm extends \yii\widgets\ActiveForm
     public $formConfig = [];
     
     /**
+     * @var boolean whether all data in form are to be static inputs
+     */
+    public $staticOnly = false;
+    
+    /**
      * @var boolean whether all inputs in form are to be disabled
      */
     public $disabled = false;
@@ -132,7 +137,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
             'deviceSize' => self::SIZE_MEDIUM,
             'showLabels' => true,
             'showErrors' => true,
-            'showHints' => false
+            'showHints' => true
         ],
         self::TYPE_INLINE => [
             'labelSpan' => self::NOT_SET,

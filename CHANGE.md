@@ -1,11 +1,14 @@
 version 1.4.0
 =============
-**Date:** 14-Jan-2015
+**Date:** 28-Jan-2015
 
 - (enh #19): Add new `showHints` property to ActiveField configuration.
 - (enh #20): Ability to add markup before and after ActiveField Input.
 - (enh #21): Prevent display of error and hint blocks for static input.
 - (enh #22): Enhance active field template for controlling labels, hints, & errors.
+- (enh #24): Allow static data forms through new `ActiveForm::staticOnly` property.
+- (enh #25): Default `showHints` to `true` for all form types in ActiveForm.
+- (enh #26): Enhance `ActiveField::staticInput` to include options to show error and hint.
 
 version 1.3.0
 =============
