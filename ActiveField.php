@@ -73,6 +73,13 @@ class ActiveField extends \yii\widgets\ActiveField
     public $addClass = 'form-control';
 
     /**
+     * @var string the static value for the field to be displayed
+     * for the static input OR when the form is in staticOnly mode.
+     * This value is not HTML encoded.
+     */
+    public $staticValue;
+
+    /**
      * @var boolean|string whether to show labels for the field. Should
      * be one of the following values:
      * - `true`: show labels for the field
@@ -107,6 +114,11 @@ class ActiveField extends \yii\widgets\ActiveField
     private $_multiselect = '';
 
     /**
+     * @var boolean is it a static input
+     */
+    private $_isStatic = false;
+
+    /**
      * @inherit doc
      */
     public function init()
@@ -128,26 +140,17 @@ class ActiveField extends \yii\widgets\ActiveField
     /**
      * Renders a static input (display only).
      *
-     * @param array $options the tag options in terms of name-value pairs. The 
-     * following special options are recognized:
-     * - $showError bool, whether to show error for the static input. Defaults to `false`.
-     * - $showHint bool, whether to show hint for the static input. Defaults to `false`.
+     * @param array $options the tag options in terms of name-value pairs.
      *
      * @return ActiveField object
      */
     public function staticInput($options = [])
     {
+        $content = isset($this->staticValue) ? $this->staticValue : Html::getAttributeValue($this->model,
+            $this->attribute);
         Html::addCssClass($options, 'form-control-static');
-        $content = isset($this->model[Html::getAttributeName($this->attribute)]) ? $this->model[Html::getAttributeName($this->attribute)] : '-';
-        $showError = ArrayHelper::remove($options, 'showError', false);
-        $showHint = ArrayHelper::remove($options, 'showHint', false);
-        $this->parts['{input}'] = Html::tag('p', $content, $options);
-        if (!$showError) {
-            $this->parts['{error}'] = '';
-        }
-        if (!$showHint) {
-            $this->parts['{hint}'] = '';
-        }
+        $this->parts['{input}'] = Html::tag('div', $content, $options);
+        $this->_isStatic = true;
         return $this;
     }
 
@@ -535,17 +538,17 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public function render($content = null)
     {
-        $this->initTemplate();
         if ($this->form->staticOnly === true) {
             $field = $this->staticInput();
+            $this->initTemplate();
+            $this->buildTemplate();
             return parent::render(null);
         }
+        $this->initTemplate();
         $this->initPlaceholder($this->inputOptions);
         $this->initAddon();
         $this->initDisability($this->inputOptions);
-        $this->template = strtr($this->template, [
-            '{input}' => $this->contentBeforeInput . '{input}' . $this->contentAfterInput
-        ]);
+        $this->buildTemplate();
         return parent::render($content);
     }
 
@@ -570,7 +573,6 @@ class ActiveField extends \yii\widgets\ActiveField
         if (!isset($this->parts['{hint}'])) {
             $showHints = false;
         }
-
         if ($form->hasInputCss()) {
             $offsetDivClass = $form->getOffsetCss();
             $inputDivClass = ($this->_offset) ? $offsetDivClass : $form->getInputCss();
@@ -593,18 +595,35 @@ class ActiveField extends \yii\widgets\ActiveField
         if (!empty($inputDivClass)) {
             $input = "<div class='{$inputDivClass}'>{input}</div>";
         }
-        if (!empty($errorDivClass)) {
-            $error = "<div class='{$errorDivClass}'>{error}</div>";
-            $hint = "<div class='{$errorDivClass}'>{hint}</div>";
-        }
         if (!empty($this->_multiselect)) {
             $input = str_replace('{input}', $this->_multiselect, $input);
+        }
+        if ($this->_isStatic && $this->showErrors !== true) {
+            $showErrors = false;
+        }
+        if (!empty($errorDivClass) && $showErrors) {
+            $error = "<div class='{$errorDivClass}'>{error}</div>";
+        }
+        if (!empty($errorDivClass) && $showHints) {
+            $hint = "<div class='{$errorDivClass}'>{hint}</div>";
         }
         $this->template = strtr($this->template, [
             '{label}' => $showLabels ? $label : '',
             '{input}' => $input,
             '{error}' => $showErrors ? $error : '',
             '{hint}' => $showHints ? $hint : ''
+        ]);
+    }
+
+    /**
+     * Builds the template based on content before and after input
+     *
+     * @return void
+     */
+    protected function buildTemplate()
+    {
+        $this->template = strtr($this->template, [
+            '{input}' => $this->contentBeforeInput . '{input}' . $this->contentAfterInput
         ]);
     }
 

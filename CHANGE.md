@@ -9,6 +9,8 @@ version 1.4.0
 - (enh #24): Allow static data forms through new `ActiveForm::staticOnly` property.
 - (enh #25): Default `showHints` to `true` for all form types in ActiveForm.
 - (enh #26): Enhance `ActiveField::staticInput` to include options to show error and hint.
+- (enh #27): New property `staticValue` in ActiveField.
+- (enh #28): Enhancements for error and hint display for horizontal forms.
 
 version 1.3.0
 =============
