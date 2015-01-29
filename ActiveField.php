@@ -129,7 +129,7 @@ class ActiveField extends \yii\widgets\ActiveField
         } elseif (!isset($this->autoPlaceholder)) {
             $this->autoPlaceholder = false;
         }
-        if ($this->form->type === ActiveForm::TYPE_HORIZONTAL) {
+        if ($this->form->type === ActiveForm::TYPE_HORIZONTAL || $this->form->type === ActiveForm::TYPE_VERTICAL) {
             Html::addCssClass($this->labelOptions, 'control-label');
         }
         if ($this->showLabels === ActiveForm::SCREEN_READER) {
