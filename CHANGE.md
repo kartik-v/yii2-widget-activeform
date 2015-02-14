@@ -1,3 +1,10 @@
+version 1.4.1
+=============
+**Date:** 14-Feb-2015
+
+- (enh #30): Add `control-label` class to labels for Vertical form.
+- Set copyright year to current.
+
 version 1.4.0
 =============
 **Date:** 28-Jan-2015
