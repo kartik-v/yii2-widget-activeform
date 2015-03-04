@@ -1,3 +1,9 @@
+version 1.4.2
+=============
+**Date:** 04-Mar-2015
+
+- (enh #32): Create new `checkboxButtonGroup` & `radioButtonGroup` in ActiveField
+
 version 1.4.1
 =============
 **Date:** 14-Feb-2015

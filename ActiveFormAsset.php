@@ -17,6 +17,9 @@ namespace kartik\form;
  */
 class ActiveFormAsset extends \kartik\base\AssetBundle
 {
+    public $depends = [
+        'yii\bootstrap\BootstrapPluginAsset'
+    ];
     /**
      * @inheritdoc
      */

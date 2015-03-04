@@ -288,8 +288,6 @@ class ActiveField extends \yii\widgets\ActiveField
      * Generates a toggle field (checkbox or radio)
      *
      * @param string $type the toggle input type 'checkbox' or 'radio'.
-     * @param array  $items the data item used to generate the checkboxes / radios.
-     * The array values are the labels, while the array keys are the corresponding checkbox / radio values.
      * @param array  $options options (name => config) for the toggle input list container tag.
      *
      * @return ActiveField object
@@ -393,7 +391,70 @@ class ActiveField extends \yii\widgets\ActiveField
         return $selector == self::TYPE_RADIO ? $this->radioList($items, $options) : $this->checkboxList($items,
             $options);
     }
+    
+    /**
+     * Renders a list of radio toggle buttons.
+     * @see http://getbootstrap.com/javascript/#buttons-checkbox-radio
+     *
+     * @param array $items the data item used to generate the radios.
+     * The array values are the labels, while the array keys are the corresponding radio values.
+     * Note that the labels will NOT be HTML-encoded, while the values will.
+     * @param array $options options (name => config) for the radio button list. The following options are specially handled:
+     *
+     * - unselect: string, the value that should be submitted when none of the radios is selected.
+     *   By setting this option, a hidden input will be generated. If you do not want any hidden input,
+     *   you should explicitly set this option as null.
+     * - separator: string, the HTML code that separates items.
+     * - item: callable, a callback that can be used to customize the generation of the HTML code
+     *   corresponding to a single item in $items. The signature of this callback must be:
+     *
+     * ~~~
+     * function ($index, $label, $name, $checked, $value)
+     * ~~~
+     *
+     * where $index is the zero-based index of the radio button in the whole list; $label
+     * is the label for the radio button; and $name, $value and $checked represent the name,
+     * value and the checked status of the radio button input.
+     *
+     * @return ActiveField object
+     */
+    public function radioButtonGroup($items, $options = [])
+    {
+        return $this->getToggleFieldList(self::TYPE_RADIO, $items, $options, true);
+    }
 
+    
+    /**
+     * Renders a list of checkbox toggle buttons.
+     * @see http://getbootstrap.com/javascript/#buttons-checkbox-radio
+     *
+     * @param array $items the data item used to generate the checkboxes.
+     * The array values are the labels, while the array keys are the corresponding checkbox values.
+     * Note that the labels will NOT be HTML-encoded, while the values will.
+     * @param array $options options (name => config) for the checkbox button list. The following options are specially handled:
+     *
+     * - unselect: string, the value that should be submitted when none of the checkboxes is selected.
+     *   By setting this option, a hidden input will be generated. If you do not want any hidden input,
+     *   you should explicitly set this option as null.
+     * - separator: string, the HTML code that separates items.
+     * - item: callable, a callback that can be used to customize the generation of the HTML code
+     *   corresponding to a single item in $items. The signature of this callback must be:
+     *
+     * ~~~
+     * function ($index, $label, $name, $checked, $value)
+     * ~~~
+     *
+     * where $index is the zero-based index of the checkbox button in the whole list; $label
+     * is the label for the checkbox button; and $name, $value and $checked represent the name,
+     * value and the checked status of the checkbox button input.
+     *
+     * @return ActiveField object
+     */
+    public function checkboxButtonGroup($items, $options = [])
+    {
+        return $this->getToggleFieldList(self::TYPE_CHECKBOX, $items, $options, true);
+    }
+    
     /**
      * Renders a list of radio buttons.
      * A radio button list is like a checkbox list, except that it only allows single selection.
@@ -442,6 +503,8 @@ class ActiveField extends \yii\widgets\ActiveField
      *   By setting this option, a hidden input will be generated.
      * - separator: string, the HTML code that separates items.
      * - inline: boolean, whether the list should be displayed as a series on the same line, default is false
+     * - disabledItems: array, the list of values that will be disabled.
+     * - readonlyItems: array, the list of values that will be readonly.
      * - item: callable, a callback that can be used to customize the generation of the HTML code
      *   corresponding to a single item in $items. The signature of this callback must be:
      *
@@ -453,10 +516,22 @@ class ActiveField extends \yii\widgets\ActiveField
      * is the label for the checkbox/ radio button; and $name, $value and $checked represent the name,
      * value and the checked status of the checkbox/ radio button input.
      *
+     * @param bool   $asButtonGroup whether to generate the toggle list as a bootstrap button group
+     *
      * @return ActiveField object
      */
-    protected function getToggleFieldList($type, $items, $options = [])
+    protected function getToggleFieldList($type, $items, $options = [], $asButtonGroup = false)
     {
+        $disabled = ArrayHelper::remove($options, 'disabledItems', []);
+        $readonly = ArrayHelper::remove($options, 'readonlyItems', []);
+        if ($asButtonGroup) {
+            Html::addCssClass($options, 'btn-group');
+            $options['data-toggle'] = 'buttons';
+            $options['inline'] = true;
+            if (!isset($options['itemOptions']['labelOptions']['class'])) {
+                $options['itemOptions']['labelOptions']['class'] = 'btn btn-default';
+            }
+        }
         $inline = ArrayHelper::remove($options, 'inline', false);
         $inputType = "{$type}List";
         $this->initDisability($options['itemOptions']);
@@ -465,13 +540,29 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($inline && !isset($options['itemOptions']['labelOptions']['class'])) {
             $options['itemOptions']['labelOptions']['class'] = "{$type}-inline{$css}";
         } elseif (!isset($options['item'])) {
-            $options['item'] = function ($index, $label, $name, $checked, $value) use ($type, $css) {
-                return "<div class='{$type}{$css}'>" . Html::$type($name, $checked, [
-                    'label' => $label,
+            $labelOptions = ArrayHelper::getValue($options, 'itemOptions.labelOptions');
+            $options['item'] = function ($index, $label, $name, $checked, $value) 
+                use ($type, $css, $disabled, $readonly, $asButtonGroup, $labelOptions) {
+                $opts =  [
+                    'label' => $label, 
                     'value' => $value,
                     'disabled' => $this->form->disabled,
                     'readonly' => $this->form->readonly,
-                ]) . "</div>";
+                ];
+                if ($asButtonGroup && $checked) {
+                    Html::addCssClass($labelOptions, 'active');
+                }
+                if (!empty($disabled) && in_array($value, $disabled) || $this->form->disabled) {
+                    Html::addCssClass($labelOptions, 'disabled');
+                    $opts['disabled'] = true;
+                }
+                if (!empty($readonly) && in_array($value, $readonly) || $this->form->readonly) {
+                    Html::addCssClass($labelOptions, 'disabled');
+                    $opts['readonly'] = true;
+                }
+                $opts['labelOptions'] = $labelOptions;
+                $out = Html::$type($name, $checked, $opts);
+                return $asButtonGroup ? $out : "<div class='{$type}{$css}'>{$out}</div>";
             };
         }
         return parent::$inputType($items, $options);
