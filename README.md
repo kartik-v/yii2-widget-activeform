@@ -19,7 +19,6 @@ Extends and enhances the [Yii ActiveForm widget](https://github.com/yiisoft/yii2
     * Segmented Button Addon
     * Prepend & Append
     * Input Group Settings
-
 - Inputs
     * Checkbox
     * Radio
@@ -28,8 +27,7 @@ Extends and enhances the [Yii ActiveForm widget](https://github.com/yiisoft/yii2
     * Static Input
     * HTML 5 Input
     * Checkbox Button Group
-    * Radio Button Group
-    
+    * Radio Button Group  
 - Multi Select
     * Vertical Form
     * Horizontal Form
