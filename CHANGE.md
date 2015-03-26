@@ -1,9 +1,11 @@
 version 1.4.2
 =============
-**Date:** 05-Mar-2015
+**Date:** 26-Mar-2015
 
 - (enh #32): Create new `checkboxButtonGroup` & `radioButtonGroup` in ActiveField.
 - (bug #33): Correct autoPlaceholder based attribute label generation for tabular inputs.
+- (enh #36): Prevent offset of checkbox/radio labels for horizontal forms when `enclosedByLabel` is `false`.
+- (enh #37): Scale inputs to full width in horizontal forms when `showLabels` is set to SCREEN_READER`.
 
 version 1.4.1
 =============

@@ -669,7 +669,7 @@ class ActiveField extends \yii\widgets\ActiveField
             $offsetDivClass = $form->getOffsetCss();
             $inputDivClass = ($this->_offset) ? $offsetDivClass : $form->getInputCss();
             $error = $showErrors ? "{error}\n" : "";
-            if ($showLabels === false) {
+            if ($showLabels === false || $showLabels === ActiveForm::SCREEN_READER) {
                 $size = ArrayHelper::getValue($form->formConfig, 'deviceSize', ActiveForm::SIZE_MEDIUM);
                 $errorDivClass = "col-{$size}-{$form->fullSpan}";
                 $inputDivClass = $errorDivClass;
