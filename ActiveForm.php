@@ -110,7 +110,13 @@ class ActiveForm extends \yii\widgets\ActiveForm
     public $readonly = false;
     
     /**
-     * @var string the extra input container css class for horizontal forms
+     * @var string the label additional css class for horizontal forms
+     * and special inputs like checkbox and radio.
+     */
+    private $_labelCss;
+    
+    /**
+     * @var string the input container additional css class for horizontal forms
      * and special inputs like checkbox and radio.
      */
     private $_inputCss;
@@ -187,7 +193,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
         $span = $config['labelSpan'];
         $size = $config['deviceSize'];
         $formStyle = $this->getFormLayoutStyle();
-        $labelCss = $formStyle['labelCss'];
+        $this->_labelCss = $formStyle['labelCss'];
         $this->_inputCss = $formStyle['inputCss'];
         $this->_offsetCss = $formStyle['offsetCss'];
 
@@ -205,19 +211,13 @@ class ActiveForm extends \yii\widgets\ActiveForm
             }
 
             $prefix = "col-{$size}-";
-            $labelCss = $prefix . $span;
+            $this->_labelCss = $prefix . $span;
             $this->_inputCss = $prefix . ($this->fullSpan - $span);
             $this->_offsetCss = "col-" . $size . "-offset-" . $span . " " . $this->_inputCss;
         }
 
         if ($this->_inputCss == self::NOT_SET && empty($this->fieldConfig['template'])) {
             $this->fieldConfig['template'] = "{label}\n{input}\n{error}\n{hint}";
-        }
-
-        if ($config['showLabels'] === self::SCREEN_READER) {
-            Html::addCssClass($this->fieldConfig['labelOptions'], self::SCREEN_READER);
-        } elseif ($labelCss != self::NOT_SET) {
-            Html::addCssClass($this->fieldConfig['labelOptions'], $labelCss);
         }
 
         parent::init();
@@ -248,6 +248,16 @@ class ActiveForm extends \yii\widgets\ActiveForm
             $offsetCss =  "col-" . $size . "-offset-" . $span . " " . $inputCss;
         }
         return ['labelCss'=> $labelCss, 'inputCss'=>$inputCss, 'offsetCss'=>$offsetCss];
+    }
+
+    /**
+     * Gets label css property
+     *
+     * @return string
+     */
+    public function getLabelCss()
+    {
+        return $this->_labelCss;
     }
     
     /**

@@ -656,6 +656,7 @@ class ActiveField extends \yii\widgets\ActiveField
         $form = $this->form;
         $inputDivClass = '';
         $errorDivClass = '';
+        $sr = ActiveForm::SCREEN_READER;
         $showLabels = isset($this->showLabels) ? $this->showLabels :
             ArrayHelper::getValue($form->formConfig, 'showLabels', true);
         $showErrors = isset($this->showErrors) ? $this->showErrors :
@@ -669,7 +670,7 @@ class ActiveField extends \yii\widgets\ActiveField
             $offsetDivClass = $form->getOffsetCss();
             $inputDivClass = ($this->_offset) ? $offsetDivClass : $form->getInputCss();
             $error = $showErrors ? "{error}\n" : "";
-            if ($showLabels === false || $showLabels === ActiveForm::SCREEN_READER) {
+            if ($showLabels === false || $showLabels === $sr) {
                 $size = ArrayHelper::getValue($form->formConfig, 'deviceSize', ActiveForm::SIZE_MEDIUM);
                 $errorDivClass = "col-{$size}-{$form->fullSpan}";
                 $inputDivClass = $errorDivClass;
@@ -677,8 +678,14 @@ class ActiveField extends \yii\widgets\ActiveField
                 $errorDivClass = $offsetDivClass;
             }
         }
-        if ($this->autoPlaceholder && $showLabels !== ActiveForm::SCREEN_READER) {
+        if ($this->autoPlaceholder && $showLabels !== $sr) {
             $showLabels = false;
+        }
+        $labelCss = $form->getLabelCss();
+        if ($showLabels === $sr) {
+            Html::addCssClass($this->labelOptions, $sr);
+        } elseif ($labelCss != ActiveForm::NOT_SET) {
+            Html::addCssClass($this->labelOptions, $labelCss);
         }
         $input = '{input}';
         $label = '{label}';
