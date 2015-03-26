@@ -295,15 +295,16 @@ class ActiveField extends \yii\widgets\ActiveField
     protected function getToggleField($type = self::TYPE_CHECKBOX, $options = [], $enclosedByLabel = true)
     {
         $this->initDisability($options);
-        $this->_offset = true;
         $inputType = 'active' . ucfirst($type);
         $disabled = ArrayHelper::getValue($options, 'disabled', false);
         $readonly = ArrayHelper::getValue($options, 'readonly', false);
         $css = $disabled ? $type . ' disabled' : $type;
         $container = ArrayHelper::remove($options, 'container', ['class' => $css]);
         if ($enclosedByLabel) {
+            $this->_offset = true;
             $this->parts['{label}'] = '';
         } else {
+            $this->_offset = false;
             if (isset($options['label']) && !isset($this->parts['{label}'])) {
                 $this->parts['label'] = $options['label'];
                 if (!empty($options['labelOptions'])) {
