@@ -4,7 +4,7 @@
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.3.0
+ * @version 1.4.1
  */
 
 namespace kartik\form;
@@ -135,6 +135,7 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($this->showLabels === ActiveForm::SCREEN_READER) {
             Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
         }
+        $this->initTemplate();
     }
 
     /**
@@ -632,11 +633,9 @@ class ActiveField extends \yii\widgets\ActiveField
     {
         if ($this->form->staticOnly === true) {
             $field = $this->staticInput();
-            $this->initTemplate();
             $this->buildTemplate();
             return parent::render(null);
         }
-        $this->initTemplate();
         $this->initPlaceholder($this->inputOptions);
         $this->initAddon();
         $this->initDisability($this->inputOptions);
