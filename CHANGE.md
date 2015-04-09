@@ -6,6 +6,7 @@ version 1.4.2
 - (bug #33): Correct autoPlaceholder based attribute label generation for tabular inputs.
 - (enh #36): Prevent offset of checkbox/radio labels for horizontal forms when `enclosedByLabel` is `false`.
 - (enh #37): Scale inputs to full width in horizontal forms when `showLabels` is set to SCREEN_READER`.
+- (enh #39): Change ActiveField private properties to protected.
 - (enh #40): Initialize ActiveField template more correctly.
 
 version 1.4.1

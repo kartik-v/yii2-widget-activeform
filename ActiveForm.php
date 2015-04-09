@@ -259,6 +259,16 @@ class ActiveForm extends \yii\widgets\ActiveForm
     {
         return $this->_labelCss;
     }
+
+    /**
+     * Sets label css property
+     *
+     * @param string $class
+     */
+    public function setLabelCss($class)
+    {
+        $this->_labelCss = $class;
+    }
     
     /**
      * Gets input css property
@@ -272,6 +282,8 @@ class ActiveForm extends \yii\widgets\ActiveForm
 
     /**
      * Sets input css property
+     *
+     * @param string $class
      */
     public function setInputCss($class)
     {
@@ -300,6 +312,8 @@ class ActiveForm extends \yii\widgets\ActiveForm
 
     /**
      * Sets offset css property
+     *
+     * @param string $class
      */
     public function setOffsetCss($class)
     {
