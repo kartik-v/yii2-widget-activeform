@@ -4,7 +4,7 @@
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.4.2
+ * @version 1.3.0
  */
 
 namespace kartik\form;
@@ -631,6 +631,7 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public function render($content = null)
     {
+        $this->initTemplate();
         if ($this->form->staticOnly === true) {
             $field = $this->staticInput();
             $this->buildTemplate();
