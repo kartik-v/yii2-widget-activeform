@@ -106,17 +106,17 @@ class ActiveField extends \yii\widgets\ActiveField
     /**
      * @var boolean whether the input is to be offset (like for checkbox or radio).
      */
-    private $_offset = false;
+    protected $_offset = false;
 
     /**
      * @var boolean the container for multi select
      */
-    private $_multiselect = '';
+    protected $_multiselect = '';
 
     /**
      * @var boolean is it a static input
      */
-    private $_isStatic = false;
+    protected $_isStatic = false; 
 
     /**
      * @inherit doc
@@ -135,7 +135,7 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($this->showLabels === ActiveForm::SCREEN_READER) {
             Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
         }
-        $this->initTemplate();
+        $this->initLabels();
     }
 
     /**
@@ -645,6 +645,33 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
+     * Validate label display status
+     * @return bool|string
+     */
+    protected function hasLabels()
+    {
+        $showLabels = isset($this->showLabels) ? $this->showLabels :
+            ArrayHelper::getValue($this->form->formConfig, 'showLabels', true);
+        if ($this->autoPlaceholder && $showLabels !== ActiveForm::SCREEN_READER) {
+            $showLabels = false;
+        }
+        return $showLabels;
+    }
+    
+    /**
+     * Initialize label options
+     */
+    protected function initLabels()
+    {
+        $labelCss = $this->form->getLabelCss();
+        if ($this->hasLabels() === ActiveForm::SCREEN_READER) {
+            Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
+        } elseif ($labelCss != ActiveForm::NOT_SET) {
+            Html::addCssClass($this->labelOptions, $labelCss);
+        }
+    }
+    
+    /**
      * Initializes template based on layout settings for label, input,
      * error and hint blocks and for various bootstrap 3 form layouts
      */
@@ -656,13 +683,11 @@ class ActiveField extends \yii\widgets\ActiveField
         $form = $this->form;
         $inputDivClass = '';
         $errorDivClass = '';
-        $sr = ActiveForm::SCREEN_READER;
-        $showLabels = isset($this->showLabels) ? $this->showLabels :
-            ArrayHelper::getValue($form->formConfig, 'showLabels', true);
         $showErrors = isset($this->showErrors) ? $this->showErrors :
             ArrayHelper::getValue($form->formConfig, 'showErrors', true);
         $showHints = isset($this->showHints) ? $this->showHints :
             ArrayHelper::getValue($form->formConfig, 'showHints', true);
+        $showLabels = $this->hasLabels();
         if (!isset($this->parts['{hint}'])) {
             $showHints = false;
         }
@@ -670,7 +695,7 @@ class ActiveField extends \yii\widgets\ActiveField
             $offsetDivClass = $form->getOffsetCss();
             $inputDivClass = ($this->_offset) ? $offsetDivClass : $form->getInputCss();
             $error = $showErrors ? "{error}\n" : "";
-            if ($showLabels === false || $showLabels === $sr) {
+            if ($showLabels === false || $showLabels === ActiveForm::SCREEN_READER) {
                 $size = ArrayHelper::getValue($form->formConfig, 'deviceSize', ActiveForm::SIZE_MEDIUM);
                 $errorDivClass = "col-{$size}-{$form->fullSpan}";
                 $inputDivClass = $errorDivClass;
@@ -678,17 +703,7 @@ class ActiveField extends \yii\widgets\ActiveField
                 $errorDivClass = $offsetDivClass;
             }
         }
-        if ($this->autoPlaceholder && $showLabels !== $sr) {
-            $showLabels = false;
-        }
-        $labelCss = $form->getLabelCss();
-        if ($showLabels === $sr) {
-            Html::addCssClass($this->labelOptions, $sr);
-        } elseif ($labelCss != ActiveForm::NOT_SET) {
-            Html::addCssClass($this->labelOptions, $labelCss);
-        }
         $input = '{input}';
-        $label = '{label}';
         $error = '{error}';
         $hint = '{hint}';
         if (!empty($inputDivClass)) {
@@ -707,7 +722,7 @@ class ActiveField extends \yii\widgets\ActiveField
             $hint = "<div class='{$errorDivClass}'>{hint}</div>";
         }
         $this->template = strtr($this->template, [
-            '{label}' => $showLabels ? $label : '',
+            '{label}' => $showLabels ? '{label}' : '',
             '{input}' => $input,
             '{error}' => $showErrors ? $error : '',
             '{hint}' => $showHints ? $hint : ''
