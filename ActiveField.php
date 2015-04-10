@@ -704,6 +704,12 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     protected function getLayoutParts($showLabels, $showErrors, $showHints, &$input, &$error, &$hint)
     {
+        $input = '{input}';
+        $error = '{error}';
+        $hint = '{hint}';
+        if ($this->skipFormLayout) {
+            return;
+        }
         $inputDivClass = '';
         $errorDivClass = '';
         if ($this->form->hasInputCss()) {
@@ -780,9 +786,7 @@ class ActiveField extends \yii\widgets\ActiveField
         $input = '{input}';
         $error = '{error}';
         $hint = '{hint}';
-        if (!$this->skipFormLayout) {
-            $this->getLayoutParts($showLabels, $showErrors, $showHints, $input, $error, $hint);
-        }
+        $this->getLayoutParts($showLabels, $showErrors, $showHints, $input, $error, $hint);
         $this->_settings = [
             'input' => $input,
             'error' => $error,
