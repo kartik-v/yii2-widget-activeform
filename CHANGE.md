@@ -5,7 +5,8 @@ version 1.4.2
 - (enh #32): Create new `checkboxButtonGroup` & `radioButtonGroup` in ActiveField.
 - (bug #33): Correct autoPlaceholder based attribute label generation for tabular inputs.
 - (enh #36): Prevent offset of checkbox/radio labels for horizontal forms when `enclosedByLabel` is `false`.
-- (enh #37): Scale inputs to full width in horizontal forms when `showLabels` is set to SCREEN_READER`.
+- (enh #37): Scale inputs to full width in horizontal forms when `showLabels` is `ActiveForm:;SCREEN_READER`.
+- (enh #38): Fix `autoPlaceholder` property for INLINE forms when `showLabels` is `true`.
 - (enh #39): Change ActiveField private properties to protected.
 - (enh #40): Initialize ActiveField template more correctly.
 - (enh #41): New properties for adding or wrapping markup before LABEL, ERROR & HINT blocks.

@@ -165,7 +165,8 @@ class ActiveField extends \yii\widgets\ActiveField
     public function init()
     {
         parent::init();
-        if ($this->form->type === ActiveForm::TYPE_INLINE && !isset($this->autoPlaceholder)) {
+        $showLabels = $this->getConfigParam('showLabels');
+        if ($this->form->type === ActiveForm::TYPE_INLINE && !isset($this->autoPlaceholder) && $showLabels !== true) {
             $this->autoPlaceholder = true;
         } elseif (!isset($this->autoPlaceholder)) {
             $this->autoPlaceholder = false;
@@ -173,7 +174,7 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($this->form->type === ActiveForm::TYPE_HORIZONTAL || $this->form->type === ActiveForm::TYPE_VERTICAL) {
             Html::addCssClass($this->labelOptions, 'control-label');
         }
-        if ($this->showLabels === ActiveForm::SCREEN_READER) {
+        if ($showLabels === ActiveForm::SCREEN_READER) {
             Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
         }
         $this->initLabels();
