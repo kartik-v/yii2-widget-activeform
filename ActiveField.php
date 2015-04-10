@@ -119,6 +119,11 @@ class ActiveField extends \yii\widgets\ActiveField
     protected $_isStatic = false; 
 
     /**
+     * @var array the settings for the template
+     */
+    protected $_settings = [];
+    
+    /**
      * @inherit doc
      */
     public function init()
@@ -632,9 +637,6 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public function render($content = null)
     {
-        if (!empty($this->_multiselect)) {
-            $this->template = str_replace('{input}', $this->_multiselect, $this->template);
-        }
         if ($this->form->staticOnly === true) {
             $field = $this->staticInput();
             $this->buildTemplate();
@@ -712,21 +714,20 @@ class ActiveField extends \yii\widgets\ActiveField
         if (!empty($inputDivClass)) {
             $input = "<div class='{$inputDivClass}'>{input}</div>";
         }
-        if ($this->_isStatic && $this->showErrors !== true) {
-            $showErrors = false;
-        }
         if (!empty($errorDivClass) && $showErrors) {
             $error = "<div class='{$errorDivClass}'>{error}</div>";
         }
         if (!empty($errorDivClass) && $showHints) {
             $hint = "<div class='{$errorDivClass}'>{hint}</div>";
         }
-        $this->template = strtr($this->template, [
-            '{label}' => $showLabels ? '{label}' : '',
-            '{input}' => $input,
-            '{error}' => $showErrors ? $error : '',
-            '{hint}' => $showHints ? $hint : ''
-        ]);
+        $this->_settings = [
+            'input' => $input,
+            'error' => $error,
+            'hint' => $hint,
+            'showLabels' => $showLabels,
+            'showErrors' => $showErrors,
+            'showHints' => $showHints
+        ];
     }
 
     /**
@@ -736,8 +737,18 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     protected function buildTemplate()
     {
+        extract($this->_settings);
+        if (!empty($this->_multiselect)) {
+            $input = str_replace('{input}', $this->_multiselect, $input);
+        }
+        if ($this->_isStatic && $this->showErrors !== true) {
+            $showErrors = false;
+        }
         $this->template = strtr($this->template, [
-            '{input}' => $this->contentBeforeInput . '{input}' . $this->contentAfterInput
+            '{label}' => $showLabels ? '{label}' : '',
+            '{input}' => $this->contentBeforeInput . $input . $this->contentAfterInput,
+            '{error}' => $showErrors ? $error : '',
+            '{hint}' => $showHints ? $hint : '',
         ]);
     }
 
