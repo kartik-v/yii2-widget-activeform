@@ -53,7 +53,8 @@ class ActiveField extends \yii\widgets\ActiveField
     const MULTI_SELECT_HEIGHT = '145px';
 
     /**
-     * @var boolean whether to skip field formatting as per form layout
+     * @var boolean whether to override the form layout styles and skip field formatting 
+     * as per the form layout. Defaults to `false`.
      */
     public $skipFormLayout = false;
 
