@@ -119,7 +119,7 @@ class ActiveField extends \yii\widgets\ActiveField
     protected $_isStatic = false; 
 
     /**
-     * @var array the settings for the template
+     * @var array the settings for the active field layout
      */
     protected $_settings = [];
     
