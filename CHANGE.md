@@ -8,7 +8,7 @@ version 1.4.2
 - (enh #37): Scale inputs to full width in horizontal forms when `showLabels` is set to SCREEN_READER`.
 - (enh #39): Change ActiveField private properties to protected.
 - (enh #40): Initialize ActiveField template more correctly.
-- (enh #41): New properties for adding or wrapping markup before ERROR & HINT blocks.
+- (enh #41): New properties for adding or wrapping markup before LABEL, ERROR & HINT blocks.
 - (enh #42): New ActiveField property `skipFormLayout` to override and skip special form layout styling.
 
 version 1.4.1
