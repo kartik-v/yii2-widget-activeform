@@ -53,6 +53,11 @@ class ActiveField extends \yii\widgets\ActiveField
     const MULTI_SELECT_HEIGHT = '145px';
 
     /**
+     * @var boolean whether to skip field formatting as per form layout
+     */
+    public $skipFormLayout = false;
+
+    /**
      * @var string content to be placed before input
      */
     public $contentBeforeInput = '';
@@ -61,6 +66,26 @@ class ActiveField extends \yii\widgets\ActiveField
      * @var string content to be placed after input
      */
     public $contentAfterInput = '';
+
+    /**
+     * @var string content to be placed before error block
+     */
+    public $contentBeforeError = '';
+
+    /**
+     * @var string content to be placed after error block
+     */
+    public $contentAfterError = '';
+
+    /**
+     * @var string content to be placed before hint block
+     */
+    public $contentBeforeHint = '';
+
+    /**
+     * @var string content to be placed after hint block
+     */
+    public $contentAfterHint = '';
 
     /**
      * @var array addon options for text and password inputs
@@ -121,7 +146,14 @@ class ActiveField extends \yii\widgets\ActiveField
     /**
      * @var array the settings for the active field layout
      */
-    protected $_settings = [];
+    protected $_settings = [
+        'input' => '{input}',
+        'error' => '{error}',
+        'hint' => '{hint}',
+        'showLabels' => true,
+        'showErrors' => true,
+        'showHints' => true
+    ];
     
     /**
      * @inherit doc
@@ -711,14 +743,16 @@ class ActiveField extends \yii\widgets\ActiveField
         $input = '{input}';
         $error = '{error}';
         $hint = '{hint}';
-        if (!empty($inputDivClass)) {
-            $input = "<div class='{$inputDivClass}'>{input}</div>";
-        }
-        if (!empty($errorDivClass) && $showErrors) {
-            $error = "<div class='{$errorDivClass}'>{error}</div>";
-        }
-        if (!empty($errorDivClass) && $showHints) {
-            $hint = "<div class='{$errorDivClass}'>{hint}</div>";
+        if (!$this->skipFormLayout) {
+            if (!empty($inputDivClass)) {
+                $input = "<div class='{$inputDivClass}'>{input}</div>";
+            }
+            if (!empty($errorDivClass) && $showErrors) {
+                $error = "<div class='{$errorDivClass}'>{error}</div>";
+            }
+            if (!empty($errorDivClass) && $showHints) {
+                $hint = "<div class='{$errorDivClass}'>{hint}</div>";
+            }
         }
         $this->_settings = [
             'input' => $input,
@@ -747,8 +781,8 @@ class ActiveField extends \yii\widgets\ActiveField
         $this->template = strtr($this->template, [
             '{label}' => $showLabels ? '{label}' : '',
             '{input}' => $this->contentBeforeInput . $input . $this->contentAfterInput,
-            '{error}' => $showErrors ? $error : '',
-            '{hint}' => $showHints ? $hint : '',
+            '{error}' => $showErrors ? $this->contentBeforeError . $error . $this->contentAfterError : '',
+            '{hint}' => $showHints ? $this->contentBeforeHint . $hint . $this->contentAfterHint : '',
         ]);
     }
 
