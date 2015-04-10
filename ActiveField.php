@@ -136,6 +136,7 @@ class ActiveField extends \yii\widgets\ActiveField
             Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
         }
         $this->initLabels();
+        $this->initTemplate();
     }
 
     /**
@@ -631,7 +632,9 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public function render($content = null)
     {
-        $this->initTemplate();
+        if (!empty($this->_multiselect)) {
+            $this->template = str_replace('{input}', $this->_multiselect, $this->template);
+        }
         if ($this->form->staticOnly === true) {
             $field = $this->staticInput();
             $this->buildTemplate();
@@ -708,9 +711,6 @@ class ActiveField extends \yii\widgets\ActiveField
         $hint = '{hint}';
         if (!empty($inputDivClass)) {
             $input = "<div class='{$inputDivClass}'>{input}</div>";
-        }
-        if (!empty($this->_multiselect)) {
-            $input = str_replace('{input}', $this->_multiselect, $input);
         }
         if ($this->_isStatic && $this->showErrors !== true) {
             $showErrors = false;
