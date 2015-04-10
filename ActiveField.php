@@ -141,7 +141,7 @@ class ActiveField extends \yii\widgets\ActiveField
             Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
         }
         $this->initLabels();
-        $this->initTemplate();
+        $this->validateLayout();
     }
 
     /**
@@ -677,10 +677,10 @@ class ActiveField extends \yii\widgets\ActiveField
     }
     
     /**
-     * Initializes template based on layout settings for label, input,
-     * error and hint blocks and for various bootstrap 3 form layouts
+     * Validate layout settings for label, input, error and hint blocks 
+     * and for various bootstrap 3 form layouts
      */
-    protected function initTemplate()
+    protected function validateLayout()
     {
         /**
          * @var ActiveForm $form
