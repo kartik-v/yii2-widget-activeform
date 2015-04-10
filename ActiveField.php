@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
- * @package yii2-widgets
+ * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
+ * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.3.0
+ * @version    1.4.2
  */
 
 namespace kartik\form;
@@ -13,25 +13,7 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 
 /**
- * Extends the ActiveField widget to handle various
- * bootstrap form types and handle input groups.
- *
- * ADDITIONAL VARIABLES/PARAMETERS:
- * ===============================
- *
- * @param boolean $autoPlaceholder whether to display the label as a placeholder (default false)
- * @param array   $addon whether to prepend or append an addon to an input group - contains these keys:
- * - prepend: array the prepend addon configuration
- *     - content: string the prepend addon content
- *     - asButton: boolean whether the addon is a button or button group. Defaults to false.
- *     - options: array the HTML attributes to be added to the container.
- * - append: array the append addon configuration
- *     - content: string/array the append addon content
- *     - asButton: boolean whether the addon is a button or button group. Defaults to false.
- *     - options: array the HTML attributes to be added to the container.
- * - groupOptions: array HTML options for the input group
- * - contentBefore: string content placed before addon
- * - contentAfter: string content placed after addon
+ * Extends the ActiveField widget to handle various bootstrap form types and handle input groups.
  *
  * Example(s):
  * ```php
@@ -42,7 +24,7 @@ use yii\helpers\ArrayHelper;
  * ```
  *
  * @author Kartik Visweswaran <kartikv2@gmail.com>
- * @since 1.0
+ * @since  1.0
  */
 class ActiveField extends \yii\widgets\ActiveField
 {
@@ -53,7 +35,7 @@ class ActiveField extends \yii\widgets\ActiveField
     const MULTI_SELECT_HEIGHT = '145px';
 
     /**
-     * @var boolean whether to override the form layout styles and skip field formatting 
+     * @var boolean whether to override the form layout styles and skip field formatting
      * as per the form layout. Defaults to `false`.
      */
     public $skipFormLayout = false;
@@ -99,7 +81,18 @@ class ActiveField extends \yii\widgets\ActiveField
     public $contentAfterHint = '';
 
     /**
-     * @var array addon options for text and password inputs
+     * @var array addon options for text and password inputs. The following settings can be configured:
+     * - prepend: array the prepend addon configuration
+     * - content: string the prepend addon content
+     * - asButton: boolean whether the addon is a button or button group. Defaults to false.
+     * - options: array the HTML attributes to be added to the container.
+     * - append: array the append addon configuration
+     * - content: string/array the append addon content
+     * - asButton: boolean whether the addon is a button or button group. Defaults to false.
+     * - options: array the HTML attributes to be added to the container.
+     * - groupOptions: array HTML options for the input group
+     * - contentBefore: string content placed before addon
+     * - contentAfter: string content placed after addon
      */
     public $addon = [];
 
@@ -152,7 +145,7 @@ class ActiveField extends \yii\widgets\ActiveField
     /**
      * @var boolean is it a static input
      */
-    protected $_isStatic = false; 
+    protected $_isStatic = false;
 
     /**
      * @var array the settings for the active field layout
@@ -165,9 +158,9 @@ class ActiveField extends \yii\widgets\ActiveField
         'showErrors' => true,
         'showHints' => true
     ];
-    
+
     /**
-     * @inherit doc
+     * @inheritdoc
      */
     public function init()
     {
@@ -196,8 +189,8 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public function staticInput($options = [])
     {
-        $content = isset($this->staticValue) ? $this->staticValue : Html::getAttributeValue($this->model,
-            $this->attribute);
+        $content = isset($this->staticValue) ? $this->staticValue :
+            Html::getAttributeValue($this->model, $this->attribute);
         Html::addCssClass($options, 'form-control-static');
         $this->parts['{input}'] = Html::tag('div', $content, $options);
         $this->_isStatic = true;
@@ -205,7 +198,7 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @inherit doc
+     * @inheritdoc
      */
     public function input($type, $options = [])
     {
@@ -247,7 +240,7 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @inherit doc
+     * @inheritdoc
      */
     public function textInput($options = [])
     {
@@ -258,7 +251,7 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @inherit doc
+     * @inheritdoc
      */
     public function passwordInput($options = [])
     {
@@ -269,7 +262,7 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @inherit doc
+     * @inheritdoc
      */
     public function textarea($options = [])
     {
@@ -280,7 +273,7 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @inherit doc
+     * @inheritdoc
      */
     public function dropDownList($items, $options = [])
     {
@@ -290,48 +283,13 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @inherit doc
+     * @inheritdoc
      */
     public function listBox($items, $options = [])
     {
         $this->initDisability($options);
         Html::addCssClass($options, $this->addClass);
         return parent::listBox($items, $options);
-    }
-
-    /**
-     * Renders a radio button.
-     * This method will generate the "checked" tag attribute according to the model attribute value.
-     *
-     * @param array   $options the tag options in terms of name-value pairs. The following options are specially
-     *     handled:
-     *
-     * - uncheck: string, the value associated with the uncheck state of the radio button. If not set,
-     *   it will take the default value '0'. This method will render a hidden input so that if the radio button
-     *   is not checked and is submitted, the value of this attribute will still be submitted to the server
-     *   via the hidden input.
-     * - label: string, a label displayed next to the radio button.  It will NOT be HTML-encoded. Therefore you can
-     *     pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should [[Html::encode()]] it to
-     *     prevent XSS attacks. When this option is specified, the radio button will be enclosed by a label tag.
-     * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is
-     *     specified.
-     * - container: boolean|array, the HTML attributes for the checkbox container. If this is set to false, no
-     *     container will be rendered. The special option `tag` will be recognized which defaults to `div`. This
-     *     defaults to:
-     *   `['tag' => 'div', 'class'=>'radio']`
-     *
-     * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using [[Html::encode()]]. If a value is null, the corresponding attribute will not be rendered.
-     * @param boolean $enclosedByLabel whether to enclose the radio within the label.
-     * If true, the method will still use [[template]] to layout the checkbox and the error message
-     * except that the radio is enclosed by the label tag.
-     *
-     * @return ActiveField object
-     */
-    public function radio($options = [], $enclosedByLabel = true)
-    {
-        return $this->getToggleField(self::TYPE_RADIO, $options, $enclosedByLabel);
     }
 
     /**
@@ -376,31 +334,64 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * Renders a checkbox.
+     * Renders a radio button.
      * This method will generate the "checked" tag attribute according to the model attribute value.
      *
      * @param array   $options the tag options in terms of name-value pairs. The following options are specially
-     *     handled:
+     * handled:
      *
      * - uncheck: string, the value associated with the uncheck state of the radio button. If not set,
      *   it will take the default value '0'. This method will render a hidden input so that if the radio button
      *   is not checked and is submitted, the value of this attribute will still be submitted to the server
      *   via the hidden input.
-     * - label: string, a label displayed next to the checkbox.  It will NOT be HTML-encoded. Therefore you can pass
-     *   in HTML code such as an image tag. If this is is coming from end users, you should [[Html::encode()]] it to
-     *     prevent XSS attacks. When this option is specified, the checkbox will be enclosed by a label tag.
+     * - label: string, a label displayed next to the radio button. It will NOT be HTML-encoded. Therefore you can
+     *   pass in HTML code such as an image tag. If this is is coming from end users, you should [[Html::encode()]]
+     *   it to prevent XSS attacks. When this option is specified, the radio button will be enclosed by a label tag.
      * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is
-     *     specified.
+     *   specified.
      * - container: boolean|array, the HTML attributes for the checkbox container. If this is set to false, no
-     *     container will be rendered. The special option `tag` will be recognized which defaults to `div`. This
-     *     defaults to:
-     *   `['tag' => 'div', 'class'=>'checkbox']`
+     *   container will be rendered. The special option `tag` will be recognized which defaults to `div`. This
+     *   defaults to:
+     *   `['tag' => 'div', 'class'=>'radio']`
+     * The rest of the options will be rendered as the attributes of the resulting tag. The values will be
+     * HTML-encoded using [[Html::encode()]]. If a value is null, the corresponding attribute will not be rendered.
      *
-     * The rest of the options will be rendered as the attributes of the resulting tag. The values will
-     * be HTML-encoded using [[Html::encode()]]. If a value is null, the corresponding attribute will not be rendered.
-     * @param boolean $enclosedByLabel whether to enclose the checkbox within the label.
-     * If true, the method will still use [[template]] to layout the checkbox and the error message
-     * except that the checkbox is enclosed by the label tag.
+     * @param boolean $enclosedByLabel whether to enclose the radio within the label. If `true`, the method will
+     * still use [[template]] to layout the checkbox and the error message except that the radio is enclosed by
+     * the label tag.
+     *
+     * @return ActiveField object
+     */
+    public function radio($options = [], $enclosedByLabel = true)
+    {
+        return $this->getToggleField(self::TYPE_RADIO, $options, $enclosedByLabel);
+    }
+
+    /**
+     * Renders a checkbox. This method will generate the "checked" tag attribute according to the model attribute value.
+     *
+     * @param array   $options the tag options in terms of name-value pairs. The following options are specially
+     * handled:
+     *
+     * - uncheck: string, the value associated with the uncheck state of the checkbox. If not set,
+     *   it will take the default value '0'. This method will render a hidden input so that if the checkbox
+     *   is not checked and is submitted, the value of this attribute will still be submitted to the server
+     *   via the hidden input.
+     * - label: string, a label displayed next to the checkbox. It will NOT be HTML-encoded. Therefore you can
+     *   pass in HTML code such as an image tag. If this is is coming from end users, you should [[Html::encode()]]
+     *   it to prevent XSS attacks. When this option is specified, the checkbox will be enclosed by a label tag.
+     * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is
+     *   specified.
+     * - container: boolean|array, the HTML attributes for the checkbox container. If this is set to false, no
+     *   container will be rendered. The special option `tag` will be recognized which defaults to `div`. This
+     *   defaults to:
+     *   `['tag' => 'div', 'class'=>'radio']`
+     * The rest of the options will be rendered as the attributes of the resulting tag. The values will be
+     * HTML-encoded using [[Html::encode()]]. If a value is null, the corresponding attribute will not be rendered.
+     *
+     * @param boolean $enclosedByLabel whether to enclose the radio within the label. If `true`, the method will
+     * still use [[template]] to layout the checkbox and the error message except that the radio is enclosed by
+     * the label tag.
      *
      * @return ActiveField object
      */
@@ -415,16 +406,18 @@ class ActiveField extends \yii\widgets\ActiveField
      *
      * @param array $items the data item used to generate the checkboxes or radio.
      * @param array $options the options for checkboxList or radioList. Additional parameters
-     * - height: string, the height of the multiselect control - defaults to 145px
-     * - selector: string, whether checkbox or radio - defaults to checkbox
-     * - container: array, options for the multiselect container
-     * - unselect: string, the value that should be submitted when none of the radio buttons is selected.
-     *   By setting this option, a hidden input will be generated.
-     * - separator: string, the HTML code that separates items.
-     * - item: callable, a callback that can be used to customize the generation of the HTML code
-     *   corresponding to a single item in $items. The signature of this callback must be:
-     * - inline: boolean, whether the list should be displayed as a series on the same line, default is false
-     * - selector: string, whether the selection input is [[self::TYPE_RADIO]] or [[self::TYPE_CHECKBOX]]
+     *                       - height: string, the height of the multiselect control - defaults to 145px
+     *                       - selector: string, whether checkbox or radio - defaults to checkbox
+     *                       - container: array, options for the multiselect container
+     *                       - unselect: string, the value that should be submitted when none of the radio buttons is
+     *                       selected. By setting this option, a hidden input will be generated.
+     *                       - separator: string, the HTML code that separates items.
+     *                       - item: callable, a callback that can be used to customize the generation of the HTML code
+     *                       corresponding to a single item in $items. The signature of this callback must be:
+     *                       - inline: boolean, whether the list should be displayed as a series on the same line,
+     *                       default is false
+     *                       - selector: string, whether the selection input is [[self::TYPE_RADIO]] or
+     *                       [[self::TYPE_CHECKBOX]]
      *
      * @return ActiveField object
      */
@@ -442,15 +435,17 @@ class ActiveField extends \yii\widgets\ActiveField
         return $selector == self::TYPE_RADIO ? $this->radioList($items, $options) : $this->checkboxList($items,
             $options);
     }
-    
+
     /**
      * Renders a list of radio toggle buttons.
+     *
      * @see http://getbootstrap.com/javascript/#buttons-checkbox-radio
      *
      * @param array $items the data item used to generate the radios.
-     * The array values are the labels, while the array keys are the corresponding radio values.
-     * Note that the labels will NOT be HTML-encoded, while the values will.
-     * @param array $options options (name => config) for the radio button list. The following options are specially handled:
+     *                       The array values are the labels, while the array keys are the corresponding radio values.
+     *                       Note that the labels will NOT be HTML-encoded, while the values will.
+     * @param array $options options (name => config) for the radio button list. The following options are specially
+     *                       handled:
      *
      * - unselect: string, the value that should be submitted when none of the radios is selected.
      *   By setting this option, a hidden input will be generated. If you do not want any hidden input,
@@ -474,15 +469,17 @@ class ActiveField extends \yii\widgets\ActiveField
         return $this->getToggleFieldList(self::TYPE_RADIO, $items, $options, true);
     }
 
-    
+
     /**
      * Renders a list of checkbox toggle buttons.
+     *
      * @see http://getbootstrap.com/javascript/#buttons-checkbox-radio
      *
      * @param array $items the data item used to generate the checkboxes.
-     * The array values are the labels, while the array keys are the corresponding checkbox values.
-     * Note that the labels will NOT be HTML-encoded, while the values will.
-     * @param array $options options (name => config) for the checkbox button list. The following options are specially handled:
+     *                       The array values are the labels, while the array keys are the corresponding checkbox
+     *                       values. Note that the labels will NOT be HTML-encoded, while the values will.
+     * @param array $options options (name => config) for the checkbox button list. The following options are specially
+     *                       handled:
      *
      * - unselect: string, the value that should be submitted when none of the checkboxes is selected.
      *   By setting this option, a hidden input will be generated. If you do not want any hidden input,
@@ -505,17 +502,17 @@ class ActiveField extends \yii\widgets\ActiveField
     {
         return $this->getToggleFieldList(self::TYPE_CHECKBOX, $items, $options, true);
     }
-    
+
     /**
      * Renders a list of radio buttons.
      * A radio button list is like a checkbox list, except that it only allows single selection.
      * The selection of the radio buttons is taken from the value of the model attribute.
      *
      * @param array $items the data item used to generate the radio buttons.
-     * The array keys are the labels, while the array values are the corresponding radio button values.
-     * Note that the labels will NOT be HTML-encoded, while the values will.
+     *                       The array keys are the labels, while the array values are the corresponding radio button
+     *                       values. Note that the labels will NOT be HTML-encoded, while the values will.
      * @param array $options options (name => config) for the radio button list. The following options are specially
-     *     handled:
+     *                       handled:
      *
      * - unselect: string, the value that should be submitted when none of the radio buttons is selected.
      *   By setting this option, a hidden input will be generated.
@@ -545,10 +542,11 @@ class ActiveField extends \yii\widgets\ActiveField
      *
      * @param string $type the toggle input type 'checkbox' or 'radio'.
      * @param array  $items the data item used to generate the checkbox / radio buttons.
-     * The array keys are the labels, while the array values are the corresponding checkbox / radio button values.
-     * Note that the labels will NOT be HTML-encoded, while the values will.
-     * @param array  $options options (name => config) for the checkbox / radio button list. The following options are
-     *     specially handled:
+     *                              The array keys are the labels, while the array values are the corresponding
+     *                              checkbox / radio button values. Note that the labels will NOT be HTML-encoded,
+     *                              while the values will.
+     * @param array  $options options (name => config) for the checkbox / radio button list. The following
+     *                              options are specially handled:
      *
      * - unselect: string, the value that should be submitted when none of the checkbox / radio buttons is selected.
      *   By setting this option, a hidden input will be generated.
@@ -592,10 +590,10 @@ class ActiveField extends \yii\widgets\ActiveField
             $options['itemOptions']['labelOptions']['class'] = "{$type}-inline{$css}";
         } elseif (!isset($options['item'])) {
             $labelOptions = ArrayHelper::getValue($options, 'itemOptions.labelOptions');
-            $options['item'] = function ($index, $label, $name, $checked, $value) 
-                use ($type, $css, $disabled, $readonly, $asButtonGroup, $labelOptions) {
-                $opts =  [
-                    'label' => $label, 
+            $options['item'] = function ($index, $label, $name, $checked, $value)
+            use ($type, $css, $disabled, $readonly, $asButtonGroup, $labelOptions) {
+                $opts = [
+                    'label' => $label,
                     'value' => $value,
                     'disabled' => $this->form->disabled,
                     'readonly' => $this->form->readonly,
@@ -625,19 +623,17 @@ class ActiveField extends \yii\widgets\ActiveField
      * As a result, the corresponding submitted value is an array.
      * The selection of the checkbox list is taken from the value of the model attribute.
      *
-     * @param array $items the data item used to generate the checkboxes.
-     * The array values are the labels, while the array keys are the corresponding checkbox values.
-     * Note that the labels will NOT be HTML-encoded, while the values will.
+     * @param array $items the data item used to generate the checkboxes. The array values are the labels, while the
+     * array keys are the corresponding checkbox values. Note that the labels will NOT be HTML-encoded, while the
+     * values will.
      * @param array $options options (name => config) for the checkbox list. The following options are specially
-     *     handled:
-     *
+     * handled:
      * - unselect: string, the value that should be submitted when none of the checkboxes is selected.
      *   By setting this option, a hidden input will be generated.
      * - separator: string, the HTML code that separates items.
      * - inline: boolean, whether the list should be displayed as a series on the same line, default is false
      * - item: callable, a callback that can be used to customize the generation of the HTML code
      *   corresponding to a single item in $items. The signature of this callback must be:
-     *
      * ~~~
      * function ($index, $label, $name, $checked, $value)
      * ~~~
@@ -654,7 +650,7 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @inherit doc
+     * @inheritdoc
      */
     public function widget($class, $config = [])
     {
@@ -665,7 +661,7 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @inherit doc
+     * @inheritdoc
      */
     public function label($label = null, $options = [])
     {
@@ -676,7 +672,7 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * @inherit doc
+     * @inheritdoc
      */
     public function render($content = null)
     {
@@ -691,22 +687,24 @@ class ActiveField extends \yii\widgets\ActiveField
         $this->buildTemplate();
         return parent::render($content);
     }
-    
+
     /**
-     * Gets the field layout parts
+     * Builds the field layout parts
      *
-     * @param bool $showLabels whether to show labels
-     * @param bool $showErrors whether to show errors
-     * @param bool $showHints whether to show hints
+     * @param bool   $showLabels whether to show labels
+     * @param bool   $showErrors whether to show errors
+     * @param bool   $showHints whether to show hints
      * @param string $input the input template markup
      * @param string $error the error template markup
      * @param string $hint the hint template markup
+     *
+     * @return void
      */
-    protected function getLayoutParts($showLabels, $showErrors, $showHints, &$input, &$error, &$hint)
+    protected function buildLayoutParts($showLabels, $showErrors, $showHints, &$input, &$error, &$hint)
     {
         $input = '{input}';
-        $error = '{error}';
-        $hint = '{hint}';
+        $error = $showErrors ? '{error}' : '';
+        $hint = $showHints ? '{hint}' : '';
         if ($this->skipFormLayout) {
             return;
         }
@@ -732,22 +730,25 @@ class ActiveField extends \yii\widgets\ActiveField
         }
         if (!empty($errorDivClass) && $showHints) {
             $hint = "<div class='{$errorDivClass}'>{hint}</div>";
-        }        
+        }
     }
-    
+
     /**
      * Gets configuration parameter from formConfig
+     *
      * @param string $param the parameter name
-     * @param mixed $default the default parameter value
+     * @param mixed  $default the default parameter value
+     *
      * @return the parsed parameter value
      */
     protected function getConfigParam($param, $default = true)
     {
         return isset($this->$param) ? $this->$param : ArrayHelper::getValue($this->form->formConfig, $param, $default);
     }
- 
+
     /**
      * Validate label display status
+     *
      * @return bool|string
      */
     protected function hasLabels()
@@ -758,9 +759,11 @@ class ActiveField extends \yii\widgets\ActiveField
         }
         return $showLabels;
     }
-    
+
     /**
      * Initialize label options
+     *
+     * @return void
      */
     protected function initLabels()
     {
@@ -770,10 +773,13 @@ class ActiveField extends \yii\widgets\ActiveField
         } elseif ($labelCss != ActiveForm::NOT_SET) {
             Html::addCssClass($this->labelOptions, $labelCss);
         }
-    }   
+    }
+
     /**
-     * Initialize layout settings for label, input, error and hint blocks 
+     * Initialize layout settings for label, input, error and hint blocks
      * and for various bootstrap 3 form layouts
+     *
+     * @return void
      */
     protected function initLayout()
     {
@@ -786,7 +792,7 @@ class ActiveField extends \yii\widgets\ActiveField
         $input = '{input}';
         $error = '{error}';
         $hint = '{hint}';
-        $this->getLayoutParts($showLabels, $showErrors, $showHints, $input, $error, $hint);
+        $this->buildLayoutParts($showLabels, $showErrors, $showHints, $input, $error, $hint);
         $this->_settings = [
             'input' => $input,
             'error' => $error,
@@ -812,7 +818,7 @@ class ActiveField extends \yii\widgets\ActiveField
             $showErrors = false;
         }
         $showLabels = $showLabels && $this->hasLabels();
-        $this->getLayoutParts($showLabels, $showErrors, $showHints, $input, $error, $hint);
+        $this->buildLayoutParts($showLabels, $showErrors, $showHints, $input, $error, $hint);
         $this->template = strtr($this->template, [
             '{label}' => $showLabels ? $this->contentBeforeLabel . '{label}' . $this->contentAfterLabel : '',
             '{input}' => $this->contentBeforeInput . $input . $this->contentAfterInput,
@@ -823,6 +829,8 @@ class ActiveField extends \yii\widgets\ActiveField
 
     /**
      * Initializes the addon for text inputs
+     *
+     * @return void
      */
     protected function initAddon()
     {

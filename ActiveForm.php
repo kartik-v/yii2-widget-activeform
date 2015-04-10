@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
- * @package yii2-widgets
+ * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
+ * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.4.2
+ * @version    1.4.2
  */
 
 namespace kartik\form;
@@ -38,7 +38,7 @@ use yii\helpers\ArrayHelper;
  * ]);
  *
  * @author Kartik Visweswaran <kartikv2@gmail.com>
- * @since 1.0
+ * @since  1.0
  */
 class ActiveForm extends \yii\widgets\ActiveForm
 {
@@ -66,7 +66,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
      * Defaults to 'vertical'.
      */
     public $type;
-    
+
     /**
      * @var int set the bootstrap grid width. Defaults to [[ActiveForm::FULL_SPAN]].
      */
@@ -88,33 +88,33 @@ class ActiveForm extends \yii\widgets\ActiveForm
      *      'deviceSize' => ActiveForm::SIZE_MEDIUM,
      *      'showLabels' => true,
      *      'showErrors' => true,
-     *      'showHints' => true 
+     *      'showHints' => true
      * ],
      * ```
      */
     public $formConfig = [];
-    
+
     /**
      * @var boolean whether all data in form are to be static inputs
      */
     public $staticOnly = false;
-    
+
     /**
      * @var boolean whether all inputs in form are to be disabled
      */
     public $disabled = false;
-    
+
     /**
      * @var boolean whether all inputs in form are to be readonly
      */
     public $readonly = false;
-    
+
     /**
      * @var string the label additional css class for horizontal forms
      * and special inputs like checkbox and radio.
      */
     private $_labelCss;
-    
+
     /**
      * @var string the input container additional css class for horizontal forms
      * and special inputs like checkbox and radio.
@@ -223,7 +223,8 @@ class ActiveForm extends \yii\widgets\ActiveForm
         parent::init();
     }
 
-    public function getFormLayoutStyle() {
+    public function getFormLayoutStyle()
+    {
         $config = $this->formConfig;
         $span = $config['labelSpan'];
         $size = $config['deviceSize'];
@@ -245,9 +246,9 @@ class ActiveForm extends \yii\widgets\ActiveForm
             $prefix = "col-{$size}-";
             $labelCss = $prefix . $span;
             $inputCss = $prefix . ($this->fullSpan - $span);
-            $offsetCss =  "col-" . $size . "-offset-" . $span . " " . $inputCss;
+            $offsetCss = "col-" . $size . "-offset-" . $span . " " . $inputCss;
         }
-        return ['labelCss'=> $labelCss, 'inputCss'=>$inputCss, 'offsetCss'=>$offsetCss];
+        return ['labelCss' => $labelCss, 'inputCss' => $inputCss, 'offsetCss' => $offsetCss];
     }
 
     /**
@@ -269,7 +270,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
     {
         $this->_labelCss = $class;
     }
-    
+
     /**
      * Gets input css property
      *
