@@ -26,4 +26,8 @@ class ActiveFormAsset extends \kartik\base\AssetBundle
      */
     public function init()
     {
-        $this->setSourcePa
+        $this->setSourcePath(__DIR__ . '/assets');
+        $this->setupAssets('css', ['css/activeform']);
+        parent::init();
+    }
+}
