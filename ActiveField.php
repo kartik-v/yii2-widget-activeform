@@ -729,22 +729,22 @@ class ActiveField extends \yii\widgets\ActiveField
         if (!isset($this->parts['{hint}'])) {
             $showHints = false;
         }
-        if ($form->hasInputCss()) {
-            $offsetDivClass = $form->getOffsetCss();
-            $inputDivClass = ($this->_offset) ? $offsetDivClass : $form->getInputCss();
-            $error = $showErrors ? "{error}\n" : "";
-            if ($showLabels === false || $showLabels === ActiveForm::SCREEN_READER) {
-                $size = ArrayHelper::getValue($form->formConfig, 'deviceSize', ActiveForm::SIZE_MEDIUM);
-                $errorDivClass = "col-{$size}-{$form->fullSpan}";
-                $inputDivClass = $errorDivClass;
-            } elseif ($form->hasOffsetCss()) {
-                $errorDivClass = $offsetDivClass;
-            }
-        }
         $input = '{input}';
         $error = '{error}';
         $hint = '{hint}';
         if (!$this->skipFormLayout) {
+            if ($form->hasInputCss()) {
+                $offsetDivClass = $form->getOffsetCss();
+                $inputDivClass = ($this->_offset) ? $offsetDivClass : $form->getInputCss();
+                $error = $showErrors ? "{error}\n" : "";
+                if ($showLabels === false || $showLabels === ActiveForm::SCREEN_READER) {
+                    $size = ArrayHelper::getValue($form->formConfig, 'deviceSize', ActiveForm::SIZE_MEDIUM);
+                    $errorDivClass = "col-{$size}-{$form->fullSpan}";
+                    $inputDivClass = $errorDivClass;
+                } elseif ($form->hasOffsetCss()) {
+                    $errorDivClass = $offsetDivClass;
+                }
+            }
             if (!empty($inputDivClass)) {
                 $input = "<div class='{$inputDivClass}'>{input}</div>";
             }
