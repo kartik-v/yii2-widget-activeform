@@ -839,10 +839,18 @@ class ActiveField extends \yii\widgets\ActiveField
             $input = str_replace('{input}', $this->_multiselect, $input);
         }
         $this->template = strtr($this->template, [
-            '{label}' => $showLabels ? $this->contentBeforeLabel . '{label}' . $this->contentAfterLabel : '',
-            '{input}' => $this->contentBeforeInput . $input . $this->contentAfterInput,
-            '{error}' => $showErrors ? $this->contentBeforeError . $error . $this->contentAfterError : '',
-            '{hint}' => $showHints ? $this->contentBeforeHint . $hint . $this->contentAfterHint : '',
+            '{label}' => $showLabels ? "{$this->contentBeforeLabel}{label}{$this->contentAfterLabel}" : '',
+            '{input}' => str_replace('{input}', "$this->contentBeforeInput{input}$this->contentAfterInput", $input),
+            '{error}' => $showErrors ? str_replace(
+                '{error}',
+                "{$this->contentBeforeError}{error}{$this->contentAfterError}",
+                $error
+            ) : '',
+            '{hint}' => $showHints ? str_replace(
+                '{hint}',
+                "{$this->contentBeforeHint}{hint}{$this->contentAfterHint}",
+                $hint
+            ) : '',
         ]);
     }
 
