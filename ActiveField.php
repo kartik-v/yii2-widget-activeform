@@ -683,30 +683,63 @@ class ActiveField extends \yii\widgets\ActiveField
             return parent::render(null);
         }
         $this->initPlaceholder($this->inputOptions);
-        $this->initAddon();
         $this->initDisability($this->inputOptions);
         $this->buildTemplate();
         return parent::render($content);
     }
 
     /**
-     * Builds the field layout parts
+     * Merges the parameters for layout settings
      *
-     * @param bool   $showLabels whether to show labels
-     * @param bool   $showErrors whether to show errors
-     * @param bool   $showHints whether to show hints
-     * @param string $input the input template markup
-     * @param string $error the error template markup
-     * @param string $hint the hint template markup
+     * @param bool $showLabels whether to show labels
+     * @param bool $showErrors whether to show errors
+     * @param bool $showHints whether to show hints
      *
      * @return void
      */
-    protected function buildLayoutParts($showLabels, $showErrors, $showHints, &$input, &$error, &$hint)
+    protected function mergeSettings($showLabels, $showErrors, $showHints)
     {
-        $input = '{input}';
-        $error = $showErrors ? '{error}' : '';
-        $hint = $showHints ? '{hint}' : '';
+        $this->_settings['showLabels'] = $showLabels;
+        $this->_settings['showErrors'] = $showErrors;
+        $this->_settings['showHints'] = $showHints;
+    }
+
+    /**
+     * Sets the layout element container
+     *
+     * @param string $type the layout element type
+     * @param string $css the css class for the container
+     * @param bool   $chk whether to create the container for the layout element
+     *
+     * @return void
+     */
+    protected function setLayoutContainer($type, $css = '', $chk = true)
+    {
+        if (!empty($css) && $chk) {
+            $this->_settings[$type] = "<div class='{$css}'>" . $this->_settings[$type] . "</div>";
+        }
+    }
+
+    /**
+     * Builds the field layout parts
+     *
+     * @param bool $showLabels whether to show labels
+     * @param bool $showErrors whether to show errors
+     * @param bool $showHints whether to show hints
+     *
+     * @return void
+     */
+    protected function buildLayoutParts($showLabels, $showErrors, $showHints)
+    {
+        $this->_settings['input'] = $this->generateAddon();
+        if (!$showErrors) {
+            $this->_settings['error'] = '';
+        }
+        if (!$showHints) {
+            $this->_settings['hint'] = '';
+        }
         if ($this->skipFormLayout) {
+            $this->mergeSettings($showLabels, $showErrors, $showHints);
             return;
         }
         $inputDivClass = '';
@@ -714,7 +747,6 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($this->form->hasInputCss()) {
             $offsetDivClass = $this->form->getOffsetCss();
             $inputDivClass = ($this->_offset) ? $offsetDivClass : $this->form->getInputCss();
-            $error = $showErrors ? "{error}\n" : "";
             if ($showLabels === false || $showLabels === ActiveForm::SCREEN_READER) {
                 $size = ArrayHelper::getValue($this->form->formConfig, 'deviceSize', ActiveForm::SIZE_MEDIUM);
                 $errorDivClass = "col-{$size}-{$this->form->fullSpan}";
@@ -723,15 +755,10 @@ class ActiveField extends \yii\widgets\ActiveField
                 $errorDivClass = $offsetDivClass;
             }
         }
-        if (!empty($inputDivClass)) {
-            $input = "<div class='{$inputDivClass}'>{input}</div>";
-        }
-        if (!empty($errorDivClass) && $showErrors) {
-            $error = "<div class='{$errorDivClass}'>{error}</div>";
-        }
-        if (!empty($errorDivClass) && $showHints) {
-            $hint = "<div class='{$errorDivClass}'>{hint}</div>";
-        }
+        $this->setLayoutContainer('input', $inputDivClass);
+        $this->setLayoutContainer('error', $errorDivClass, $showErrors);
+        $this->setLayoutContainer('hint', $errorDivClass, $showHints);
+        $this->mergeSettings($showLabels, $showErrors, $showHints);
     }
 
     /**
@@ -784,24 +811,14 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     protected function initLayout()
     {
+        $showLabels = $this->hasLabels();
         $showErrors = $this->getConfigParam('showErrors');
         $showHints = $this->getConfigParam('showHints');
-        $showLabels = $this->hasLabels();
         if (!isset($this->parts['{hint}'])) {
             $showHints = false;
         }
-        $input = '{input}';
-        $error = '{error}';
-        $hint = '{hint}';
-        $this->buildLayoutParts($showLabels, $showErrors, $showHints, $input, $error, $hint);
-        $this->_settings = [
-            'input' => $input,
-            'error' => $error,
-            'hint' => $hint,
-            'showLabels' => $showLabels,
-            'showErrors' => $showErrors,
-            'showHints' => $showHints
-        ];
+        $this->mergeSettings($showLabels, $showErrors, $showHints);
+        $this->buildLayoutParts($showLabels, $showErrors, $showHints);
     }
 
     /**
@@ -812,14 +829,15 @@ class ActiveField extends \yii\widgets\ActiveField
     protected function buildTemplate()
     {
         extract($this->_settings);
-        if (!empty($this->_multiselect)) {
-            $input = str_replace('{input}', $this->_multiselect, $input);
-        }
         if ($this->_isStatic && $this->showErrors !== true) {
             $showErrors = false;
         }
         $showLabels = $showLabels && $this->hasLabels();
-        $this->buildLayoutParts($showLabels, $showErrors, $showHints, $input, $error, $hint);
+        $this->buildLayoutParts($showLabels, $showErrors, $showHints);
+        extract($this->_settings);
+        if (!empty($this->_multiselect)) {
+            $input = str_replace('{input}', $this->_multiselect, $input);
+        }
         $this->template = strtr($this->template, [
             '{label}' => $showLabels ? $this->contentBeforeLabel . '{label}' . $this->contentAfterLabel : '',
             '{input}' => $this->contentBeforeInput . $input . $this->contentAfterInput,
@@ -829,30 +847,31 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * Initializes the addon for text inputs
+     * Generates the addon markup
      *
-     * @return void
+     * @return string
      */
-    protected function initAddon()
+    protected function generateAddon()
     {
-        if (!empty($this->addon)) {
-            $addon = $this->addon;
-            $prepend = static::getAddonContent(ArrayHelper::getValue($addon, 'prepend', ''));
-            $append = static::getAddonContent(ArrayHelper::getValue($addon, 'append', ''));
-            $addonText = $prepend . '{input}' . $append;
-            $group = ArrayHelper::getValue($addon, 'groupOptions', []);
-            Html::addCssClass($group, 'input-group');
-            $contentBefore = ArrayHelper::getValue($addon, 'contentBefore', '');
-            $contentAfter = ArrayHelper::getValue($addon, 'contentAfter', '');
-            $addonText = Html::tag('div', $contentBefore . $addonText . $contentAfter, $group);
-            $this->template = str_replace('{input}', $addonText, $this->template);
+        if (empty($this->addon)) {
+            return '{input}';
         }
+        $addon = $this->addon;
+        $prepend = static::getAddonContent(ArrayHelper::getValue($addon, 'prepend', ''));
+        $append = static::getAddonContent(ArrayHelper::getValue($addon, 'append', ''));
+        $content = $prepend . '{input}' . $append;
+        $group = ArrayHelper::getValue($addon, 'groupOptions', []);
+        Html::addCssClass($group, 'input-group');
+        $contentBefore = ArrayHelper::getValue($addon, 'contentBefore', '');
+        $contentAfter = ArrayHelper::getValue($addon, 'contentAfter', '');
+        $content = Html::tag('div', $contentBefore . $content . $contentAfter, $group);
+        return $content;
     }
 
     /**
      * Parses and returns addon content
      *
-     * @param string /array $addon the addon parameter
+     * @param string|array $addon the addon parameter
      *
      * @return string
      */

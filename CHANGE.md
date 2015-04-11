@@ -11,6 +11,7 @@ version 1.4.2
 - (enh #40): Initialize ActiveField template more correctly.
 - (enh #41): New properties for adding or wrapping markup before LABEL, ERROR & HINT blocks.
 - (enh #42): New ActiveField property `skipFormLayout` to override and skip special form layout styling.
+- (bug #46): Bootstrap input group addons for horizontal forms.
 
 version 1.4.1
 =============
