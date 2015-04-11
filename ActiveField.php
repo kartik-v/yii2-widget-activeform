@@ -822,7 +822,8 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * Builds the template based on content before and after input
+     * Builds the final template based on the bootstrap form type, display settings for
+     * label, error, and hint, and content before and after label, input, error, and hint
      *
      * @return void
      */
