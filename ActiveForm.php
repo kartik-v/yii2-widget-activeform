@@ -171,9 +171,12 @@ class ActiveForm extends \yii\widgets\ActiveForm
         $this->_offsetCss = self::NOT_SET;
         $class = 'form-' . $this->type;
         /* Fixes the button alignment for inline forms containing error block */
-        if ($this->type == self::TYPE_INLINE && $this->formConfig['showErrors']) {
+        if ($this->type === self::TYPE_INLINE && $this->formConfig['showErrors']) {
             $class .= ' ' . $class . '-block';
         }
+        if ($this->type === self::TYPE_HORIZONTAL) {
+            $class .= ' kv-form-horizontal';
+        }            
         Html::addCssClass($this->options, $class);
     }
 

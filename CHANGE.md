@@ -13,6 +13,7 @@ version 1.4.2
 - (enh #42): New ActiveField property `skipFormLayout` to override and skip special form layout styling.
 - (bug #46): Bootstrap input group addons for horizontal forms.
 - (enh kartik-v/yii2-widgets#243): Enhance CSS style `kv-fieldset-inline`.
+- (enh #48): Various enhancements to Horizontal Form Layout Styles.
 
 version 1.4.1
 =============

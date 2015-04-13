@@ -41,8 +41,12 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     min-height: 145px !important;
 }
 
-.kv-fieldset-inline .form-group {
+.kv-form-horizontal .form-group  {
     margin-bottom: 0;
+}
+
+.kv-form-horizontal  .form-group + .form-group {
+    margin-top: 5px;
 }
 
 /**

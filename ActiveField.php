@@ -731,7 +731,6 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     protected function buildLayoutParts($showLabels, $showErrors, $showHints)
     {
-        $this->_settings['input'] = $this->generateAddon();
         if (!$showErrors) {
             $this->_settings['error'] = '';
         }
@@ -759,6 +758,7 @@ class ActiveField extends \yii\widgets\ActiveField
         $this->setLayoutContainer('error', $errorDivClass, $showErrors);
         $this->setLayoutContainer('hint', $errorDivClass, $showHints);
         $this->mergeSettings($showLabels, $showErrors, $showHints);
+        $this->_settings['input'] = str_replace('{input}', $this->generateAddon(), $this->_settings['input']);
     }
 
     /**
