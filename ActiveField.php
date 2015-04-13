@@ -716,7 +716,7 @@ class ActiveField extends \yii\widgets\ActiveField
     protected function setLayoutContainer($type, $css = '', $chk = true)
     {
         if (!empty($css) && $chk) {
-            $this->_settings[$type] = "<div class='{$css}'>" . $this->_settings[$type] . "</div>";
+            $this->_settings[$type] = "<div class='{$css}'>{{$type}}</div>";
         }
     }
 

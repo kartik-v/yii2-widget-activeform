@@ -1,6 +1,6 @@
 version 1.4.2
 =============
-**Date:** 10-Apr-2015
+**Date:** 13-Apr-2015
 
 - (enh #32): Create new `checkboxButtonGroup` & `radioButtonGroup` in ActiveField.
 - (bug #33): Correct autoPlaceholder based attribute label generation for tabular inputs.
@@ -12,6 +12,7 @@ version 1.4.2
 - (enh #41): New properties for adding or wrapping markup before LABEL, ERROR & HINT blocks.
 - (enh #42): New ActiveField property `skipFormLayout` to override and skip special form layout styling.
 - (bug #46): Bootstrap input group addons for horizontal forms.
+- (enh kartik-v/yii2-widgets#243): Enhance CSS style `kv-fieldset-inline`.
 
 version 1.4.1
 =============
