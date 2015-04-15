@@ -758,7 +758,6 @@ class ActiveField extends \yii\widgets\ActiveField
         $this->setLayoutContainer('error', $errorDivClass, $showErrors);
         $this->setLayoutContainer('hint', $errorDivClass, $showHints);
         $this->mergeSettings($showLabels, $showErrors, $showHints);
-        $this->_settings['input'] = str_replace('{input}', $this->generateAddon(), $this->_settings['input']);
     }
 
     /**
@@ -841,7 +840,7 @@ class ActiveField extends \yii\widgets\ActiveField
         }
         $this->template = strtr($this->template, [
             '{label}' => $showLabels ? "{$this->contentBeforeLabel}{label}{$this->contentAfterLabel}" : '',
-            '{input}' => str_replace('{input}', "$this->contentBeforeInput{input}$this->contentAfterInput", $input),
+            '{input}' => str_replace('{input}', $this->contentBeforeInput. $this->generateAddon() . $this->contentAfterInput, $input),
             '{error}' => $showErrors ? str_replace(
                 '{error}',
                 "{$this->contentBeforeError}{error}{$this->contentAfterError}",
