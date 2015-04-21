@@ -14,6 +14,7 @@ version 1.4.2
 - (bug #46): Bootstrap input group addons for horizontal forms.
 - (enh kartik-v/yii2-widgets#243): Enhance CSS style `kv-fieldset-inline`.
 - (enh #48): Various enhancements to Horizontal Form Layout Styles.
+- (enh #49, #50): Updates to hint rendering for latest yii ActiveField upgrade.
 
 version 1.4.1
 =============

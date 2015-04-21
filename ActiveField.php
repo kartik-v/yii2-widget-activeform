@@ -155,8 +155,7 @@ class ActiveField extends \yii\widgets\ActiveField
         'error' => '{error}',
         'hint' => '{hint}',
         'showLabels' => true,
-        'showErrors' => true,
-        'showHints' => true
+        'showErrors' => true
     ];
 
     /**
@@ -407,18 +406,18 @@ class ActiveField extends \yii\widgets\ActiveField
      *
      * @param array $items the data item used to generate the checkboxes or radio.
      * @param array $options the options for checkboxList or radioList. Additional parameters
-     *                       - height: string, the height of the multiselect control - defaults to 145px
-     *                       - selector: string, whether checkbox or radio - defaults to checkbox
-     *                       - container: array, options for the multiselect container
-     *                       - unselect: string, the value that should be submitted when none of the radio buttons is
-     *                       selected. By setting this option, a hidden input will be generated.
-     *                       - separator: string, the HTML code that separates items.
-     *                       - item: callable, a callback that can be used to customize the generation of the HTML code
-     *                       corresponding to a single item in $items. The signature of this callback must be:
-     *                       - inline: boolean, whether the list should be displayed as a series on the same line,
-     *                       default is false
-     *                       - selector: string, whether the selection input is [[self::TYPE_RADIO]] or
-     *                       [[self::TYPE_CHECKBOX]]
+     * - height: string, the height of the multiselect control - defaults to 145px
+     * - selector: string, whether checkbox or radio - defaults to checkbox
+     * - container: array, options for the multiselect container
+     * - unselect: string, the value that should be submitted when none of the radio buttons is
+     *   selected. By setting this option, a hidden input will be generated.
+     * - separator: string, the HTML code that separates items.
+     * - item: callable, a callback that can be used to customize the generation of the HTML code
+     *   corresponding to a single item in $items. The signature of this callback must be:
+     * - inline: boolean, whether the list should be displayed as a series on the same line,
+     *   default is false
+     * - selector: string, whether the selection input is [[self::TYPE_RADIO]] or
+     *   [[self::TYPE_CHECKBOX]]
      *
      * @return ActiveField object
      */
@@ -433,8 +432,8 @@ class ActiveField extends \yii\widgets\ActiveField
         Html::addCssClass($container, $this->addClass . ' input-multiselect');
         $container['tabindex'] = 0;
         $this->_multiselect = Html::tag('div', '{input}', $container);
-        return $selector == self::TYPE_RADIO ? $this->radioList($items, $options) : $this->checkboxList($items,
-            $options);
+        return $selector == self::TYPE_RADIO ? $this->radioList($items, $options) :
+            $this->checkboxList($items, $options);
     }
 
     /**
@@ -443,10 +442,10 @@ class ActiveField extends \yii\widgets\ActiveField
      * @see http://getbootstrap.com/javascript/#buttons-checkbox-radio
      *
      * @param array $items the data item used to generate the radios.
-     *                       The array values are the labels, while the array keys are the corresponding radio values.
-     *                       Note that the labels will NOT be HTML-encoded, while the values will.
+     * The array values are the labels, while the array keys are the corresponding radio values.
+     * Note that the labels will NOT be HTML-encoded, while the values will.
      * @param array $options options (name => config) for the radio button list. The following options are specially
-     *                       handled:
+     * handled:
      *
      * - unselect: string, the value that should be submitted when none of the radios is selected.
      *   By setting this option, a hidden input will be generated. If you do not want any hidden input,
@@ -477,10 +476,10 @@ class ActiveField extends \yii\widgets\ActiveField
      * @see http://getbootstrap.com/javascript/#buttons-checkbox-radio
      *
      * @param array $items the data item used to generate the checkboxes.
-     *                       The array values are the labels, while the array keys are the corresponding checkbox
-     *                       values. Note that the labels will NOT be HTML-encoded, while the values will.
+     * The array values are the labels, while the array keys are the corresponding checkbox
+     * values. Note that the labels will NOT be HTML-encoded, while the values will.
      * @param array $options options (name => config) for the checkbox button list. The following options are specially
-     *                       handled:
+     * handled:
      *
      * - unselect: string, the value that should be submitted when none of the checkboxes is selected.
      *   By setting this option, a hidden input will be generated. If you do not want any hidden input,
@@ -510,10 +509,10 @@ class ActiveField extends \yii\widgets\ActiveField
      * The selection of the radio buttons is taken from the value of the model attribute.
      *
      * @param array $items the data item used to generate the radio buttons.
-     *                       The array keys are the labels, while the array values are the corresponding radio button
-     *                       values. Note that the labels will NOT be HTML-encoded, while the values will.
+     * The array keys are the labels, while the array values are the corresponding radio button
+     * values. Note that the labels will NOT be HTML-encoded, while the values will.
      * @param array $options options (name => config) for the radio button list. The following options are specially
-     *                       handled:
+     * handled:
      *
      * - unselect: string, the value that should be submitted when none of the radio buttons is selected.
      *   By setting this option, a hidden input will be generated.
@@ -543,11 +542,11 @@ class ActiveField extends \yii\widgets\ActiveField
      *
      * @param string $type the toggle input type 'checkbox' or 'radio'.
      * @param array  $items the data item used to generate the checkbox / radio buttons.
-     *                              The array keys are the labels, while the array values are the corresponding
-     *                              checkbox / radio button values. Note that the labels will NOT be HTML-encoded,
-     *                              while the values will.
+     * The array keys are the labels, while the array values are the corresponding
+     * checkbox / radio button values. Note that the labels will NOT be HTML-encoded,
+     * while the values will.
      * @param array  $options options (name => config) for the checkbox / radio button list. The following
-     *                              options are specially handled:
+     * options are specially handled:
      *
      * - unselect: string, the value that should be submitted when none of the checkbox / radio buttons is selected.
      *   By setting this option, a hidden input will be generated.
@@ -591,8 +590,14 @@ class ActiveField extends \yii\widgets\ActiveField
             $options['itemOptions']['labelOptions']['class'] = "{$type}-inline{$css}";
         } elseif (!isset($options['item'])) {
             $labelOptions = ArrayHelper::getValue($options, 'itemOptions.labelOptions');
-            $options['item'] = function ($index, $label, $name, $checked, $value)
-            use ($type, $css, $disabled, $readonly, $asButtonGroup, $labelOptions) {
+            $options['item'] = function ($index, $label, $name, $checked, $value) use (
+                $type,
+                $css,
+                $disabled,
+                $readonly,
+                $asButtonGroup,
+                $labelOptions
+            ) {
                 $opts = [
                     'label' => $label,
                     'value' => $value,
@@ -664,12 +669,13 @@ class ActiveField extends \yii\widgets\ActiveField
     /**
      * @inheritdoc
      */
-    public function label($label = null, $options = [])
+    public function hint($content, $options = [])
     {
-        if ($label === false) {
-            $this->showLabels = false;
+        if ($this->getConfigParam('showHints') === false) {
+            $this->parts['{hint}'] = '';
+            return $this;
         }
-        return parent::label($label, $options);
+        return parent::hint($this->contentBeforeHint . $content . $this->contentAfterHint, $options);
     }
 
     /**
@@ -677,6 +683,17 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public function render($content = null)
     {
+        if ($this->getConfigParam('showHints') === false) {
+            $this->hintOptions['hint'] = '';
+        } else {
+            if ($content === null && !isset($this->parts['{hint}']) && !isset($this->hintOptions['hint'])) {
+                $this->hintOptions['hint'] = $this->contentBeforeHint .
+                    $this->model->getAttributeHint($this->attribute) .
+                    $this->contentAfterHint;
+            }
+            $this->template = strtr($this->template, ['{hint}' => $this->_settings['hint']]);
+        }
+
         if ($this->form->staticOnly === true) {
             $field = $this->staticInput();
             $this->buildTemplate();
@@ -693,15 +710,13 @@ class ActiveField extends \yii\widgets\ActiveField
      *
      * @param bool $showLabels whether to show labels
      * @param bool $showErrors whether to show errors
-     * @param bool $showHints whether to show hints
      *
      * @return void
      */
-    protected function mergeSettings($showLabels, $showErrors, $showHints)
+    protected function mergeSettings($showLabels, $showErrors)
     {
         $this->_settings['showLabels'] = $showLabels;
         $this->_settings['showErrors'] = $showErrors;
-        $this->_settings['showHints'] = $showHints;
     }
 
     /**
@@ -725,20 +740,16 @@ class ActiveField extends \yii\widgets\ActiveField
      *
      * @param bool $showLabels whether to show labels
      * @param bool $showErrors whether to show errors
-     * @param bool $showHints whether to show hints
      *
      * @return void
      */
-    protected function buildLayoutParts($showLabels, $showErrors, $showHints)
+    protected function buildLayoutParts($showLabels, $showErrors)
     {
         if (!$showErrors) {
             $this->_settings['error'] = '';
         }
-        if (!$showHints) {
-            $this->_settings['hint'] = '';
-        }
         if ($this->skipFormLayout) {
-            $this->mergeSettings($showLabels, $showErrors, $showHints);
+            $this->mergeSettings($showLabels, $showErrors);
             return;
         }
         $inputDivClass = '';
@@ -756,8 +767,8 @@ class ActiveField extends \yii\widgets\ActiveField
         }
         $this->setLayoutContainer('input', $inputDivClass);
         $this->setLayoutContainer('error', $errorDivClass, $showErrors);
-        $this->setLayoutContainer('hint', $errorDivClass, $showHints);
-        $this->mergeSettings($showLabels, $showErrors, $showHints);
+        $this->setLayoutContainer('hint', $errorDivClass);
+        $this->mergeSettings($showLabels, $showErrors);
     }
 
     /**
@@ -812,12 +823,8 @@ class ActiveField extends \yii\widgets\ActiveField
     {
         $showLabels = $this->hasLabels();
         $showErrors = $this->getConfigParam('showErrors');
-        $showHints = $this->getConfigParam('showHints');
-        if (!isset($this->parts['{hint}'])) {
-            $showHints = false;
-        }
-        $this->mergeSettings($showLabels, $showErrors, $showHints);
-        $this->buildLayoutParts($showLabels, $showErrors, $showHints);
+        $this->mergeSettings($showLabels, $showErrors);
+        $this->buildLayoutParts($showLabels, $showErrors);
     }
 
     /**
@@ -833,24 +840,23 @@ class ActiveField extends \yii\widgets\ActiveField
             $showErrors = false;
         }
         $showLabels = $showLabels && $this->hasLabels();
-        $this->buildLayoutParts($showLabels, $showErrors, $showHints);
+        $this->buildLayoutParts($showLabels, $showErrors);
         extract($this->_settings);
         if (!empty($this->_multiselect)) {
             $input = str_replace('{input}', $this->_multiselect, $input);
         }
         $this->template = strtr($this->template, [
             '{label}' => $showLabels ? "{$this->contentBeforeLabel}{label}{$this->contentAfterLabel}" : '',
-            '{input}' => str_replace('{input}', $this->contentBeforeInput. $this->generateAddon() . $this->contentAfterInput, $input),
+            '{input}' => str_replace(
+                '{input}',
+                $this->contentBeforeInput . $this->generateAddon() . $this->contentAfterInput,
+                $input
+            ),
             '{error}' => $showErrors ? str_replace(
                 '{error}',
                 "{$this->contentBeforeError}{error}{$this->contentAfterError}",
                 $error
-            ) : '',
-            '{hint}' => $showHints ? str_replace(
-                '{hint}',
-                "{$this->contentBeforeHint}{hint}{$this->contentAfterHint}",
-                $hint
-            ) : '',
+            ) : ''
         ]);
     }
 
