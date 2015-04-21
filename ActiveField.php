@@ -590,7 +590,13 @@ class ActiveField extends \yii\widgets\ActiveField
             $options['itemOptions']['labelOptions']['class'] = "{$type}-inline{$css}";
         } elseif (!isset($options['item'])) {
             $labelOptions = ArrayHelper::getValue($options, 'itemOptions.labelOptions');
-            $options['item'] = function ($index, $label, $name, $checked, $value) use (
+            $options['item'] = function (
+                $index,
+                $label,
+                $name,
+                $checked,
+                $value
+            ) use (
                 $type,
                 $css,
                 $disabled,
@@ -675,7 +681,7 @@ class ActiveField extends \yii\widgets\ActiveField
             $this->parts['{hint}'] = '';
             return $this;
         }
-        return parent::hint($this->contentBeforeHint . $content . $this->contentAfterHint, $options);
+        return parent::hint($this->generateHint($content), $options);
     }
 
     /**
@@ -687,9 +693,7 @@ class ActiveField extends \yii\widgets\ActiveField
             $this->hintOptions['hint'] = '';
         } else {
             if ($content === null && !isset($this->parts['{hint}']) && !isset($this->hintOptions['hint'])) {
-                $this->hintOptions['hint'] = $this->contentBeforeHint .
-                    $this->model->getAttributeHint($this->attribute) .
-                    $this->contentAfterHint;
+                $this->hintOptions['hint'] = $this->generateHint();
             }
             $this->template = strtr($this->template, ['{hint}' => $this->_settings['hint']]);
         }
@@ -772,33 +776,6 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
-     * Gets configuration parameter from formConfig
-     *
-     * @param string $param the parameter name
-     * @param mixed  $default the default parameter value
-     *
-     * @return the parsed parameter value
-     */
-    protected function getConfigParam($param, $default = true)
-    {
-        return isset($this->$param) ? $this->$param : ArrayHelper::getValue($this->form->formConfig, $param, $default);
-    }
-
-    /**
-     * Validate label display status
-     *
-     * @return bool|string
-     */
-    protected function hasLabels()
-    {
-        $showLabels = $this->getConfigParam('showLabels');
-        if ($this->autoPlaceholder && $showLabels !== ActiveForm::SCREEN_READER) {
-            $showLabels = false;
-        }
-        return $showLabels;
-    }
-
-    /**
      * Initialize label options
      *
      * @return void
@@ -861,6 +838,21 @@ class ActiveField extends \yii\widgets\ActiveField
     }
 
     /**
+     * Generates the hint.
+     *
+     * @param string $content the hint content
+     *
+     * @return string
+     */
+    protected function generateHint($content = null)
+    {
+        if ($content === null && method_exists($this->model, 'getAttributeHint')) {
+            $content = $this->model->getAttributeHint($this->attribute);
+        }
+        return $this->contentBeforeHint . $content . $this->contentAfterHint;
+    }
+
+    /**
      * Generates the addon markup
      *
      * @return string
@@ -903,5 +895,32 @@ class ActiveField extends \yii\widgets\ActiveField
             }
         }
         return $addon;
+    }
+
+    /**
+     * Gets configuration parameter from formConfig
+     *
+     * @param string $param the parameter name
+     * @param mixed  $default the default parameter value
+     *
+     * @return the parsed parameter value
+     */
+    protected function getConfigParam($param, $default = true)
+    {
+        return isset($this->$param) ? $this->$param : ArrayHelper::getValue($this->form->formConfig, $param, $default);
+    }
+
+    /**
+     * Validate label display status
+     *
+     * @return bool|string
+     */
+    protected function hasLabels()
+    {
+        $showLabels = $this->getConfigParam('showLabels');
+        if ($this->autoPlaceholder && $showLabels !== ActiveForm::SCREEN_READER) {
+            $showLabels = false;
+        }
+        return $showLabels;
     }
 }
