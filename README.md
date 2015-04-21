@@ -1,11 +1,11 @@
 yii2-widget-activeform
 ======================
 
-[![Latest Stable Version](https://poser.pugx.org/kartik-v/yii2-widget-activeform/v/stable.svg)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
-[![License](https://poser.pugx.org/kartik-v/yii2-widget-activeform/license.svg)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
-[![Total Downloads](https://poser.pugx.org/kartik-v/yii2-widget-activeform/downloads.svg)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
-[![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-widget-activeform/d/monthly.png)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
-[![Daily Downloads](https://poser.pugx.org/kartik-v/yii2-widget-activeform/d/daily.png)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
+[![Latest Stable Version](https://poser.pugx.org/kartik-v/yii2-widget-activeform/v/stable)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
+[![License](https://poser.pugx.org/kartik-v/yii2-widget-activeform/license)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
+[![Total Downloads](https://poser.pugx.org/kartik-v/yii2-widget-activeform/downloads)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
+[![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-widget-activeform/d/monthly)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
+[![Daily Downloads](https://poser.pugx.org/kartik-v/yii2-widget-activeform/d/daily)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
 
 Extends and enhances the [Yii ActiveForm widget](https://github.com/yiisoft/yii2/blob/master/framework/widgets/ActiveForm.php). Facilitates all [three form layouts](http://getbootstrap.com/css/#forms-example) available in Bootstrap i.e. __vertical__, __horizontal__, and __inline__. Allows options for offsetting labels and inputs for horizontal form layout. Works closely with the extended ActiveField widget. In addition, this extension enhances and extends the [Yii ActiveField widget](https://github.com/yiisoft/yii2/blob/master/framework/widgets/ActiveField.php). Allows Bootstrap styled [input group addons](http://getbootstrap.com/components/#input-groups-basic) to be prepended or appended to textInputs. Automatically adjusts checkboxes and radio input offsets for horizontal forms. Allows, flexibility to control the labels and placeholders based on form layout style (e.g. hide labels and show them as placeholder for inline forms). The extended ActiveField functionalities available are:
 
