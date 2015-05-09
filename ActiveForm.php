@@ -220,7 +220,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
         }
 
         if ($this->_inputCss == self::NOT_SET && empty($this->fieldConfig['template'])) {
-            $this->fieldConfig['template'] = "{label}\n{input}\n{error}\n{hint}";
+            $this->fieldConfig['template'] = "{label}\n{input}\n{hint}\n{error}";
         }
 
         parent::init();

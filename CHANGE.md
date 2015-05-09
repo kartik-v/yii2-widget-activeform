@@ -1,6 +1,6 @@
 version 1.4.2
 =============
-**Date:** 13-Apr-2015
+**Date:** 09-May-2015
 
 - (enh #32): Create new `checkboxButtonGroup` & `radioButtonGroup` in ActiveField.
 - (bug #33): Correct autoPlaceholder based attribute label generation for tabular inputs.
@@ -15,6 +15,7 @@ version 1.4.2
 - (enh kartik-v/yii2-widgets#243): Enhance CSS style `kv-fieldset-inline`.
 - (enh #48): Various enhancements to Horizontal Form Layout Styles.
 - (enh #49, #50): Updates to hint rendering for latest yii ActiveField upgrade.
+- (enh #54): Set default ActiveForm field template to be consistent with yii\widgets\ActiveForm.
 
 version 1.4.1
 =============
