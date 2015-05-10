@@ -1,6 +1,6 @@
 version 1.4.2
 =============
-**Date:** 09-May-2015
+**Date:** 11-May-2015
 
 - (enh #32): Create new `checkboxButtonGroup` & `radioButtonGroup` in ActiveField.
 - (bug #33): Correct autoPlaceholder based attribute label generation for tabular inputs.
