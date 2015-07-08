@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.4.3
+ * @version    1.4.4
  */
 
 namespace kartik\form;
@@ -39,6 +39,30 @@ class ActiveField extends \yii\widgets\ActiveField
      * as per the form layout. Defaults to `false`.
      */
     public $skipFormLayout = false;
+
+    /**
+     * @var array the feedback icon configuration (applicable for bootstrap text inputs).
+     * @see http://getbootstrap.com/css/#with-optional-icons
+     *
+     * This must be setup as an array containing the following keys:
+     * - type: string, the icon type to use. Should be one of `raw` or `icon`. Defaults to `icon`, where 
+     *   the `default`, `error` and `success` settings will be treated as an icon CSS suffix name. If set 
+     *   to `raw`, they will be treated as a raw content markup.
+     * - prefix: string, the icon CSS class prefix to use if `type` is `icon`. Defaults to `glyphicon glyphicon-`.
+     * - default: string, the icon (CSS class suffix name or raw markup) to show by default. If not set will
+     *   not be shown.
+     * - error: string, the icon (CSS class suffix name or raw markup) to use when input has an error validation.
+     *   If not set will not be shown.
+     * - success: string, the icon (CSS class suffix name or raw markup) to use when input has a success validation.
+     *   If not set will not be shown.
+     * - defaultOptions: array, the HTML attributes to apply for default icon. The special attribute `description`
+     *   can be set to describe this feedback as an `aria` attribute for accessibility. Defaults to `(default)`.
+     * - errorOptions: array, the HTML attributes to apply for error icon. The special attribute `description`
+     *   can be set to describe this feedback as an `aria` attribute for accessibility. Defaults to `(error)`.
+     * - successOptions: array, the HTML attributes to apply for success icon. The special attribute `description`
+     *   can be set to describe this feedback as an `aria` attribute for accessibility. Defaults to `(success)`.
+     */
+    public $feedbackIcon = [];
 
     /**
      * @var string content to be placed before label
@@ -159,6 +183,11 @@ class ActiveField extends \yii\widgets\ActiveField
     ];
 
     /**
+     * @var bool whether there is a feedback icon configuration set
+     */
+    protected $_hasFeedback = false;
+    
+    /**
      * @inheritdoc
      */
     public function init()
@@ -178,8 +207,67 @@ class ActiveField extends \yii\widgets\ActiveField
         }
         $this->initLabels();
         $this->initLayout();
+        $this->_hasFeedback = !empty($this->feedbackIcon) && is_array($this->feedbackIcon);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function begin()
+    {
+        if ($this->_hasFeedback) {
+            Html::addCssClass($this->options, 'has-feedback');
+        }
+        return parent::begin();
+    }
+
+    /**
+     * Renders the bootstrap feedback icon.
+     * @see http://getbootstrap.com/css/#with-optional-icons
+     *
+     * @return string
+     */
+    protected function renderFeedbackIcon()
+    {
+        if (!$this->_hasFeedback) {
+            return '';
+        }
+        $config = $this->feedbackIcon;
+        $type = ArrayHelper::getValue($config, 'type', 'icon');
+        $prefix = ArrayHelper::getValue($config, 'prefix', 'glyphicon glyphicon-');
+        $id = Html::getInputId($this->model, $this->attribute);
+        return $this->getFeedbackIcon($config, 'default', $type, $prefix, $id) .
+            $this->getFeedbackIcon($config, 'success', $type, $prefix, $id) .
+            $this->getFeedbackIcon($config, 'error', $type, $prefix, $id);
+    }
+    
+    /**
+     * Generates a feedback icon
+     * @param array $config the feedback icon configuration
+     * @param string $cat the feedback icon category
+     * @param string $type the feedback icon type
+     * @param string $prefix the feedback icon prefix
+     * @param string $id the input attribute identifier
+     * @return string
+     */
+    protected function getFeedbackIcon($config, $cat, $type, $prefix, $id)
+    {
+        $markup = ArrayHelper::getValue($config, $cat, null);
+        if ($markup === null) {
+            return '';
+        }
+        $description = ArrayHelper::remove($options, 'description', "({$cat})");
+        $options = ArrayHelper::getValue($config, $cat . 'Options', []);
+        $options['aria-hidden'] = true;
+        $key = $id . '-' . $cat;
+        $this->inputOptions['aria-describedby'] = empty($this->inputOptions['aria-describedby']) ? $key : 
+            $this->inputOptions['aria-describedby'] . ' ' . $key;
+        Html::addCssClass($options, 'form-control-feedback');
+        Html::addCssClass($options, 'kv-feedback-'.$cat);
+        $icon = $type === 'raw' ? $markup : Html::tag('i', '', ['class'=>$prefix.$markup]);
+        return Html::tag('span', $icon, $options) . Html::tag('span', $description, ['id'=>$key, 'class'=>'sr-only']);
+    }
+    
     /**
      * Renders a static input (display only).
      *
@@ -826,7 +914,7 @@ class ActiveField extends \yii\widgets\ActiveField
             '{label}' => $showLabels ? "{$this->contentBeforeLabel}{label}{$this->contentAfterLabel}" : '',
             '{input}' => str_replace(
                 '{input}',
-                $this->contentBeforeInput . $this->generateAddon() . $this->contentAfterInput,
+                $this->contentBeforeInput . $this->generateAddon() . $this->renderFeedbackIcon() . $this->contentAfterInput,
                 $input
             ),
             '{error}' => $showErrors ? str_replace(

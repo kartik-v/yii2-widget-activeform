@@ -2,7 +2,7 @@
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.4.3
+ * @version 1.4.4
  *
  * Active Form Styling for Twitter Bootstrap 3.0
  * Built for Yii Framework 2.0
@@ -140,4 +140,20 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 .has-error .input-group-btn .btn-default .badge {
     color: #d9534f;
     background-color: #fff;
+}
+
+
+/**
+ * feedback icon styling
+ */
+.kv-feedback-success,
+.kv-feedback-error,
+.has-error .kv-feedback-default,
+.has-success .kv-feedback-default {
+    display: none;
+}
+
+.has-error .kv-feedback-error,
+.has-success .kv-feedback-success {
+    display: inline;
 }

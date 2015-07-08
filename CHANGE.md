@@ -1,3 +1,9 @@
+version 1.4.4
+=============
+**Date:** 08-Jul-2015
+
+- (enh #56): Implement feedback icons within inputs.
+
 version 1.4.3
 =============
 **Date:** 17-Jun-2015
