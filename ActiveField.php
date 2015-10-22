@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.4.4
+ * @version    1.4.5
  */
 
 namespace kartik\form;
@@ -709,6 +709,9 @@ class ActiveField extends \yii\widgets\ActiveField
                     Html::addCssClass($labelOptions, 'disabled');
                     $opts['readonly'] = true;
                 }
+                if ($checked && $asButtonGroup) {
+                    Html::addCssClass($labelOptions, 'active');
+                }
                 $opts['labelOptions'] = $labelOptions;
                 $out = Html::$type($name, $checked, $opts);
                 return $asButtonGroup ? $out : "<div class='{$type}{$css}'>{$out}</div>";
@@ -976,7 +979,7 @@ class ActiveField extends \yii\widgets\ActiveField
             $options = ArrayHelper::getValue($addon, 'options', []);
             if (ArrayHelper::getValue($addon, 'asButton', false) == true) {
                 Html::addCssClass($options, 'input-group-btn');
-                return Html::tag('div', $content, $options);
+                return Html::tag('span', $content, $options);
             } else {
                 Html::addCssClass($options, 'input-group-addon');
                 return Html::tag('span', $content, $options);

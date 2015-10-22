@@ -1,7 +1,7 @@
 yii2-widget-activeform
 ======================
 
-[![Latest Stable Version](https://poser.pugx.org/kartik-v/yii2-widget-activeform/v/stable)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
+[![Latest Stable Version](https://img.shields.io/packagist/v/kartik-v/yii2-widget-activeform.svg)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
 [![License](https://poser.pugx.org/kartik-v/yii2-widget-activeform/license)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
 [![Total Downloads](https://poser.pugx.org/kartik-v/yii2-widget-activeform/downloads)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
 [![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-widget-activeform/d/monthly)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
@@ -57,7 +57,7 @@ to the ```require``` section of your `composer.json` file.
 
 ## Latest Release
 
-> NOTE: The latest version of the module is v1.4.4. Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-widget-activeform/blob/master/CHANGE.md) for details.
+> NOTE: The latest version of the module is v1.4.5. Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-widget-activeform/blob/master/CHANGE.md) for details.
 
 ## Demo
 

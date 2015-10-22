@@ -1,17 +1,28 @@
-version 1.4.4
-=============
+Change Log: `yii2-widget-activeform`
+====================================
+
+## Version 1.4.5
+
+**Date:** 22-Oct-2015
+
+- (enh #59): Added .gitignore for composer stuff.
+- (enh #60): Enhancements to `checkboxButtonGroup` and `radioButtonGroup`.
+
+
+## Version 1.4.4
+
 **Date:** 08-Jul-2015
 
 - (enh #56): Implement feedback icons within inputs.
 
-version 1.4.3
-=============
+## Version 1.4.3
+
 **Date:** 17-Jun-2015
 
-- (enh #55): Set composer version dependencies.
+- (enh #55): Set composer ## Version dependencies.
 
-version 1.4.2
-=============
+## Version 1.4.2
+
 **Date:** 11-May-2015
 
 - (enh #32): Create new `checkboxButtonGroup` & `radioButtonGroup` in ActiveField.
@@ -29,15 +40,15 @@ version 1.4.2
 - (enh #49, #50): Updates to hint rendering for latest yii ActiveField upgrade.
 - (enh #54): Set default ActiveForm field template to be consistent with yii\widgets\ActiveForm.
 
-version 1.4.1
-=============
+## Version 1.4.1
+
 **Date:** 14-Feb-2015
 
 - (enh #30): Add `control-label` class to labels for Vertical form.
 - Set copyright year to current.
 
-version 1.4.0
-=============
+## Version 1.4.0
+
 **Date:** 28-Jan-2015
 
 - (enh #19): Add new `showHints` property to ActiveField configuration.
@@ -50,8 +61,8 @@ version 1.4.0
 - (enh #27): New property `staticValue` in ActiveField.
 - (enh #28): Enhancements for error and hint display for horizontal forms.
 
-version 1.3.0
-=============
+## Version 1.3.0
+
 **Date:** 04-Dec-2014
 
 - (enh #9): Enhance support for labels and horizontal form layouts
@@ -64,15 +75,15 @@ version 1.3.0
     - `false`: hide labels
     - `ActiveForm::SCREEN_READER`: show in screen reader only (hide from normal display)
     
-version 1.2.0
-=============
+## Version 1.2.0
+
 **Date:** 26-Nov-2014
 
 - (bug #7): Fix custom labels rendering for checkboxes
 - Set release to stable
 
-version 1.1.0
-=============
+## Version 1.1.0
+
 **Date:** 17-Nov-2014
 
 - (enh #1): Enhance ActiveField inputs to include bootstrap default styles.
@@ -80,8 +91,8 @@ version 1.1.0
 - (enh #5): Add special styling for bootstrap input group button addons for success and error states.
 - (enh #6): Fix incorrect alignment of inputs, buttons, and error block for INLINE FORM orientation.
 
-version 1.0.0
-=============
+## Version 1.0.0
+
 **Date:** 08-Nov-2014
 
 - Initial release 
