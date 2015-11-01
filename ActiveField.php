@@ -306,7 +306,7 @@ class ActiveField extends \yii\widgets\ActiveField
     protected function initPlaceholder(&$options)
     {
         if ($this->autoPlaceholder) {
-            $label = $this->model->getAttributeLabel(Html::getAttributeName($this->attribute));
+            $label = ArrayHelper::getValue($options, 'placeholder', $this->model->getAttributeLabel(Html::getAttributeName($this->attribute)));
             $this->inputOptions['placeholder'] = $label;
             $options['placeholder'] = $label;
         }
