@@ -4,14 +4,13 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.4.5
+ * @version    1.4.6
  */
 
 namespace kartik\form;
 
 use yii\base\InvalidConfigException;
 use yii\helpers\Html;
-use yii\helpers\ArrayHelper;
 
 /**
  * Extends the ActiveForm widget to handle various
@@ -62,8 +61,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
     const SCREEN_READER = 'sr-only';
 
     /**
-     * @var string form orientation type (for bootstrap styling)
-     * Defaults to 'vertical'.
+     * @var string form orientation type (for bootstrap styling). Defaults to 'vertical'.
      */
     public $type;
 
@@ -76,12 +74,12 @@ class ActiveForm extends \yii\widgets\ActiveForm
      * @var array the configuration for the form. Takes in the following properties
      * - labelSpan: int, the bootstrap grid column width (usually between 1 to 12)
      * - deviceSize: string, one of the bootstrap sizes (refer the ActiveForm::SIZE constants)
-     * - showLabels: boolean|string, whether to show labels (true), hide labels (false), or display only
-     *   for screen reader (ActiveForm::SCREEN_READER). This is mainly useful for inline forms.
-     * - showErrors: boolean, whether to show errors (true) or hide errors (false).
-     *   This is mainly useful for inline forms.
-     * - showHints: boolean, whether to show hints (true) or hide errors (false). Defaults to `true`.
-     *   The hint will be rendered only if a valid hint has been set through the `hint()` method.
+     * - showLabels: boolean|string, whether to show labels (true), hide labels (false), or display only for screen
+     *     reader (ActiveForm::SCREEN_READER). This is mainly useful for inline forms.
+     * - showErrors: boolean, whether to show errors (true) or hide errors (false). This is mainly useful for inline
+     *     forms.
+     * - showHints: boolean, whether to show hints (true) or hide errors (false). Defaults to `true`. The hint will be
+     *     rendered only if a valid hint has been set through the `hint()` method.
      * ```
      * [
      *      'labelSpan' => 2,
@@ -110,14 +108,13 @@ class ActiveForm extends \yii\widgets\ActiveForm
     public $readonly = false;
 
     /**
-     * @var string the label additional css class for horizontal forms
-     * and special inputs like checkbox and radio.
+     * @var string the label additional css class for horizontal forms and special inputs like checkbox and radio.
      */
     private $_labelCss;
 
     /**
-     * @var string the input container additional css class for horizontal forms
-     * and special inputs like checkbox and radio.
+     * @var string the input container additional css class for horizontal forms and special inputs like checkbox and
+     *     radio.
      */
     private $_inputCss;
 
@@ -143,14 +140,14 @@ class ActiveForm extends \yii\widgets\ActiveForm
             'deviceSize' => self::SIZE_MEDIUM,
             'showLabels' => true,
             'showErrors' => true,
-            'showHints' => true
+            'showHints' => true,
         ],
         self::TYPE_INLINE => [
             'labelSpan' => self::NOT_SET,
             'deviceSize' => self::NOT_SET,
             'showLabels' => self::SCREEN_READER,
             'showErrors' => false,
-            'showHints' => true
+            'showHints' => true,
         ],
     ];
 
@@ -176,7 +173,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
         }
         if ($this->type === self::TYPE_HORIZONTAL) {
             $class .= ' kv-form-horizontal';
-        }            
+        }
         Html::addCssClass($this->options, $class);
     }
 
@@ -190,7 +187,6 @@ class ActiveForm extends \yii\widgets\ActiveForm
         if (!is_int($this->fullSpan) && $this->fullSpan < 1) {
             throw new InvalidConfigException("The 'fullSpan' property must be a valid positive integer.");
         }
-        $this->registerAssets();
         $this->initForm();
         $config = $this->formConfig;
         $span = $config['labelSpan'];
@@ -224,6 +220,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
         }
 
         parent::init();
+        $this->registerAssets();
     }
 
     public function getFormLayoutStyle()
@@ -341,5 +338,7 @@ class ActiveForm extends \yii\widgets\ActiveForm
     {
         $view = $this->getView();
         ActiveFormAsset::register($view);
+        $id = 'jQuery("#' . $this->options['id'] . ' .kv-hint-special")';
+        $view->registerJs('var $el='.$id.';if($el.length){$el.each(function(){$(this).activeFieldHint()});}');
     }
 }

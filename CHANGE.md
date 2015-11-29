@@ -1,6 +1,14 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.4.6
+
+**Date:** 30-Nov-2015
+
+- (enh #61): Use model `getAttributeLabel()` as default in `initPlaceholder`.
+- (enh #64): Enhancement to display and style hints via icon popups or label hover
+- (bug #65): Fixes to staticOnly form rendering.
+
 ## Version 1.4.5
 
 **Date:** 22-Oct-2015
