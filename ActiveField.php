@@ -824,7 +824,8 @@ class ActiveField extends \yii\widgets\ActiveField
     public function label($label = null, $options = [])
     {
         $config = $this->hintSettings;
-        $hasIcon = ($config['onLabelClick'] || $config['onLabelHover']) && $config['showIcon'];
+        $hasIcon = (ArrayHelper::getValue($config, 'onLabelClick') || ArrayHelper::getValue($config, 'onLabelHover'))
+            && ArrayHelper::getValue($config, 'showIcon');
         if ($label !== false && $this->hasLabels() && $this->hintType === self::HINT_SPECIAL && $hasIcon) {
             if ($label === null) {
                 $label = $this->model->getAttributeLabel($this->attribute);
