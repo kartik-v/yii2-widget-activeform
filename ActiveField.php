@@ -66,7 +66,7 @@ class ActiveField extends \yii\widgets\ActiveField
      *     each input. If set to `self::HINT_SPECIAL`, then the `hintSettings` will be applied to display the field
      *     hint.
      */
-    public $hintType = self::HINT_DEFAUlT;
+    public $hintType = self::HINT_DEFAULT;
     /**
      * @var array the settings for displaying the hint. These settings are parsed only if `hintType` is set to
      *     `self::HINT_SPECIAL`. The following properties are supported:
