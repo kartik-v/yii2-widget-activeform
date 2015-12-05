@@ -14,7 +14,7 @@ use yii\helpers\Html;
 use yii\helpers\Inflector;
 
 /**
- * Extends the ActiveField widget to handle various bootstrap form types and handle input groups.
+ * Extends the ActiveField component to handle various bootstrap form types and handle input groups.
  *
  * Example(s):
  * ```php
@@ -100,7 +100,8 @@ class ActiveField extends \yii\widgets\ActiveField
      *     displayed.
      * - placement: string, the placement of the help popover on hover or click of the icon or label. Defaults to
      *     `top`.
-     * - container: string, the specific element to which the popover will be appended to. Defaults to `form`.
+     * - container: string, the specific element to which the popover will be appended to. Defaults to `table` when 
+     *     `iconBesideInput` is `true`, else defaults to `form`
      * - animation: bool, whether to add a CSS fade transition effect when opening and closing the popover. Defaults to
      *     `true`.
      * - delay: int|array, the number of milliseconds it will take to open and close the popover. Defaults to `0`.
@@ -389,8 +390,7 @@ class ActiveField extends \yii\widgets\ActiveField
     {
         $hasLabels = $this->hasLabels();
         $processLabels = $label !== false && $this->_isHintSpecial && $hasLabels !== false &&
-            $hasLabels !== ActiveForm::SCREEN_READER && $this->getHintData('showIcon') &&
-            ($this->getHintData('onLabelClick') || $this->getHintData('onLabelHover'));
+            $hasLabels !== ActiveForm::SCREEN_READER && ($this->getHintData('onLabelClick') || $this->getHintData('onLabelHover'));
         if ($processLabels) {
             if ($label === null) {
                 $label = $this->model->getAttributeLabel($this->attribute);
@@ -398,7 +398,7 @@ class ActiveField extends \yii\widgets\ActiveField
             $opts = ['class' => 'kv-type-label'];
             Html::addCssClass($opts, $this->getHintIconCss('Label'));
             $label = Html::tag('span', $label, $opts);
-            if (!$this->getHintData('iconBesideInput')) {
+            if ($this->getHintData('showIcon') && !$this->getHintData('iconBesideInput')) {
                 $label = strtr(
                     $this->getHintData('labelTemplate'),
                     ['{label}' => $label, '{help}' => $this->getHintIcon()]
@@ -897,6 +897,7 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($this->hintType !== self::HINT_SPECIAL) {
             return;
         }
+        $container = ArrayHelper::getValue($this->hintSettings, 'iconBesideInput') ?  'table' : 'form';
         $this->hintSettings = array_replace_recursive([
             'showIcon' => true,
             'iconBesideInput' => false,
@@ -913,7 +914,7 @@ class ActiveField extends \yii\widgets\ActiveField
             'hideOnEscape' => true,
             'hideOnClickOut' => true,
             'placement' => 'top',
-            'container' => 'form',
+            'container' => $container
         ], $this->hintSettings);
         Html::addCssClass($this->options, 'kv-hint-special');
         foreach (static::$_pluginHintKeys as $key) {
