@@ -509,11 +509,12 @@ class ActiveField extends \yii\widgets\ActiveField
 
         if ($this->form->staticOnly === true) {
             $this->buildTemplate();
-            return $this->staticInput()->render($content);
+            $this->staticInput();
+        } else {
+            $this->initPlaceholder($this->inputOptions);
+            $this->initDisability($this->inputOptions);
+            $this->buildTemplate();
         }
-        $this->initPlaceholder($this->inputOptions);
-        $this->initDisability($this->inputOptions);
-        $this->buildTemplate();
         return parent::render($content);
     }
 
