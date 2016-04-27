@@ -9,23 +9,25 @@
 
 namespace kartik\form;
 
+use kartik\base\AssetBundle;
+
 /**
  * Asset bundle for ActiveForm Widget
  *
  * @author Kartik Visweswaran <kartikv2@gmail.com>
  * @since  1.0
  */
-class ActiveFormAsset extends \kartik\base\AssetBundle
+class ActiveFormAsset extends AssetBundle
 {
-    public $depends = [
-        'yii\bootstrap\BootstrapPluginAsset'
-    ];
-
     /**
      * @inheritdoc
      */
     public function init()
     {
+        $this->depends = array_merge($this->depends, [            
+            'yii\web\YiiAsset',
+            'yii\bootstrap\BootstrapPluginAsset'
+        ]);
         $this->setSourcePath(__DIR__ . '/assets');
         $this->setupAssets('css', ['css/activeform']);
         $this->setupAssets('js', ['js/activeform']);

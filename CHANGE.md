@@ -1,6 +1,12 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.4.8
+
+**Date:** 28-Apr-2016
+
+- (bug #73): Correct dependency for `ActiveFormAsset`.
+
 ## Version 1.4.7
 
 **Date:** 05-Dec-2015
