@@ -1,6 +1,12 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.4.9
+- (bug #75): Closure function as fieldConfig now possible as Yii/widget supports
+- (enh #76): 'formConfig' can be changed between ActiveForm::begin / end and it has dynamic effect until rechanged.
+- (enh #76): Make ActiveForm/ActiveField compatibel to Yii/bootstrap with 'horizontalCssClasses' and wrappers
+- (bug #77): 'IconBeside' with container 'table' doesn't work, fix change container to 'form' and replace table by divs
+
 ## Version 1.4.8
 
 **Date:** 28-Apr-2016
