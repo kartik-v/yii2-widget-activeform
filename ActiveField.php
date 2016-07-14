@@ -4,7 +4,28 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2016
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.4.8
+ * @version    1.4.9a
+ * 
+ * Changes version 1.4.9a by Enrica
+ * - set default template moved from ActiveForm to ActiveField.initLayout()
+ *   (template and css are properties of an ActiveField)
+ * - Enhance public options 'labelSpan' and 'deviceSize' on level ActiveField also
+ * - Defaulting of 'labelSpan' and 'deviceSize' Prio: 1. Option (fieldConfig), 
+ *    2. formConfig, 3. _settings (default)
+ * - Build CSS for label, offset and Input on level field
+ * 
+ * Changes version 1.4.9b by Enrica
+ * - bug: checkbox/radio showLabels=>false didn't work
+ * - bug: Hint bedside container 'table' doesn't work (why?), fix use 'form'
+ * - enh: new option 'horizontalCss' compatible with Yii/bootstrap/ActiveForm rsp. Field
+ *        Options 'wrapper', 'label', 'error', 'hint'. These options give complete control
+ *        for all classes. 'labelSpan' still works and 'wrapper' is added if there
+ *        is no 'col-' tag defined.
+ * - enh: add template with '{beginWrapper'}, '{endWrapper}' to enclose input, hint, error
+ * - enh: optionally template '{label}' could be splitted in '{beginLabel}', 
+ *        '{labelTitle}' and '{endLabel}' tag. '{label}' is still working as usual
+ * 
+ * 
  */
 
 namespace kartik\form;
@@ -16,7 +37,7 @@ use yii\helpers\Inflector;
 /**
  * Extends the ActiveField component to handle various bootstrap form types and handle input groups.
  *
- * Example(s):
+ * Example(s) with addons:
  * ```php
  *    echo $this->form->field($model, 'email', ['addon' => ['type'=>'prepend', 'content'=>'@']]);
  *    echo $this->form->field($model, 'amount_paid', ['addon' => ['type'=>'append', 'content'=>'.00']]);
@@ -24,6 +45,14 @@ use yii\helpers\Inflector;
  *     glyphicon-phone']]);
  * ```
  *
+ * Example(s) with CSS control:
+ * ```php
+ *    echo $this->form->field($model, 'email', ['labelSpan' => 2, 'deviceSize' => ActiveForm::SIZE_SMALL]]);
+ *    echo $this->form->field($model, 'amount_paid', ['horizontalCssClass' => ['wrapper' => 'hidden-xs']]);
+ *    echo $this->form->field($model, 'phone', ['horizontalCssClass' => ['label' => 'col-md-2 col-sm-3 col-xs-12 myRedClass']]);
+ *    echo $this->form->field($model, 'special', ['template' => '{beginLabel}Text for: {labelTitle}{endLabel}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}']); 
+ * ```
+ * 
  * @property ActiveForm $form
  *
  * @author Kartik Visweswaran <kartikv2@gmail.com>
@@ -31,6 +60,7 @@ use yii\helpers\Inflector;
  */
 class ActiveField extends \yii\widgets\ActiveField
 {
+    const NOT_SET = '';
     const TYPE_RADIO = 'radio';
     const TYPE_CHECKBOX = 'checkbox';
     const STYLE_INLINE = 'inline';
@@ -229,6 +259,8 @@ class ActiveField extends \yii\widgets\ActiveField
         'hint' => '{hint}',
         'showLabels' => true,
         'showErrors' => true,
+        'labelSpan' => ActiveForm::DEFAULT_LABEL_SPAN,
+        'deviceSize' => ActiveForm::SIZE_MEDIUM,
     ];
     /**
      * @var bool whether there is a feedback icon configuration set
@@ -238,6 +270,82 @@ class ActiveField extends \yii\widgets\ActiveField
      * @var bool whether there is a feedback icon configuration set
      */
     protected $_isHintSpecial = false;
+    
+    // new vars from Enrica for v 1.4.9a
+    
+    /**
+     *
+     * @var type string: inherits and overrides values from parent class
+     * Value can be overridden by option in ActiveForm.field call.
+     * Following tags supported:
+     * {beginLabel}: Container begin tag for labels
+     * {labelTitle}: Label content without tags
+     * {endLabel}: Container end tag for labels
+     * {label}: Full label tag with begin tag, content and end tag
+     * {beginWrapper}: Div container for input,error and hint start tag
+     * {input}: placeholder for input control whatever it is
+     * {hint}: placeholder for hint/help text including sub container
+     * {error}: placeholder for error text including sub container
+     * {endWrapper}: end tag for {beginWrapper} normally '</div>'
+     */  
+    public $template = "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}";  
+    
+    /**
+     *
+     * @var type int labelSpan: int, the bootstrap grid column width (usually between 1 to 12)
+     */
+    public $labelSpan;
+
+    /**
+     *
+     * @var type deviceSize: string, one of the bootstrap sizes (refer the ActiveForm::SIZE constants)
+     */
+    public $deviceSize;
+
+     /**
+     * @var boolean whether to render the error. Default is `true` except for layout `inline`.
+     * For compatibility with Yii/bootstrap/ActiveField; is handed over to $showErrors 
+     */
+    public $enableError;
+    /**
+     * @var boolean whether to render the label. Default is `true`.
+     * For compatibility with Yii/bootstrap/ActiveField; is handed over to $showLabels 
+     */
+
+    public $enableLabel;
+
+    /**
+     * @var string the label additional css class for horizontal forms and special inputs like checkbox and radio.
+     */
+    private $_labelCss;
+
+    /**
+     * @var string the input container additional css class for horizontal forms and special inputs like checkbox and
+     *     radio.
+     */
+    private $_inputCss;
+
+    /**
+     * @var string the offset class for error and hint for horizontal forms
+     * or for special inputs like checkbox and radio.
+     */
+    private $_offsetCss;
+
+    // new vars Enrica 1.4.9b (Compat with yii/bootstrap widget
+    
+     /**
+     * @var null|array CSS grid classes for horizontal layout. This must be an array with these keys:
+     *  - 'offset' the offset grid class to append to the wrapper if no label is rendered
+     *  - 'label' the label grid class
+     *  - 'wrapper' the wrapper grid class
+     *  - 'error' the error grid class
+     *  - 'hint' the hint grid class
+     * These options are compatible with Yii/bootstrap/ActiveForm and provide a complete
+     * flexible container.
+     * If 'labelSpan' (eg. in formConfig) is set and 'wrapper' is set both css options are
+     * concatenated. If 'wrapper' contains a 'col-' class wrapper overrides tag from 'labelSpan'
+     */
+    public $horizontalCssClasses;
 
     /**
      * Parses and returns addon content
@@ -405,6 +513,10 @@ class ActiveField extends \yii\widgets\ActiveField
                 );
             }
         }
+        if (strpos($this->template, '{beginLabel}') !== false){
+            $this->renderLabelParts($label, $options);
+        }
+        
         return parent::label($label, $options);
     }
 
@@ -703,6 +815,12 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($enclosedByLabel) {
             $this->_offset = true;
             $this->parts['{label}'] = '';
+            // Enrica: fix showLables => false bug fix
+            $showLabels = $this->hasLabels();
+            if ($showLabels === false){
+                $options['label'] = '';
+                $this->showLabels = true;
+            }
         } else {
             $this->_offset = false;
             if (isset($options['label']) && !isset($this->parts['{label}'])) {
@@ -773,6 +891,12 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     protected function initActiveField()
     {
+        if (isset($this->enableError)){
+            $this->showErrors = $this->enableError;
+        }
+        if (isset($this->enableLabel)){
+            $this->showLabels = $this->enableLabel;
+        }
         $showLabels = $this->getConfigParam('showLabels');
         $this->_isHintSpecial = $this->hintType === self::HINT_SPECIAL;
         if ($this->form->type === ActiveForm::TYPE_INLINE && !isset($this->autoPlaceholder) && $showLabels !== true) {
@@ -786,8 +910,9 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($showLabels === ActiveForm::SCREEN_READER) {
             Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
         }
+        $this->initCssWrappers();   // new Enrica 1.4.9b
         $this->initLabels();
-        $this->initLayout();
+//        $this->initLayout();  deleted Enrica 1.4.9b -> functionality is done later again in buildTemplate
         $this->initHints();
         $this->_hasFeedback = !empty($this->feedbackIcon) && is_array($this->feedbackIcon);
     }
@@ -797,7 +922,8 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     protected function initLabels()
     {
-        $labelCss = $this->form->getLabelCss();
+        //$labelCss = $this->form->getLabelCss();  Replaced by Enrica 1.4.9a
+        $labelCss = $this->_labelCss;
         if ($this->hasLabels() === ActiveForm::SCREEN_READER) {
             Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
         } elseif ($labelCss != ActiveForm::NOT_SET) {
@@ -812,13 +938,105 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     protected function hasLabels()
     {
-        $showLabels = $this->getConfigParam('showLabels');
+        $showLabels = $this->getConfigParam('showLabels'); // plus abfrage $this-showLabels kombinieren.
         if ($this->autoPlaceholder && $showLabels !== ActiveForm::SCREEN_READER) {
             $showLabels = false;
         }
         return $showLabels;
     }
 
+    /**
+     * Prepares bootstrap grid col classes for label and input tags and initiate
+     * private CSS variables. 
+     * no return
+     * Process order for 'labelSpan' and 'wrapper'
+     * 
+     * 1. use a) $labelSpan/$deviceSize b) formConfig(['labelSpan' => x, 'deviceSize' => xy]) and build css tag.
+     * 2a. if horizontalCssClass['wrapper'] isset and no 'col-' tag then add this to css tag from 1)
+     * 2b. if horizontalCssClass['wrapper'] isset and has 'col-' tag then override css tag completely
+     * 3. if no $labelSpan and no horizontalCssClass['wrapper'] isset then use default from _settings
+     * Same behaviour with horizontalCssClass['label']
+     * 
+     */
+    protected function initCssWrappers() {
+        /* new 1.4.9a Enrica: Css init move CSS control from ActiveForm to 
+         * ActiveField
+        */        
+        
+        // prepare labelSpan without defaulting
+        if (!empty($this->labelSpan)){
+            $span = $this->labelSpan;
+        } elseif (isset($this->form->formConfig['labelSpan'])){
+            $span = $this->form->formConfig['labelSpan'];
+        }
+        
+        // check horizontalCssClasses['wrapper'] if there is a col- class
+        if (isset($this->horizontalCssClasses['wrapper'])){
+            if (strpos($this->horizontalCssClasses['wrapper'], 'col-') !== false){
+                $span = '';
+            }
+        }
+        
+        if (empty($span) && !isset($this->horizontalCssClasses['wrapper'])){
+            $span = $this->_settings['labelSpan'];
+        }
+        
+        if (!empty($this->deviceSize)){
+            $size = $this->deviceSize;
+        } elseif (isset($this->form->formConfig['deviceSize'])){
+            $size = $this->form->formConfig['deviceSize'];
+        } else {
+            $size = $this->_settings['deviceSize'];
+        }
+        $this->deviceSize = $size;
+        
+        $labelCss = $inputCss = $offsetCss = self::NOT_SET;
+
+        if ($span != self::NOT_SET && intval($span) > 0) {
+            $span = intval($span);
+
+            /* Validate if invalid labelSpan is passed - else set to DEFAULT_LABEL_SPAN */
+            if ($span <= 0 && $span >= $this->form->fullSpan) {
+                $span = $this->form->fullSpan;
+            }
+
+            /* Validate if invalid deviceSize is passed - else default to medium */
+            // Enrica 1.4.9a: add check valid values
+            if ($size == self::NOT_SET || !in_array($size, [ActiveForm::SIZE_TINY,
+                ActiveForm::SIZE_SMALL, ActiveForm::SIZE_MEDIUM, ActiveForm::SIZE_LARGE])) {
+                    $size = ActiveForm::SIZE_MEDIUM;
+            }
+
+            $this->labelSpan = $span;
+            
+            $prefix = "col-{$size}-";
+            $this->_labelCss = $prefix . $span;
+            $this->_inputCss = $prefix . ($this->form->fullSpan - $span);
+            $this->_offsetCss = "col-" . $size . "-offset-" . $span;
+        }
+        
+        if (isset($this->horizontalCssClasses['wrapper'])){
+            if ($span !== self::NOT_SET){
+                $this->_inputCss .= " ";
+            }
+            $this->_inputCss .= $this->horizontalCssClasses['wrapper'];
+        }
+        
+        if (isset($this->horizontalCssClasses['offset'])){
+            $this->_offsetCss = $this->horizontalCssClasses['offset'];
+        }
+        
+        if (isset($this->horizontalCssClasses['label'])){
+            if ($span !== self::NOT_SET){
+                $this->_labelCss .= " ";
+            }
+            $this->_labelCss .= $this->horizontalCssClasses['label'];
+        }
+        
+        if (isset($this->horizontalCssClasses['error'])){
+            $this->errorOptions['class'] = $this->errorOptions['class'] . " " . $this->horizontalCssClasses['error'];
+        }
+    }
     /**
      * Initialize layout settings for label, input, error and hint blocks and for various bootstrap 3 form layouts
      */
@@ -855,24 +1073,32 @@ class ActiveField extends \yii\widgets\ActiveField
         }
         if ($this->skipFormLayout) {
             $this->mergeSettings($showLabels, $showErrors);
+            $this->parts['{beginWrapper}'] = '';
+            $this->parts['{endWrapper}'] = '';
+            $this->parts['{beginLabel}'] = '';
+            $this->parts['{labelTitle}'] = '';
+            $this->parts['{endLabel}'] = '';
             return;
         }
         $inputDivClass = '';
-        $errorDivClass = '';
-        if ($this->form->hasInputCss()) {
-            $offsetDivClass = $this->form->getOffsetCss();
-            $inputDivClass = ($this->_offset) ? $offsetDivClass : $this->form->getInputCss();
+    //    $errorDivClass = '';
+        if (!empty($this->_inputCss)) {
+            $offsetDivClass = $this->_offsetCss . " " . $this->_inputCss;
+            $inputDivClass = ($this->_offset) ? $offsetDivClass : $this->_inputCss;
             if ($showLabels === false || $showLabels === ActiveForm::SCREEN_READER) {
-                $size = ArrayHelper::getValue($this->form->formConfig, 'deviceSize', ActiveForm::SIZE_MEDIUM);
-                $errorDivClass = "col-{$size}-{$this->form->fullSpan}";
-                $inputDivClass = $errorDivClass;
-            } elseif ($this->form->hasOffsetCss()) {
-                $errorDivClass = $offsetDivClass;
+            //    $size = ArrayHelper::getValue($this->form->formConfig, 'deviceSize', ActiveForm::SIZE_MEDIUM);
+            //    $errorDivClass = "col-{$this->deviceSize}-{$this->form->fullSpan}";
+                $inputDivClass = "col-{$this->deviceSize}-{$this->form->fullSpan}";
+            } elseif (!empty($this->_offsetCss)) {
+            //    $errorDivClass = $offsetDivClass;
             }
         }
-        $this->setLayoutContainer('input', $inputDivClass);
-        $this->setLayoutContainer('error', $errorDivClass, $showErrors);
-        $this->setLayoutContainer('hint', $errorDivClass);
+        //$this->setLayoutContainer('input', $inputDivClass);
+        //$this->setLayoutContainer('error', $errorDivClass, $showErrors);
+        //$this->setLayoutContainer('hint', $errorDivClass);
+//        $tag = ArrayHelper::remove($options, 'tag', 'div');
+    $this->parts['{beginWrapper}'] = Html::beginTag('div', ['class' => $inputDivClass]);
+        $this->parts['{endWrapper}'] = Html::endTag('div');
         $this->mergeSettings($showLabels, $showErrors);
     }
 
@@ -898,12 +1124,13 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($this->hintType !== self::HINT_SPECIAL) {
             return;
         }
-        $container = ArrayHelper::getValue($this->hintSettings, 'iconBesideInput') ?  'table' : 'form';
+        $container = ArrayHelper::getValue($this->hintSettings, 'iconBesideInput') ?  'form' : 'form';
         $this->hintSettings = array_replace_recursive([
             'showIcon' => true,
             'iconBesideInput' => false,
             'labelTemplate' => '{label}{help}',
-            'inputTemplate' => '<table style="width:100%"><tr><td>{input}</td><td style="width:5%">{help}</td></tr></table>',
+        //    'inputTemplate' => '<table style="width:100%"><tr><td>{input}</td><td style="width:5%">{help}</td></tr></table>',
+            'inputTemplate' => '<div style="width:90%; float:left">{input}</div><div style="padding-top:7px">{help}</div>',
             'onLabelClick' => false,
             'onLabelHover' => true,
             'onIconClick' => true,
@@ -997,7 +1224,7 @@ class ActiveField extends \yii\widgets\ActiveField
             $showErrors = false;
         }
         $showLabels = $showLabels && $this->hasLabels();
-        $this->buildLayoutParts($showLabels, $showErrors);
+        $this->buildLayoutParts($showLabels, $showErrors);   //ist überflüssig, da bereits bei init erfolgt
         extract($this->_settings);
         if (!empty($this->_multiselect)) {
             $input = str_replace('{input}', $this->_multiselect, $input);
@@ -1009,10 +1236,14 @@ class ActiveField extends \yii\widgets\ActiveField
         $newInput = $this->contentBeforeInput . $this->generateAddon() . $this->renderFeedbackIcon() . $this->contentAfterInput;
         $newError = "{$this->contentBeforeError}{error}{$this->contentAfterError}";
         $this->template = strtr($this->template, [
+           '{beginLabel}' => $showLabels ? '{beginLabel}' : "",
+           '{endLabel}' => $showLabels ? '{endLabel}': "",
            '{label}' => $showLabels ? "{$this->contentBeforeLabel}{label}{$this->contentAfterLabel}" : "",
+           '{labelTitel}' => $showLabels ? "{$this->contentBeforeLabel}{labelTitel}{$this->contentAfterLabel}" : "",
            '{input}' => str_replace('{input}', $newInput, $input),
            '{error}' => $showErrors ? str_replace('{error}', $newError, $error) : '',
        ]);
+       
     }
 
     /**
@@ -1056,7 +1287,32 @@ class ActiveField extends \yii\widgets\ActiveField
         $this->getFeedbackIcon($config, 'success', $type, $prefix, $id) .
         $this->getFeedbackIcon($config, 'error', $type, $prefix, $id);
     }
-
+    
+    /**
+     * @param string|null $label the label or null to use model label
+     * @param array $options the tag options
+     */
+    protected function renderLabelParts($label = null, $options = [])
+    {
+        $options = array_merge($this->labelOptions, $options);
+        if ($label === null) {
+            if (isset($options['label'])) {
+                $label = $options['label'];
+                unset($options['label']);
+            } else {
+                $attribute = Html::getAttributeName($this->attribute);
+                $label = Html::encode($this->model->getAttributeLabel($attribute));
+            }
+        }
+        if (!isset($options['for'])) {
+            $options['for'] = Html::getInputId($this->model, $this->attribute);
+        }
+        $this->parts['{beginLabel}'] = Html::beginTag('label', $options);
+        $this->parts['{endLabel}'] = Html::endTag('label');
+        if (!isset($this->parts['{labelTitle}'])) {
+            $this->parts['{labelTitle}'] = $label;
+        }
+    }
     /**
      * Generates a feedback icon
      *
