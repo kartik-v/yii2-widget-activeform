@@ -302,6 +302,18 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     public $deviceSize;
 
+     /**
+     * @var boolean whether to render the error. Default is `true` except for layout `inline`.
+     * For compatibility with Yii/bootstrap/ActiveField; is handed over to $showErrors 
+     */
+    public $enableError;
+    /**
+     * @var boolean whether to render the label. Default is `true`.
+     * For compatibility with Yii/bootstrap/ActiveField; is handed over to $showLabels 
+     */
+
+    public $enableLabel;
+
     /**
      * @var string the label additional css class for horizontal forms and special inputs like checkbox and radio.
      */
@@ -879,6 +891,12 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     protected function initActiveField()
     {
+        if (isset($this->enableError)){
+            $this->showErrors = $this->enableError;
+        }
+        if (isset($this->enableLabel)){
+            $this->showLabels = $this->enableLabel;
+        }
         $showLabels = $this->getConfigParam('showLabels');
         $this->_isHintSpecial = $this->hintType === self::HINT_SPECIAL;
         if ($this->form->type === ActiveForm::TYPE_INLINE && !isset($this->autoPlaceholder) && $showLabels !== true) {
