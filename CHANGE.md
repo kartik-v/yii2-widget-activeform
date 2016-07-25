@@ -22,6 +22,7 @@ Change Log: `yii2-widget-activeform`
         - enh: Add template with `{beginWrapper`}, `{endWrapper}` to enclose input, hint, error
         - enh: Optionally template `{label}` could be split into `{beginLabel}`,
                `{labelTitle}` and `{endLabel}` tag. `{label}` is still working as usual
+- Add contribution and issue/PR log templates.
 
 ## Version 1.4.8
 
