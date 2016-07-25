@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2016
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.4.8
+ * @version    1.4.9
  */
 
 namespace kartik\form;
@@ -41,8 +41,6 @@ use yii\helpers\Html;
  */
 class ActiveForm extends \yii\widgets\ActiveForm
 {
-
-    const NOT_SET = '';
     const DEFAULT_LABEL_SPAN = 2; // this will offset the adjacent input accordingly
     const FULL_SPAN = 12; // bootstrap default full grid width
 
@@ -61,7 +59,13 @@ class ActiveForm extends \yii\widgets\ActiveForm
     const SCREEN_READER = 'sr-only';
 
     /**
-     * @var string form orientation type (for bootstrap styling). Defaults to 'vertical'.
+     * @inheritdoc
+     */
+    public $fieldClass = 'kartik\form\ActiveField';
+
+    /**
+     * @var string form orientation type (for bootstrap styling). Either 'vertical', 'horizontal' or 'vertical'.
+     *     Defaults to 'vertical'.
      */
     public $type;
 
@@ -93,58 +97,40 @@ class ActiveForm extends \yii\widgets\ActiveForm
     public $formConfig = [];
 
     /**
-     * @var boolean whether all data in form are to be static inputs
+     * @var array HTML attributes for the form tag. Default is `['role' => 'form']`.
+     */
+    public $options = ['role' => 'form'];
+
+    /**
+     * @var bool whether all data in form are to be static inputs
      */
     public $staticOnly = false;
 
     /**
-     * @var boolean whether all inputs in form are to be disabled
+     * @var bool whether all inputs in form are to be disabled
      */
     public $disabled = false;
 
     /**
-     * @var boolean whether all inputs in form are to be readonly
+     * @var bool whether all inputs in form are to be readonly
      */
     public $readonly = false;
-
-    /**
-     * @var string the label additional css class for horizontal forms and special inputs like checkbox and radio.
-     */
-    private $_labelCss;
-
-    /**
-     * @var string the input container additional css class for horizontal forms and special inputs like checkbox and
-     *     radio.
-     */
-    private $_inputCss;
-
-    /**
-     * @var string the offset class for error and hint for horizontal forms
-     * or for special inputs like checkbox and radio.
-     */
-    private $_offsetCss;
 
     /**
      * @var array the default form configuration
      */
     private $_config = [
         self::TYPE_VERTICAL => [
-            'labelSpan' => self::NOT_SET, // must be between 1 and 12
-            'deviceSize' => self::NOT_SET, // must be one of the SIZE modifiers
             'showLabels' => true, // show or hide labels (mainly useful for inline type form)
             'showErrors' => true, // show or hide errors (mainly useful for inline type form)
             'showHints' => true  // show or hide hints below the input
         ],
         self::TYPE_HORIZONTAL => [
-            'labelSpan' => self::DEFAULT_LABEL_SPAN,
-            'deviceSize' => self::SIZE_MEDIUM,
             'showLabels' => true,
             'showErrors' => true,
             'showHints' => true,
         ],
         self::TYPE_INLINE => [
-            'labelSpan' => self::NOT_SET,
-            'deviceSize' => self::NOT_SET,
             'showLabels' => self::SCREEN_READER,
             'showErrors' => false,
             'showHints' => true,
@@ -152,183 +138,17 @@ class ActiveForm extends \yii\widgets\ActiveForm
     ];
 
     /**
-     * Initializes the form configuration array
-     * and parameters for the form.
-     */
-    protected function initForm()
-    {
-        if (!isset($this->type) || strlen($this->type) == 0) {
-            $this->type = self::TYPE_VERTICAL;
-        }
-        $this->formConfig = array_replace_recursive($this->_config[$this->type], $this->formConfig);
-        if (!isset($this->fieldConfig['class'])) {
-            $this->fieldConfig['class'] = ActiveField::className();
-        }
-        $this->_inputCss = self::NOT_SET;
-        $this->_offsetCss = self::NOT_SET;
-        $class = 'form-' . $this->type;
-        /* Fixes the button alignment for inline forms containing error block */
-        if ($this->type === self::TYPE_INLINE && $this->formConfig['showErrors']) {
-            $class .= ' ' . $class . '-block';
-        }
-        if ($this->type === self::TYPE_HORIZONTAL) {
-            $class .= ' kv-form-horizontal';
-        }
-        Html::addCssClass($this->options, $class);
-    }
-
-    /**
-     * Initializes the widget.
-     *
-     * @throws \yii\base\InvalidConfigException
+     * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function init()
     {
-        if (!is_int($this->fullSpan) && $this->fullSpan < 1) {
+        if (!is_int($this->fullSpan) || $this->fullSpan < 1) {
             throw new InvalidConfigException("The 'fullSpan' property must be a valid positive integer.");
         }
         $this->initForm();
-        $config = $this->formConfig;
-        $span = $config['labelSpan'];
-        $size = $config['deviceSize'];
-        $formStyle = $this->getFormLayoutStyle();
-        $this->_labelCss = $formStyle['labelCss'];
-        $this->_inputCss = $formStyle['inputCss'];
-        $this->_offsetCss = $formStyle['offsetCss'];
-
-        if ($span != self::NOT_SET && intval($span) > 0) {
-            $span = intval($span);
-
-            /* Validate if invalid labelSpan is passed - else set to DEFAULT_LABEL_SPAN */
-            if ($span <= 0 && $span >= $this->fullSpan) {
-                $span = self::DEFAULT_LABEL_SPAN;
-            }
-
-            /* Validate if invalid deviceSize is passed - else default to medium */
-            if ($size == self::NOT_SET) {
-                $size = self::SIZE_MEDIUM;
-            }
-
-            $prefix = "col-{$size}-";
-            $this->_labelCss = $prefix . $span;
-            $this->_inputCss = $prefix . ($this->fullSpan - $span);
-            $this->_offsetCss = "col-" . $size . "-offset-" . $span . " " . $this->_inputCss;
-        }
-
-        if ($this->_inputCss == self::NOT_SET && empty($this->fieldConfig['template'])) {
-            $this->fieldConfig['template'] = "{label}\n{input}\n{hint}\n{error}";
-        }
-
         parent::init();
         $this->registerAssets();
-    }
-
-    public function getFormLayoutStyle()
-    {
-        $config = $this->formConfig;
-        $span = $config['labelSpan'];
-        $size = $config['deviceSize'];
-        $labelCss = $inputCss = $offsetCss = self::NOT_SET;
-
-        if ($span != self::NOT_SET && intval($span) > 0) {
-            $span = intval($span);
-
-            /* Validate if invalid labelSpan is passed - else set to DEFAULT_LABEL_SPAN */
-            if ($span <= 0 && $span >= $this->fullSpan) {
-                $span = self::DEFAULT_LABEL_SPAN;
-            }
-
-            /* Validate if invalid deviceSize is passed - else default to medium */
-            if ($size == self::NOT_SET) {
-                $size = self::SIZE_MEDIUM;
-            }
-
-            $prefix = "col-{$size}-";
-            $labelCss = $prefix . $span;
-            $inputCss = $prefix . ($this->fullSpan - $span);
-            $offsetCss = "col-" . $size . "-offset-" . $span . " " . $inputCss;
-        }
-        return ['labelCss' => $labelCss, 'inputCss' => $inputCss, 'offsetCss' => $offsetCss];
-    }
-
-    /**
-     * Gets label css property
-     *
-     * @return string
-     */
-    public function getLabelCss()
-    {
-        return $this->_labelCss;
-    }
-
-    /**
-     * Sets label css property
-     *
-     * @param string $class
-     */
-    public function setLabelCss($class)
-    {
-        $this->_labelCss = $class;
-    }
-
-    /**
-     * Gets input css property
-     *
-     * @return string
-     */
-    public function getInputCss()
-    {
-        return $this->_inputCss;
-    }
-
-    /**
-     * Sets input css property
-     *
-     * @param string $class
-     */
-    public function setInputCss($class)
-    {
-        $this->_inputCss = $class;
-    }
-
-    /**
-     * Checks if input css property is set
-     *
-     * @return bool
-     */
-    public function hasInputCss()
-    {
-        return ($this->_inputCss != self::NOT_SET);
-    }
-
-    /**
-     * Gets offset css property
-     *
-     * @return string
-     */
-    public function getOffsetCss()
-    {
-        return $this->_offsetCss;
-    }
-
-    /**
-     * Sets offset css property
-     *
-     * @param string $class
-     */
-    public function setOffsetCss($class)
-    {
-        $this->_offsetCss = $class;
-    }
-
-    /**
-     * Checks if offset css property is set
-     *
-     * @return bool
-     */
-    public function hasOffsetCss()
-    {
-        return ($this->_offsetCss != self::NOT_SET);
     }
 
     /**
@@ -339,6 +159,32 @@ class ActiveForm extends \yii\widgets\ActiveForm
         $view = $this->getView();
         ActiveFormAsset::register($view);
         $id = 'jQuery("#' . $this->options['id'] . ' .kv-hint-special")';
-        $view->registerJs('var $el='.$id.';if($el.length){$el.each(function(){$(this).activeFieldHint()});}');
+        $view->registerJs('var $el=' . $id . ';if($el.length){$el.each(function(){$(this).activeFieldHint()});}');
+    }
+
+    /**
+     * Initializes the form configuration array and parameters for the form.
+     *
+     * @throws InvalidConfigException
+     */
+    protected function initForm()
+    {
+        if (empty($this->type)) {
+            $this->type = self::TYPE_VERTICAL;
+        }
+        if (!in_array($this->type, [self::TYPE_VERTICAL, self::TYPE_HORIZONTAL, self::TYPE_INLINE])) {
+            throw new InvalidConfigException('Invalid layout type: ' . $this->type);
+        }
+        $this->formConfig = array_replace_recursive($this->_config[$this->type], $this->formConfig);
+        $prefix = 'form-' . $this->type;
+        $css = [$prefix];
+        /* Fixes the button alignment for inline forms containing error block */
+        if ($this->type === self::TYPE_INLINE && $this->formConfig['showErrors']) {
+            $css[] = $prefix . '-block';
+        }
+        if ($this->type === self::TYPE_HORIZONTAL) {
+            $css[] = 'kv-form-horizontal';
+        }
+        Html::addCssClass($this->options, $css);
     }
 }
