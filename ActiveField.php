@@ -12,25 +12,37 @@ namespace kartik\form;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Inflector;
+use yii\widgets\ActiveField as YiiActiveField;
 
 /**
- * Extends the ActiveField component to handle various bootstrap form types and handle input groups.
+ * ActiveField represents a form input field within an [[ActiveForm]] and extends the [[YiiActiveField]] component
+ * to handle various bootstrap functionality like form types, input groups/addons, toggle buttons, feedback icons, and
+ * other enhancements
  *
- * Example(s) with addons:
+ * Usage example with addons:
+ *
  * ```php
- *    echo $this->form->field($model, 'email', ['addon' => ['type'=>'prepend', 'content'=>'@']]);
- *    echo $this->form->field($model, 'amount_paid', ['addon' => ['type'=>'append', 'content'=>'.00']]);
- *    echo $this->form->field($model, 'phone', ['addon' => ['type'=>'prepend', 'content'=>'<i class="glyphicon
- *     glyphicon-phone']]);
+ * echo $this->form->field($model, 'email', ['addon' => ['type'=>'prepend', 'content'=>'@']]);
+ * echo $this->form->field($model, 'amount_paid', ['addon' => ['type'=>'append', 'content'=>'.00']]);
+ * echo $this->form->field($model, 'phone', [
+ *     'addon' => [
+ *         'type'=>'prepend',
+ *         'content'=>'<i class="glyphicon glyphicon-phone'
+ *     ]
+ * ]);
  * ```
  *
- * Example(s) with CSS control:
+ * Usage example with horizontal form and advanced field layout CSS configuration:
+ *
  * ```php
- *    echo $this->form->field($model, 'email', ['labelSpan' => 2, 'deviceSize' => ActiveForm::SIZE_SMALL]]);
- *    echo $this->form->field($model, 'amount_paid', ['horizontalCssClasses' => ['wrapper' => 'hidden-xs']]);
- *    echo $this->form->field($model, 'phone', ['horizontalCssClasses' => ['label' => 'col-md-2 col-sm-3 col-xs-12
- * myRedClass']]); echo $this->form->field($model, 'special', ['template' => '{beginLabel}Text for:
- * {labelTitle}{endLabel}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}']);
+ * echo $this->form->field($model, 'email', ['labelSpan' => 2, 'deviceSize' => ActiveForm::SIZE_SMALL]]);
+ * echo $this->form->field($model, 'amount_paid', ['horizontalCssClasses' => ['wrapper' => 'hidden-xs']]);
+ * echo $this->form->field($model, 'phone', [
+ *     'horizontalCssClasses' => ['label' => 'col-md-2 col-sm-3 col-xs-12 myRedClass']
+ * ]);
+ * echo $this->form->field($model, 'special', [
+ *     'template' => '{beginLabel}For: {labelTitle}{endLabel}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}'
+ * ]);
  * ```
  *
  * @property ActiveForm $form
@@ -38,16 +50,35 @@ use yii\helpers\Inflector;
  * @author Kartik Visweswaran <kartikv2@gmail.com>
  * @since  1.0
  */
-class ActiveField extends \yii\widgets\ActiveField
+class ActiveField extends YiiActiveField
 {
+    /**
+     * An empty string value
+     */
     const NOT_SET = '';
+    /**
+     * HTML radio input type
+     */
     const TYPE_RADIO = 'radio';
+    /**
+     * HTML checkbox input type
+     */
     const TYPE_CHECKBOX = 'checkbox';
+    /**
+     * Inline style flag for rendering checkboxes (as per bootstrap styling)
+     */
     const STYLE_INLINE = 'inline';
+    /**
+     * The default height for the Krajee multi select input
+     */
     const MULTI_SELECT_HEIGHT = '145px';
-
-    // hint display settings
+    /**
+     * Default hint type that is displayed below the input
+     */
     const HINT_DEFAULT = 1;
+    /**
+     * Special hint type that allows display via an indicator icon or on hover/click of the field label
+     */
     const HINT_SPECIAL = 2;
 
     /**
@@ -71,83 +102,84 @@ class ActiveField extends \yii\widgets\ActiveField
 
     /**
      * @var boolean whether to override the form layout styles and skip field formatting as per the form layout.
-     *     Defaults to `false`.
+     * Defaults to `false`.
      */
     public $skipFormLayout = false;
 
     /**
-     * @var int the hint display type. If set to `self::HINT_DEFAULT`, the hint will be displayed as a text block below
-     *     each input. If set to `self::HINT_SPECIAL`, then the `hintSettings` will be applied to display the field
-     *     hint.
+     * @var integer the hint display type. If set to `self::HINT_DEFAULT`, the hint will be displayed as a text block below
+     * each input. If set to `self::HINT_SPECIAL`, then the `hintSettings` will be applied to display the field
+     * hint.
      */
     public $hintType = self::HINT_DEFAULT;
 
     /**
      * @var array the settings for displaying the hint. These settings are parsed only if `hintType` is set to
-     *     `self::HINT_SPECIAL`. The following properties are supported:
-     * - showIcon: bool, whether to display the hint via a help icon indicator. Defaults to `true`.
-     * - icon: string, the markup to display the help icon. Defaults to `<i class="glyphicon glyphicon-question-sign
-     *     text-info"></i>`.
-     * - iconBesideInput: bool, whether to display the icon beside the input. Defaults to `false`. The following
-     *     actions will be taken based on this setting:
-     *      - if set to `false` the help icon is displayed beside the label and the `labelTemplate` setting is used to
+     * `self::HINT_SPECIAL`. The following properties are supported:
+     * - `showIcon`: _boolean_, whether to display the hint via a help icon indicator. Defaults to `true`.
+     * - `icon`: _string_, the markup to display the help icon. Defaults to `<i class="glyphicon glyphicon-question-sign
+     *   text-info"></i>`.
+     * - `iconBesideInput`: _boolean_, whether to display the icon beside the input. Defaults to `false`. The following
+     *   actions will be taken based on this setting:
+     *   - if set to `false` the help icon is displayed beside the label and the `labelTemplate` setting is used to
      *     render the icon and label markups.
-     *      - if set to `true` the help icon is displayed beside the input and the `inputTemplate` setting is used to
+     *   - if set to `true` the help icon is displayed beside the input and the `inputTemplate` setting is used to
      *     render the icon and input markups.
-     * - labelTemplate: string, the template to render the help icon and the field label. Defaults to `{label}{help}`,
-     *     where
-     *      - `{label}` will be replaced by the ActiveField label content
-     *      - `{help}` will be replaced by the help icon indicator markup
-     * - inputTemplate: string, the template to render the help icon and the field input. Defaults to `'<div
-     *     style="width:90%; float:left">{input}</div><div style="padding-top:7px">{help}</div>',`, where
-     *      - `{input}` will be replaced by the ActiveField input content
-     *      - `{help}` will be replaced by the help icon indicator markup
-     * - onLabelClick: bool, whether to display the hint on clicking the label. Defaults to `false`.
-     * - onLabelHover: bool, whether to display the hint on hover of the label. Defaults to `true`.
-     * - onIconClick: bool, whether to display the hint on clicking the icon. Defaults to `true`.
-     * - onIconHover: bool, whether to display the hint on hover of the icon. Defaults to `false`.
-     * - iconCssClass: string, the CSS class appended to the `span` container enclosing the icon.
-     * - labelCssClass: string, the CSS class appended to the `span` container enclosing label text within label tag.
-     * - contentCssClass: string, the CSS class appended to the `span` container displaying help content within
-     *     popover.
-     * - hideOnEscape: bool, whether to hide the popover on clicking escape button on the keyboard. Defaults to `true`.
-     * - hideOnClickOut: bool, whether to hide the popover on clicking outside the popover. Defaults to `true`.
-     * - title: string, the title heading for the popover dialog. Defaults to empty string, whereby the heading is not
-     *     displayed.
-     * - placement: string, the placement of the help popover on hover or click of the icon or label. Defaults to
-     *     `top`.
-     * - container: string, the specific element to which the popover will be appended to. Defaults to `table` when
-     *     `iconBesideInput` is `true`, else defaults to `form`
-     * - animation: bool, whether to add a CSS fade transition effect when opening and closing the popover. Defaults to
-     *     `true`.
-     * - delay: int|array, the number of milliseconds it will take to open and close the popover. Defaults to `0`.
-     * - selector: int, the specified selector to add the popover to. Defaults to boolean `false`.
-     * - viewport: string|array, the element within which the popover will be bounded to. Defaults to
-     *     `['selector' => 'body', 'padding' => 0]`.
+     * - `labelTemplate`: _string_, the template to render the help icon and the field label. Defaults to `{label}{help}`,
+     *   where
+     *   - `{label}` will be replaced by the ActiveField label content
+     *   - `{help}` will be replaced by the help icon indicator markup
+     * - `inputTemplate`: _string_, the template to render the help icon and the field input. Defaults to `'<div
+     *   style="width:90%; float:left">{input}</div><div style="padding-top:7px">{help}</div>',`, where
+     *   - `{input}` will be replaced by the ActiveField input content
+     *   - `{help}` will be replaced by the help icon indicator markup
+     * - `onLabelClick`: _boolean_, whether to display the hint on clicking the label. Defaults to `false`.
+     * - `onLabelHover`: _boolean_, whether to display the hint on hover of the label. Defaults to `true`.
+     * - `onIconClick`: _boolean_, whether to display the hint on clicking the icon. Defaults to `true`.
+     * - `onIconHover`: _boolean_, whether to display the hint on hover of the icon. Defaults to `false`.
+     * - `iconCssClass`: _string_, the CSS class appended to the `span` container enclosing the icon.
+     * - `labelCssClass`: _string_, the CSS class appended to the `span` container enclosing label text within label tag.
+     * - `contentCssClass`: _string_, the CSS class appended to the `span` container displaying help content within
+     *   popover.
+     * - `hideOnEscape`: _boolean_, whether to hide the popover on clicking escape button on the keyboard. Defaults to `true`.
+     * - `hideOnClickOut`: _boolean_, whether to hide the popover on clicking outside the popover. Defaults to `true`.
+     * - `title`: _string_, the title heading for the popover dialog. Defaults to empty string, whereby the heading is not
+     *   displayed.
+     * - `placement`: _string_, the placement of the help popover on hover or click of the icon or label. Defaults to
+     *   `top`.
+     * - `container`: _string_, the specific element to which the popover will be appended to. Defaults to `table` when
+     *   `iconBesideInput` is `true`, else defaults to `form`
+     * - `animation`: _boolean_, whether to add a CSS fade transition effect when opening and closing the popover. Defaults to
+     *   `true`.
+     * - `delay``: _integer_|_array_, the number of milliseconds it will take to open and close the popover. Defaults to `0`.
+     * - `selector`: _integer_, the specified selector to add the popover to. Defaults to boolean `false`.
+     * - `viewport`: _string_|_array_, the element within which the popover will be bounded to. Defaults to
+     *   `['selector' => 'body', 'padding' => 0]`.
      */
     public $hintSettings = [];
 
     /**
-     * @var array the feedback icon configuration (applicable for bootstrap text inputs).
-     * @see http://getbootstrap.com/css/#with-optional-icons
-     *
+     * @var array the feedback icon configuration (applicable for [bootstrap text inputs](http://getbootstrap.com/css/#with-optional-icons)).
      * This must be setup as an array containing the following keys:
-     * - type: string, the icon type to use. Should be one of `raw` or `icon`. Defaults to `icon`, where the `default`,
-     *     `error` and `success` settings will be treated as an icon CSS suffix name. If set to `raw`, they will be
-     *     treated as a raw content markup.
-     * - prefix: string, the icon CSS class prefix to use if `type` is `icon`. Defaults to `glyphicon glyphicon-`.
-     * - default: string, the icon (CSS class suffix name or raw markup) to show by default. If not set will not be
-     *     shown.
-     * - error: string, the icon (CSS class suffix name or raw markup) to use when input has an error validation. If
-     *     not set will not be shown.
-     * - success: string, the icon (CSS class suffix name or raw markup) to use when input has a success validation. If
-     *     not set will not be shown.
-     * - defaultOptions: array, the HTML attributes to apply for default icon. The special attribute `description` can
-     *     be set to describe this feedback as an `aria` attribute for accessibility. Defaults to `(default)`.
-     * - errorOptions: array, the HTML attributes to apply for error icon. The special attribute `description` can be
-     *     set to describe this feedback as an `aria` attribute for accessibility. Defaults to `(error)`.
-     * - successOptions: array, the HTML attributes to apply for success icon. The special attribute `description` can
-     *     be set to describe this feedback as an `aria` attribute for accessibility. Defaults to `(success)`.
+     *
+     * - `type`: _string_, the icon type to use. Should be one of `raw` or `icon`. Defaults to `icon`, where the `default`,
+     *   `error` and `success` settings will be treated as an icon CSS suffix name. If set to `raw`, they will be
+     *   treated as a raw content markup.
+     * - `prefix`: _string_, the icon CSS class prefix to use if `type` is `icon`. Defaults to `glyphicon glyphicon-`.
+     * - `default`: _string_, the icon (CSS class suffix name or raw markup) to show by default. If not set will not be
+     *   shown.
+     * - `error`: _string_, the icon (CSS class suffix name or raw markup) to use when input has an error validation. If
+     *   not set will not be shown.
+     * - `success`: _string_, the icon (CSS class suffix name or raw markup) to use when input has a success validation. If
+     *   not set will not be shown.
+     * - `defaultOptions`: _array_, the HTML attributes to apply for default icon. The special attribute `description` can
+     *   be set to describe this feedback as an `aria` attribute for accessibility. Defaults to `(default)`.
+     * - `errorOptions`: _array_, the HTML attributes to apply for error icon. The special attribute `description` can be
+     *   set to describe this feedback as an `aria` attribute for accessibility. Defaults to `(error)`.
+     * - `successOptions`: _array_, the HTML attributes to apply for success icon. The special attribute `description` can
+     *   be set to describe this feedback as an `aria` attribute for accessibility. Defaults to `(success)`.
+     *
+     * @see http://getbootstrap.com/css/#with-optional-icons
      */
     public $feedbackIcon = [];
 
@@ -193,17 +225,17 @@ class ActiveField extends \yii\widgets\ActiveField
 
     /**
      * @var array addon options for text and password inputs. The following settings can be configured:
-     * - prepend: array the prepend addon configuration
-     * - content: string the prepend addon content
-     * - asButton: boolean whether the addon is a button or button group. Defaults to false.
-     * - options: array the HTML attributes to be added to the container.
-     * - append: array the append addon configuration
-     * - content: string/array the append addon content
-     * - asButton: boolean whether the addon is a button or button group. Defaults to false.
-     * - options: array the HTML attributes to be added to the container.
-     * - groupOptions: array HTML options for the input group
-     * - contentBefore: string content placed before addon
-     * - contentAfter: string content placed after addon
+     * - `prepend`: _array_, the prepend addon configuration
+     * - `content`: _string_, the prepend addon content
+     * - `asButton`: _boolean_, whether the addon is a button or button group. Defaults to false.
+     * - `options`: _array_, the HTML attributes to be added to the container.
+     * - `append`: _array_, the append addon configuration
+     * - `content`: _string_|_array_, the append addon content
+     * - `asButton`: _boolean_, whether the addon is a button or button group. Defaults to false.
+     * - `options`: _array_, the HTML attributes to be added to the container.
+     * - `groupOptions`: _array_, HTML options for the input group
+     * - `contentBefore`: _string_, content placed before addon
+     * - `contentAfter`: _string_, content placed after addon
      */
     public $addon = [];
 
@@ -214,7 +246,7 @@ class ActiveField extends \yii\widgets\ActiveField
 
     /**
      * @var string the static value for the field to be displayed for the static input OR when the form is in
-     *     staticOnly mode. This value is not HTML encoded.
+     * staticOnly mode. This value is not HTML encoded.
      */
     public $staticValue;
 
@@ -242,54 +274,52 @@ class ActiveField extends \yii\widgets\ActiveField
     public $autoPlaceholder;
 
     /**
-     * @var string: inherits and overrides values from parent class. The value can be overridden within ActiveForm
-     *     `field` method. The following tags are supported:
-     * {beginLabel}: Container begin tag for labels
-     * {labelTitle}: Label content without tags
-     * {endLabel}: Container end tag for labels
-     * {label}: Full label tag with begin tag, content and end tag
-     * {beginWrapper}: Div container for input,error and hint start tag
-     * {input}: placeholder for input control whatever it is
-     * {hint}: placeholder for hint/help text including sub container
-     * {error}: placeholder for error text including sub container
-     * {endWrapper}: end tag for {beginWrapper} normally '</div>'
+     * @var string inherits and overrides values from parent class. The value can be overridden within
+     * [[ActiveForm::field()]] method. The following tags are supported:
+     * - `{beginLabel}`: Container begin tag for labels
+     * - `{labelTitle}`: Label content without tags
+     * - `{endLabel}`: Container end tag for labels
+     * - `{label}`: Full label tag with begin tag, content and end tag
+     * - `{beginWrapper}`: Container for input,error and hint start tag. Uses a `<div>` tag by default.
+     * - `{input}`: placeholder for input control whatever it is
+     * - `{hint}`: placeholder for hint/help text including sub container
+     * - `{error}`: placeholder for error text including sub container
+     * - `{endWrapper}`: end tag for `{beginWrapper}`. Defaults to `</div>`.
      */
     public $template = "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}";
 
     /**
      *
-     * @var int labelSpan: int, the bootstrap grid column width (usually between 1 to 12)
+     * @var integer the bootstrap grid column width (usually between 1 to 12)
      */
     public $labelSpan;
 
     /**
      *
-     * @var string, one of the bootstrap sizes (refer the ActiveForm::SIZE constants)
+     * @var string one of the bootstrap sizes (refer the ActiveForm::SIZE constants)
      */
     public $deviceSize;
 
     /**
      * @var boolean whether to render the error. Default is `true` except for layout `inline`.
-     * For compatibility with Yii/bootstrap/ActiveField; is handed over to $showErrors
      */
     public $enableError;
 
     /**
      * @var boolean whether to render the label. Default is `true`.
-     * For compatibility with Yii/bootstrap/ActiveField; is handed over to $showLabels
      */
     public $enableLabel;
 
     /**
      * @var null|array CSS grid classes for horizontal layout. This must be an array with these keys:
-     *  - 'offset' the offset grid class to append to the wrapper if no label is rendered
-     *  - 'label' the label grid class
-     *  - 'wrapper' the wrapper grid class
-     *  - 'error' the error grid class
-     *  - 'hint' the hint grid class
-     * These options are compatible with yii\bootstrap\ActiveForm and provide a complete flexible container. If
-     *     'labelSpan' (eg. in formConfig) is set and 'wrapper' is set, both css options are concatenated. If 'wrapper'
-     *     contains a 'col-' class wrapper, it overrides the tag from 'labelSpan'
+     * - `offset`: the offset grid class to append to the wrapper if no label is rendered
+     * - `label`: the label grid class
+     * - `wrapper`: the wrapper grid class
+     * - `error`: the error grid class
+     * - `hint`: the hint grid class
+     * These options are compatible and similar to [[\yii\bootstrap\ActiveForm]] and provide a complete flexible
+     * container. If `labelSpan` is set in [[ActiveForm::formConfig]] and `wrapper` is also set, then both css options
+     * are concatenated. If `wrapper` contains a 'col-' class wrapper, it overrides the tag from `labelSpan`.
      */
     public $horizontalCssClasses;
 
@@ -322,12 +352,12 @@ class ActiveField extends \yii\widgets\ActiveField
     ];
 
     /**
-     * @var bool whether there is a feedback icon configuration set
+     * @var boolean whether there is a feedback icon configuration set
      */
     protected $_hasFeedback = false;
 
     /**
-     * @var bool whether there is a feedback icon configuration set
+     * @var boolean whether there is a feedback icon configuration set
      */
     protected $_isHintSpecial = false;
 
@@ -338,15 +368,25 @@ class ActiveField extends \yii\widgets\ActiveField
 
     /**
      * @var string the input container additional css class for horizontal forms and special inputs like checkbox and
-     *     radio.
+     * radio.
      */
     private $_inputCss;
 
     /**
      * @var string the offset class for error and hint for horizontal forms or for special inputs like checkbox and
-     *     radio.
+     * radio.
      */
     private $_offsetCss;
+
+    /**
+     * @var boolean whether the hint icon is beside the input.
+     */
+    private $_iconBesideInput = false;
+
+    /**
+     * @var string the identifier for the hint popover container.
+     */
+    private $_hintPopoverContainer;
 
     /**
      * Parses and returns addon content
@@ -388,16 +428,15 @@ class ActiveField extends \yii\widgets\ActiveField
      * @param array   $options the tag options in terms of name-value pairs. The following options are specially
      * handled:
      *
-     * - uncheck: string, the value associated with the uncheck state of the checkbox. If not set,
-     *   it will take the default value '0'. This method will render a hidden input so that if the checkbox
-     *   is not checked and is submitted, the value of this attribute will still be submitted to the server
-     *   via the hidden input.
-     * - label: string, a label displayed next to the checkbox. It will NOT be HTML-encoded. Therefore you can
+     * - `uncheck`: _string_, the value associated with the uncheck state of the checkbox. If not set, it will take
+     *   the default value `0`. This method will render a hidden input so that if the checkbox is not checked and is
+     *   submitted, the value of this attribute will still be submitted to the server via the hidden input.
+     * - `label`: _string_, a label displayed next to the checkbox. It will NOT be HTML-encoded. Therefore you can
      *   pass in HTML code such as an image tag. If this is is coming from end users, you should [[Html::encode()]]
      *   it to prevent XSS attacks. When this option is specified, the checkbox will be enclosed by a label tag.
-     * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is
+     * - `labelOptions`: _array_, the HTML attributes for the label tag. This is only used when the "label" option is
      *   specified.
-     * - container: boolean|array, the HTML attributes for the checkbox container. If this is set to false, no
+     * - `container: boolean|array, the HTML attributes for the checkbox container. If this is set to false, no
      *   container will be rendered. The special option `tag` will be recognized which defaults to `div`. This
      *   defaults to:
      *   `['tag' => 'div', 'class'=>'radio']`
@@ -421,22 +460,22 @@ class ActiveField extends \yii\widgets\ActiveField
      * model attribute.
      *
      * @param array $items the data item used to generate the checkboxes. The array values are the labels, while the
-     *     array keys are the corresponding checkbox values. Note that the labels will NOT be HTML-encoded, while the
-     *     values will be encoded.
+     * array keys are the corresponding checkbox values. Note that the labels will NOT be HTML-encoded, while the
+     * values will be encoded.
      * @param array $options options (name => config) for the checkbox list. The following options are specially
-     *     handled:
-     * - unselect: string, the value that should be submitted when none of the checkboxes is selected. By setting this
-     *     option, a hidden input will be generated.
-     * - separator: string, the HTML code that separates items.
-     * - inline: boolean, whether the list should be displayed as a series on the same line, default is false
-     * - item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
-     *     single item in $items. The signature of this callback must be:
+     * handled:
+     * - `unselect`: _string_, the value that should be submitted when none of the checkboxes is selected. By setting this
+     *   option, a hidden input will be generated.
+     * - `separator`: _string_, the HTML code that separates items.
+     * - `inline`: _boolean_, whether the list should be displayed as a series on the same line, default is false
+     * - `item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
+     *   single item in $items. The signature of this callback must be:
      * ~~~
      * function ($index, $label, $name, $checked, $value)
      * ~~~
      *
-     * where $index is the zero-based index of the checkbox in the whole list; $label is the label for the checkbox;
-     *     and $name, $value and $checked represent the name, value and the checked status of the checkbox input.
+     * where `$index` is the zero-based index of the checkbox in the whole list; `$label` is the label for the checkbox;
+     * and `$name`, `$value` and `$checked` represent the name, value and the checked status of the checkbox input.
      *
      * @return ActiveField object
      */
@@ -549,25 +588,23 @@ class ActiveField extends \yii\widgets\ActiveField
      * value.
      *
      * @param array   $options the tag options in terms of name-value pairs. The following options are specially
-     *     handled:
-     * - uncheck: string, the value associated with the uncheck state of the radio button. If not set, it will take the
-     *     default value '0'. This method will render a hidden input so that if the radio button is not checked and is
-     *     submitted, the value of this attribute will still be submitted to the server via the hidden input.
-     * - label: string, a label displayed next to the radio button. It will NOT be HTML-encoded. Therefore you can pass
-     *     in HTML code such as an image tag. If this is is coming from end users, you should [[Html::encode()]] it to
-     *     prevent XSS attacks. When this option is specified, the radio button will be enclosed by a label tag.
-     * - labelOptions: array, the HTML attributes for the label tag. This is only used when the "label" option is
-     *     specified.
-     * - container: boolean|array, the HTML attributes for the checkbox container. If this is set to false, no
-     *     container will be rendered. The special option `tag` will be recognized which defaults to `div`. This
-     *     defaults to:
-     *   `['tag' => 'div', 'class'=>'radio']`
+     * handled:
+     * - `uncheck`: _string_, the value associated with the uncheck state of the radio button. If not set, it will take the
+     *   default value '0'. This method will render a hidden input so that if the radio button is not checked and is
+     *   submitted, the value of this attribute will still be submitted to the server via the hidden input.
+     * - `label`: _string_, a label displayed next to the radio button. It will NOT be HTML-encoded. Therefore you can pass
+     *   in HTML code such as an image tag. If this is is coming from end users, you should [[Html::encode()]] it to
+     *   prevent XSS attacks. When this option is specified, the radio button will be enclosed by a label tag.
+     * - `labelOptions`: _array_, the HTML attributes for the label tag. This is only used when the "label" option is
+     *   specified.
+     * - `container: boolean|array, the HTML attributes for the checkbox container. If this is set to false, no
+     *   container will be rendered. The special option `tag` will be recognized which defaults to `div`. This
+     *   defaults to: `['tag' => 'div', 'class'=>'radio']`
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will be HTML-encoded
-     *     using [[Html::encode()]]. If a value is null, the corresponding attribute will not be rendered.
+     *   using [[Html::encode()]]. If a value is null, the corresponding attribute will not be rendered.
      *
      * @param boolean $enclosedByLabel whether to enclose the radio within the label. If `true`, the method will still
-     *     use [[template]] to layout the checkbox and the error message except that the radio is enclosed by the label
-     *     tag.
+     * use [[template]] to layout the checkbox and the error message except that the radio is enclosed by the label tag.
      *
      * @return ActiveField object
      */
@@ -581,25 +618,25 @@ class ActiveField extends \yii\widgets\ActiveField
      * selection. The selection of the radio buttons is taken from the value of the model attribute.
      *
      * @param array $items the data item used to generate the radio buttons. The array keys are the labels, while the
-     *     array values are the corresponding radio button values. Note that the labels will NOT be HTML-encoded, while
-     *     the values will.
+     * array values are the corresponding radio button values. Note that the labels will NOT be HTML-encoded, while
+     * the values will.
      * @param array $options options (name => config) for the radio button list. The following options are specially
      * handled:
      *
-     * - unselect: string, the value that should be submitted when none of the radio buttons is selected. By setting
-     *     this option, a hidden input will be generated.
-     * - separator: string, the HTML code that separates items.
-     * - inline: boolean, whether the list should be displayed as a series on the same line, default is false
-     * - item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
-     *     single item in $items. The signature of this callback must be:
+     * - `unselect`: _string_, the value that should be submitted when none of the radio buttons is selected. By setting
+     *   this option, a hidden input will be generated.
+     * - `separator`: _string_, the HTML code that separates items.
+     * - `inline`: _boolean_, whether the list should be displayed as a series on the same line, default is false
+     * - `item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
+     *   single item in $items. The signature of this callback must be:
      *
      * ~~~
      * function ($index, $label, $name, $checked, $value)
      * ~~~
      *
-     * where $index is the zero-based index of the radio button in the whole list; $label is the label for the radio
-     *     button; and $name, $value and $checked represent the name, value and the checked status of the radio button
-     *     input.
+     * where `$index` is the zero-based index of the radio button in the whole list; `$label` is the label for the radio
+     * button; and `$name`, `$value` and `$checked` represent the name, value and the checked status of the radio button
+     * input.
      *
      * @return ActiveField object
      */
@@ -685,21 +722,20 @@ class ActiveField extends \yii\widgets\ActiveField
 
     /**
      * Renders a multi select list box. This control extends the checkboxList and radioList available in
-     * yii\widgets\ActiveField - to display a scrolling multi select list box.
+     * [[YiiActiveField]] - to display a scrolling multi select list box.
      *
      * @param array $items the data item used to generate the checkboxes or radio.
      * @param array $options the options for checkboxList or radioList. Additional parameters
-     * - height: string, the height of the multiselect control - defaults to 145px
-     * - selector: string, whether checkbox or radio - defaults to checkbox
-     * - container: array, options for the multiselect container
-     * - unselect: string, the value that should be submitted when none of the radio buttons is selected. By setting
-     *     this option, a hidden input will be generated.
-     * - separator: string, the HTML code that separates items.
-     * - item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
-     *     single item in $items. The signature of this callback must be:
-     * - inline: boolean, whether the list should be displayed as a series on the same line, default is false
-     * - selector: string, whether the selection input is [[self::TYPE_RADIO]] or
-     *   [[self::TYPE_CHECKBOX]]
+     * - `height`: _string_, the height of the multiselect control - defaults to 145px
+     * - `selector`: _string_, whether checkbox or radio - defaults to checkbox
+     * - `container`: _array_, options for the multiselect container
+     * - `unselect`: _string_, the value that should be submitted when none of the radio buttons is selected. By setting
+     *   this option, a hidden input will be generated.
+     * - `separator`: _string_, the HTML code that separates items.
+     * - `item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
+     *   single item in $items. The signature of this callback must be:
+     * - `inline`: _boolean_, whether the list should be displayed as a series on the same line, default is false
+     * - `selector`: _string_, whether the selection input is [[TYPE_RADIO]] or [[TYPE_CHECKBOX]]
      *
      * @return ActiveField object
      */
@@ -724,25 +760,25 @@ class ActiveField extends \yii\widgets\ActiveField
      * @see http://getbootstrap.com/javascript/#buttons-checkbox-radio
      *
      * @param array $items the data item used to generate the radios. The array values are the labels, while the array
-     *     keys are the corresponding radio values. Note that the labels will NOT be HTML-encoded, while the values
-     *     will be encoded.
+     * keys are the corresponding radio values. Note that the labels will NOT be HTML-encoded, while the values
+     * will be encoded.
      * @param array $options options (name => config) for the radio button list. The following options are specially
-     *     handled:
+     * handled:
      *
-     * - unselect: string, the value that should be submitted when none of the radios is selected. By setting this
-     *     option, a hidden input will be generated. If you do not want any hidden input, you should explicitly set
-     *     this option as null.
-     * - separator: string, the HTML code that separates items.
-     * - item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
-     *     single item in $items. The signature of this callback must be:
+     * - `unselect`: _string_, the value that should be submitted when none of the radios is selected. By setting this
+     *   option, a hidden input will be generated. If you do not want any hidden input, you should explicitly set
+     *   this option as null.
+     * - `separator`: _string_, the HTML code that separates items.
+     * - `item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
+     *   single item in $items. The signature of this callback must be:
      *
      * ~~~
      * function ($index, $label, $name, $checked, $value)
      * ~~~
      *
      * where $index is the zero-based index of the radio button in the whole list; $label is the label for the radio
-     *     button; and $name, $value and $checked represent the name, value and the checked status of the radio button
-     *     input.
+     * button; and $name, $value and $checked represent the name, value and the checked status of the radio button
+     * input.
      *
      * @return ActiveField object
      */
@@ -757,25 +793,25 @@ class ActiveField extends \yii\widgets\ActiveField
      * @see http://getbootstrap.com/javascript/#buttons-checkbox-radio
      *
      * @param array $items the data item used to generate the checkboxes. The array values are the labels, while the
-     *     array keys are the corresponding checkbox values. Note that the labels will NOT be HTML-encoded, while the
-     *     values will.
+     * array keys are the corresponding checkbox values. Note that the labels will NOT be HTML-encoded, while the
+     * values will.
      * @param array $options options (name => config) for the checkbox button list. The following options are specially
-     *     handled:
+     * handled:
      *
-     * - unselect: string, the value that should be submitted when none of the checkboxes is selected. By setting this
-     *     option, a hidden input will be generated. If you do not want any hidden input, you should explicitly set
-     *     this option as null.
-     * - separator: string, the HTML code that separates items.
-     * - item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
-     *     single item in $items. The signature of this callback must be:
+     * - `unselect`: _string_, the value that should be submitted when none of the checkboxes is selected. By setting this
+     *   option, a hidden input will be generated. If you do not want any hidden input, you should explicitly set
+     *   this option as null.
+     * - `separator`: _string_, the HTML code that separates items.
+     * - `item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
+     *   single item in $items. The signature of this callback must be:
      *
      * ~~~
      * function ($index, $label, $name, $checked, $value)
      * ~~~
      *
      * where $index is the zero-based index of the checkbox button in the whole list; $label is the label for the
-     *     checkbox button; and $name, $value and $checked represent the name, value and the checked status of the
-     *     checkbox button input.
+     * checkbox button; and $name, $value and $checked represent the name, value and the checked status of the
+     * checkbox button input.
      *
      * @return ActiveField object
      */
@@ -818,7 +854,6 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($enclosedByLabel) {
             $this->_offset = true;
             $this->parts['{label}'] = '';
-            // Enrica: fix showLables => false bug fix
             $showLabels = $this->hasLabels();
             if ($showLabels === false) {
                 $options['label'] = '';
@@ -919,6 +954,14 @@ class ActiveField extends \yii\widgets\ActiveField
         $this->initLabels();
         $this->initHints();
         $this->_hasFeedback = !empty($this->feedbackIcon) && is_array($this->feedbackIcon);
+        $this->_iconBesideInput = ArrayHelper::getValue($this->hintSettings, 'iconBesideInput') ? true : false;
+        if ($this->_iconBesideInput) {
+            $id = ArrayHelper::getValue($this->options, 'id', '');
+            $this->_hintPopoverContainer = $id ? "#{$id}-table" : '';
+        } else {
+            $id = ArrayHelper::getValue($this->form->options, 'id', '');
+            $this->_hintPopoverContainer = $id ? "#{$id}" : '';
+        }
     }
 
     /**
@@ -926,7 +969,6 @@ class ActiveField extends \yii\widgets\ActiveField
      */
     protected function initLabels()
     {
-        //$labelCss = $this->form->getLabelCss();  Replaced by Enrica 1.4.9a
         $labelCss = $this->_labelCss;
         if ($this->hasLabels() === ActiveForm::SCREEN_READER) {
             Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
@@ -938,7 +980,7 @@ class ActiveField extends \yii\widgets\ActiveField
     /**
      * Validate label display status
      *
-     * @return bool|string whether labels are to be shown
+     * @return boolean|string whether labels are to be shown
      */
     protected function hasLabels()
     {
@@ -1107,12 +1149,16 @@ class ActiveField extends \yii\widgets\ActiveField
         if ($this->hintType !== self::HINT_SPECIAL) {
             return;
         }
-        $container = ArrayHelper::getValue($this->hintSettings, 'iconBesideInput') ? 'table' : 'form';
+        $container = $this->_hintPopoverContainer;
+        if ($container === '') {
+            $container = $this->_iconBesideInput ? 'table' : 'form';
+        }
         $defaultSettings = [
             'showIcon' => true,
             'iconBesideInput' => false,
             'labelTemplate' => '{label}{help}',
-            'inputTemplate' => '<table style="width:100%"><tr><td>{input}</td><td style="width:5%">{help}</td></tr></table>',
+            'inputTemplate' => '<table style="width:100%"' . '{id}' . '><tr><td>{input}</td>'.
+                '<td style="width:5%">{help}</td></tr></table>',
             'onLabelClick' => false,
             'onLabelHover' => true,
             'onIconClick' => true,
@@ -1214,7 +1260,11 @@ class ActiveField extends \yii\widgets\ActiveField
             $input = str_replace('{input}', $this->_multiselect, $input);
         }
         if ($this->_isHintSpecial && $this->getHintData('iconBesideInput') && $this->getHintData('showIcon')) {
-            $help = str_replace('{help}', $this->getHintIcon(), $this->getHintData('inputTemplate'));
+            $id = $this->_hintPopoverContainer ? ' id="' . $this->_hintPopoverContainer . '"' : '';
+            $help = strtr($this->getHintData('inputTemplate'), [
+                '{help}' => $this->getHintIcon(),
+                '{id}' =>  $id,
+            ]);
             $input = str_replace('{input}', $help, $input);
         }
         $newInput = $this->contentBeforeInput . $this->generateAddon() . $this->renderFeedbackIcon(
@@ -1338,27 +1388,27 @@ class ActiveField extends \yii\widgets\ActiveField
      *
      * @param string $type the toggle input type 'checkbox' or 'radio'.
      * @param array  $items the data item used to generate the checkbox / radio buttons. The array keys are the labels,
-     *     while the array values are the corresponding checkbox / radio button values. Note that the labels will NOT
-     *     be HTML-encoded, while the values will be encoded.
+     * while the array values are the corresponding checkbox / radio button values. Note that the labels will NOT
+     * be HTML-encoded, while the values will be encoded.
      * @param array  $options options (name => config) for the checkbox / radio button list. The following options are
-     *     specially handled:
+     * specially handled:
      *
-     * - unselect: string, the value that should be submitted when none of the checkbox / radio buttons is selected. By
-     *     setting this option, a hidden input will be generated.
-     * - separator: string, the HTML code that separates items.
-     * - inline: boolean, whether the list should be displayed as a series on the same line, default is false
-     * - disabledItems: array, the list of values that will be disabled.
-     * - readonlyItems: array, the list of values that will be readonly.
-     * - item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
-     *     single item in $items. The signature of this callback must be:
+     * - `unselect`: _string_, the value that should be submitted when none of the checkbox / radio buttons is selected. By
+     *   setting this option, a hidden input will be generated.
+     * - `separator`: _string_, the HTML code that separates items.
+     * - `inline`: _boolean_, whether the list should be displayed as a series on the same line, default is false
+     * - `disabledItems`: _array_, the list of values that will be disabled.
+     * - `readonlyItems`: _array_, the list of values that will be readonly.
+     * - `item: callable, a callback that can be used to customize the generation of the HTML code corresponding to a
+     *   single item in $items. The signature of this callback must be:
      *
      * ~~~
      * function ($index, $label, $name, $checked, $value)
      * ~~~
      *
      * where $index is the zero-based index of the checkbox/ radio button in the whole list; $label is the label for
-     *     the checkbox/ radio button; and $name, $value and $checked represent the name, value and the checked status
-     *     of the checkbox/ radio button input.
+     * the checkbox/ radio button; and $name, $value and $checked represent the name, value and the checked status
+     * of the checkbox/ radio button input.
      *
      * @param bool   $asButtonGroup whether to generate the toggle list as a bootstrap button group
      *

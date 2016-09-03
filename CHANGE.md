@@ -1,8 +1,9 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
-## Version 1.4.9 (under development)
+## Version 1.4.9
 
+- (enh #72): Better hint container markup rendering.
 - (bug #75): Allow `ActiveForm::fieldConfig` to be configured as Closure.
 - (enh #76): Refactor code with additional enhancements for horizontal layout (with code support by Enrica):
     - ActiveForm changes
@@ -23,6 +24,7 @@ Change Log: `yii2-widget-activeform`
         - enh: Optionally template `{label}` could be split into `{beginLabel}`,
                `{labelTitle}` and `{endLabel}` tag. `{label}` is still working as usual
 - Add contribution and issue/PR log templates.
+- Enhance PHP Documentation for all classes and methods in the extension.
 
 ## Version 1.4.8
 

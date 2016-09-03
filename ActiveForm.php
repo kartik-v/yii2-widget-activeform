@@ -11,13 +11,15 @@ namespace kartik\form;
 
 use yii\base\InvalidConfigException;
 use yii\helpers\Html;
+use yii\widgets\ActiveForm as YiiActiveForm;
 
 /**
- * Extends the ActiveForm widget to handle various
- * bootstrap form types.
+ * ActiveForm is a widget that builds an interactive HTML form for one or multiple data models and extends the
+ * [[YiiActiveForm]] widget to handle various bootstrap form types and new functionality.
  *
- * Example(s):
- * ```php
+ * Example:
+ *
+ * ~~~
  * // Horizontal Form
  * $form = ActiveForm::begin([
  *      'id' => 'form-signup',
@@ -35,27 +37,52 @@ use yii\helpers\Html;
  *      'type' => ActiveForm::TYPE_HORIZONTAL
  *      'formConfig' => ['labelSpan' => 2, 'deviceSize' => ActiveForm::SIZE_SMALL]
  * ]);
+ * ~~~
  *
  * @author Kartik Visweswaran <kartikv2@gmail.com>
  * @since  1.0
  */
-class ActiveForm extends \yii\widgets\ActiveForm
+class ActiveForm extends YiiActiveForm
 {
-    const DEFAULT_LABEL_SPAN = 2; // this will offset the adjacent input accordingly
-    const FULL_SPAN = 12; // bootstrap default full grid width
-
-    /* Form Types */
+    /**
+     * The default label span. This will offset the adjacent input accordingly.
+     */
+    const DEFAULT_LABEL_SPAN = 2;
+    /**
+     * The bootstrap default full grid width.
+     */
+    const FULL_SPAN = 12;
+    /**
+     * Bootstrap styled vertical form layout (this is the default style)
+     */
     const TYPE_VERTICAL = 'vertical';
+    /**
+     * Bootstrap styled horizontal form layout
+     */
     const TYPE_HORIZONTAL = 'horizontal';
+    /**
+     * Bootstrap styled inline form layout
+     */
     const TYPE_INLINE = 'inline';
-
-    /* Size Modifiers */
+    /**
+     * Bootstrap **extra small** size modifier
+     */
     const SIZE_TINY = 'xs';
+    /**
+     * Bootstrap **small** size modifier
+     */
     const SIZE_SMALL = 'sm';
+    /**
+     * Bootstrap **medium** size modifier (this is the default size)
+     */
     const SIZE_MEDIUM = 'md';
+    /**
+     * Bootstrap **large** size modifier
+     */
     const SIZE_LARGE = 'lg';
-
-    /* Label Display Settings */
+    /**
+     * Bootstrap screen reader style for labels
+     */
     const SCREEN_READER = 'sr-only';
 
     /**
@@ -64,60 +91,60 @@ class ActiveForm extends \yii\widgets\ActiveForm
     public $fieldClass = 'kartik\form\ActiveField';
 
     /**
-     * @var string form orientation type (for bootstrap styling). Either 'vertical', 'horizontal' or 'vertical'.
-     *     Defaults to 'vertical'.
+     * @var string form orientation type (for bootstrap styling). Either [[TYPE_VERTICAL]], [[TYPE_HORIZONTAL]], or
+     * [[TYPE_INLINE]]. Defaults to [[TYPE_VERTICAL]].
      */
     public $type;
 
     /**
-     * @var int set the bootstrap grid width. Defaults to [[ActiveForm::FULL_SPAN]].
+     * @var integer the bootstrap grid width. Defaults to [[FULL_SPAN]].
      */
     public $fullSpan = self::FULL_SPAN;
 
     /**
      * @var array the configuration for the form. Takes in the following properties
-     * - labelSpan: int, the bootstrap grid column width (usually between 1 to 12)
-     * - deviceSize: string, one of the bootstrap sizes (refer the ActiveForm::SIZE constants)
-     * - showLabels: boolean|string, whether to show labels (true), hide labels (false), or display only for screen
-     *     reader (ActiveForm::SCREEN_READER). This is mainly useful for inline forms.
-     * - showErrors: boolean, whether to show errors (true) or hide errors (false). This is mainly useful for inline
-     *     forms.
-     * - showHints: boolean, whether to show hints (true) or hide errors (false). Defaults to `true`. The hint will be
-     *     rendered only if a valid hint has been set through the `hint()` method.
-     * ```
+     * - `labelSpan`: _integer_, the bootstrap grid column width (usually between 1 to 12)
+     * - `deviceSize`: _string_, one of the bootstrap sizes (refer the ActiveForm::SIZE constants)
+     * - `showLabels`: _boolean_|_string_, whether to show labels (true)_, hide labels (false)_, or display only for
+     *   [[SCREEN_READER]]. This is mainly useful for inline forms.
+     * - `showErrors`: _boolean_, whether to show errors (true) or hide errors (false). This is mainly useful for inline
+     *   forms.
+     * - `showHints`: _boolean_, whether to show hints (true) or hide errors (false). Defaults to `true`. The hint will be
+     *   rendered only if a valid hint has been set through the `hint()` method.
+     * ~~~
      * [
-     *      'labelSpan' => 2,
-     *      'deviceSize' => ActiveForm::SIZE_MEDIUM,
-     *      'showLabels' => true,
-     *      'showErrors' => true,
-     *      'showHints' => true
+     *     'labelSpan' => 2,
+     *     'deviceSize' => ActiveForm::SIZE_MEDIUM,
+     *     'showLabels' => true,
+     *     'showErrors' => true,
+     *     'showHints' => true
      * ],
-     * ```
+     * ~~~
      */
     public $formConfig = [];
 
     /**
-     * @var array HTML attributes for the form tag. Default is `['role' => 'form']`.
+     * @var array HTML attributes for the form tag. Defaults to `['role' => 'form']`.
      */
     public $options = ['role' => 'form'];
 
     /**
-     * @var bool whether all data in form are to be static inputs
+     * @var boolean whether all data in form are to be static inputs
      */
     public $staticOnly = false;
 
     /**
-     * @var bool whether all inputs in form are to be disabled
+     * @var boolean whether all inputs in form are to be disabled
      */
     public $disabled = false;
 
     /**
-     * @var bool whether all inputs in form are to be readonly
+     * @var boolean whether all inputs in form are to be readonly.
      */
     public $readonly = false;
 
     /**
-     * @var array the default form configuration
+     * @var array the default form configuration.
      */
     private $_config = [
         self::TYPE_VERTICAL => [
@@ -152,7 +179,38 @@ class ActiveForm extends \yii\widgets\ActiveForm
     }
 
     /**
-     * Registers the needed assets
+     * Gets form layout style configuration. This method is used by [[\kartik\field\FieldRange]] widget.
+     *
+     * @return array the form layout style configuration.
+     */
+    public function getFormLayoutStyle()
+    {
+        $config = $this->formConfig;
+        $span = $config['labelSpan'];
+        $size = $config['deviceSize'];
+        $labelCss = $inputCss = $offsetCss = ActiveField::NOT_SET;
+        $iSpan = intval($span);
+        if ($span != ActiveField::NOT_SET && $iSpan > 0) {
+            // validate if invalid `labelSpan` is passed else set to [[DEFAULT_LABEL_SPAN]]
+            if ($iSpan <= 0 && $iSpan >= $this->fullSpan) {
+                $iSpan = self::DEFAULT_LABEL_SPAN;
+            }
+
+            // validate if invalid `deviceSize` is passed else set to [[SIZE_MEDIUM]]
+            if ($size == ActiveField::NOT_SET) {
+                $size = self::SIZE_MEDIUM;
+            }
+
+            $prefix = "col-{$size}-";
+            $labelCss = $prefix . $iSpan;
+            $inputCss = $prefix . ($this->fullSpan - $iSpan);
+            $offsetCss = "col-" . $size . "-offset-" . $iSpan . " " . $inputCss;
+        }
+        return ['labelCss' => $labelCss, 'inputCss' => $inputCss, 'offsetCss' => $offsetCss];
+    }
+
+    /**
+     * Registers the assets for the [[ActiveForm]] widget.
      */
     public function registerAssets()
     {
