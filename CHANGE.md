@@ -25,6 +25,7 @@ Change Log: `yii2-widget-activeform`
                `{labelTitle}` and `{endLabel}` tag. `{label}` is still working as usual
 - Add contribution and issue/PR log templates.
 - Enhance PHP Documentation for all classes and methods in the extension.
+- (bug #78): Correct offset CSS class generation for horizontal forms.
 
 ## Version 1.4.8
 

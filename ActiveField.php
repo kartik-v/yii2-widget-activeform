@@ -1045,7 +1045,7 @@ class ActiveField extends YiiActiveField
             $prefix = "col-{$size}-";
             $this->_labelCss = $prefix . $span;
             $this->_inputCss = $prefix . ($this->form->fullSpan - $span);
-            $this->_offsetCss = $prefix . "-offset-" . $span;
+            $this->_offsetCss = $prefix . "offset-" . $span;
         }
 
         if (isset($hor['wrapper'])) {
