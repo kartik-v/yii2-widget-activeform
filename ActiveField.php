@@ -391,24 +391,32 @@ class ActiveField extends YiiActiveField
     /**
      * Parses and returns addon content
      *
-     * @param string|array $addon the addon parameter
+     * @param string|array $addonArray the addon parameter or the array of addon parameters
      *
      * @return string
      */
-    public static function getAddonContent($addon)
+    public static function getAddonContent($addonArray)
     {
-        if (!is_array($addon)) {
-            return $addon;
+        if (!is_array($addonArray)) {
+            return $addonArray;
+            //keep compatibility with existing code
+        } else if (!ArrayHelper::isIndexed($addonArray)) {
+            //pack existing array into indexed array
+            $addonArray = [$addonArray];
         }
-        $content = ArrayHelper::getValue($addon, 'content', '');
-        $options = ArrayHelper::getValue($addon, 'options', []);
-        if (ArrayHelper::getValue($addon, 'asButton', false) == true) {
-            Html::addCssClass($options, 'input-group-btn');
-            return Html::tag('span', $content, $options);
-        } else {
-            Html::addCssClass($options, 'input-group-addon');
-            return Html::tag('span', $content, $options);
+        $html = "";
+        foreach ($addonArray as $addon) {
+            $content = ArrayHelper::getValue($addon, 'content', '');
+            $options = ArrayHelper::getValue($addon, 'options', []);
+            if (ArrayHelper::getValue($addon, 'asButton', false) == true) {
+                Html::addCssClass($options, 'input-group-btn');
+                $html .= Html::tag('span', $content, $options);
+            } else {
+                Html::addCssClass($options, 'input-group-addon');
+                $html .= Html::tag('span', $content, $options);
+            }
         }
+        return $html;
     }
 
     /**
