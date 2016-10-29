@@ -84,7 +84,7 @@ class ActiveField extends YiiActiveField
     /**
      * @var array the list of hint keys that will be used by ActiveFieldHint jQuery plugin
      */
-    private static $_pluginHintKeys = [
+    protected static $_pluginHintKeys = [
         'iconCssClass',
         'labelCssClass',
         'contentCssClass',
