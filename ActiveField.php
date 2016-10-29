@@ -280,11 +280,13 @@ class ActiveField extends YiiActiveField
      * - `{labelTitle}`: Label content without tags
      * - `{endLabel}`: Container end tag for labels
      * - `{label}`: Full label tag with begin tag, content and end tag
-     * - `{beginWrapper}`: Container for input,error and hint start tag. Uses a `<div>` tag by default.
+     * - `{beginWrapper}`: Container for input,error and hint start tag. Uses a `<div>` tag if there is a input wrapper
+     *    CSS detected, else defaults to empty string.
      * - `{input}`: placeholder for input control whatever it is
      * - `{hint}`: placeholder for hint/help text including sub container
      * - `{error}`: placeholder for error text including sub container
-     * - `{endWrapper}`: end tag for `{beginWrapper}`. Defaults to `</div>`.
+     * - `{endWrapper}`: end tag for `{beginWrapper}`. Defaults to `</div>` if there is a input wrapper CSS detected,
+     *    else defaults to empty string.
      */
     public $template = "{label}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}";
 
@@ -391,30 +393,28 @@ class ActiveField extends YiiActiveField
     /**
      * Parses and returns addon content
      *
-     * @param string|array $addonArray the addon parameter or the array of addon parameters
+     * @param string|array $addon the addon parameter or the array of addon parameters
      *
      * @return string
      */
-    public static function getAddonContent($addonArray)
+    public static function getAddonContent($addon)
     {
-        if (!is_array($addonArray)) {
-            return $addonArray;
-            //keep compatibility with existing code
-        } else if (!ArrayHelper::isIndexed($addonArray)) {
-            //pack existing array into indexed array
-            $addonArray = [$addonArray];
+        if (!is_array($addon)) {
+            return $addon;
+        }
+        if (!ArrayHelper::isIndexed($addon)) {
+            $addon = [$addon]; //pack existing array into indexed array
         }
         $html = "";
-        foreach ($addonArray as $addon) {
-            $content = ArrayHelper::getValue($addon, 'content', '');
-            $options = ArrayHelper::getValue($addon, 'options', []);
-            if (ArrayHelper::getValue($addon, 'asButton', false) == true) {
+        foreach ($addon as $addonItem) {
+            $content = ArrayHelper::getValue($addonItem, 'content', '');
+            $options = ArrayHelper::getValue($addonItem, 'options', []);
+            if (ArrayHelper::getValue($addonItem, 'asButton', false)) {
                 Html::addCssClass($options, 'input-group-btn');
-                $html .= Html::tag('span', $content, $options);
             } else {
                 Html::addCssClass($options, 'input-group-addon');
-                $html .= Html::tag('span', $content, $options);
             }
+            $html .= Html::tag('span', $content, $options);
         }
         return $html;
     }
@@ -433,7 +433,7 @@ class ActiveField extends YiiActiveField
     /**
      * Renders a checkbox. This method will generate the "checked" tag attribute according to the model attribute value.
      *
-     * @param array   $options the tag options in terms of name-value pairs. The following options are specially
+     * @param array $options the tag options in terms of name-value pairs. The following options are specially
      * handled:
      *
      * - `uncheck`: _string_, the value associated with the uncheck state of the checkbox. If not set, it will take
@@ -595,7 +595,7 @@ class ActiveField extends YiiActiveField
      * Renders a radio button. This method will generate the "checked" tag attribute according to the model attribute
      * value.
      *
-     * @param array   $options the tag options in terms of name-value pairs. The following options are specially
+     * @param array $options the tag options in terms of name-value pairs. The following options are specially
      * handled:
      * - `uncheck`: _string_, the value associated with the uncheck state of the radio button. If not set, it will take the
      *   default value '0'. This method will render a hidden input so that if the radio button is not checked and is
@@ -847,8 +847,8 @@ class ActiveField extends YiiActiveField
      * Generates a toggle field (checkbox or radio)
      *
      * @param string $type the toggle input type 'checkbox' or 'radio'.
-     * @param array  $options options (name => config) for the toggle input list container tag.
-     * @param bool   $enclosedByLabel whether the input is enclosed by the label tag
+     * @param array $options options (name => config) for the toggle input list container tag.
+     * @param boolean $enclosedByLabel whether the input is enclosed by the label tag
      *
      * @return ActiveField object
      */
@@ -908,7 +908,7 @@ class ActiveField extends YiiActiveField
      * Gets configuration parameter from formConfig
      *
      * @param string $param the parameter name
-     * @param mixed  $default the default parameter value
+     * @param mixed $default the default parameter value
      *
      * @return bool the parsed parameter value
      */
@@ -1003,11 +1003,12 @@ class ActiveField extends YiiActiveField
      * Prepares bootstrap grid col classes for horizontal layout including label and input tags and initiate private
      * CSS variables. The process order for 'labelSpan' and 'wrapper' is as follows:
      *
-     * - use a) $labelSpan/$deviceSize b) formConfig(['labelSpan' => x, 'deviceSize' => xy]) and build css tag.
-     * - if horizontalCssClasses['wrapper'] isset and no 'col-' tag then add this to css tag from 1)
-     * - if horizontalCssClasses['wrapper'] isset and has 'col-' tag then override css tag completely
-     * - if no $labelSpan and no horizontalCssClasses['wrapper'] isset then use default from _settings. Same behaviour
-     * with horizontalCssClasses['label'].
+     * - Step 1: Check `$labelSpan` and `$deviceSize`.
+     * - Step 2: Check `formConfig(['labelSpan' => x, 'deviceSize' => xy]) and build css tag.
+     * - If `horizontalCssClasses['wrapper']` is set and no 'col-' tag then add this to css tag from Step 1.
+     * - If `horizontalCssClasses['wrapper']` is set and wrapper has 'col-' tag then override css tag completely.
+     * - If no `$labelSpan` and no `horizontalCssClasses['wrapper']` is set then use default from [[$_settings]].
+     *   Similar behavior to `horizontalCssClasses['label']`.
      */
     protected function initHorizontal()
     {
@@ -1036,15 +1037,8 @@ class ActiveField extends YiiActiveField
             }
 
             // validate if invalid deviceSize is passed - else default to SIZE_MEDIUM
-            if ($size == self::NOT_SET || !in_array(
-                    $size, [
-                             ActiveForm::SIZE_TINY,
-                             ActiveForm::SIZE_SMALL,
-                             ActiveForm::SIZE_MEDIUM,
-                             ActiveForm::SIZE_LARGE,
-                         ]
-                )
-            ) {
+            $sizes = [ActiveForm::SIZE_TINY, ActiveForm::SIZE_SMALL, ActiveForm::SIZE_MEDIUM, ActiveForm::SIZE_LARGE];
+            if ($size == self::NOT_SET || !in_array($size, $sizes)) {
                 $size = ActiveForm::SIZE_MEDIUM;
             }
 
@@ -1093,8 +1087,8 @@ class ActiveField extends YiiActiveField
     /**
      * Merges the parameters for layout settings
      *
-     * @param bool $showLabels whether to show labels
-     * @param bool $showErrors whether to show errors
+     * @param boolean $showLabels whether to show labels
+     * @param boolean $showErrors whether to show errors
      */
     protected function mergeSettings($showLabels, $showErrors)
     {
@@ -1105,33 +1099,32 @@ class ActiveField extends YiiActiveField
     /**
      * Builds the field layout parts
      *
-     * @param bool $showLabels whether to show labels
-     * @param bool $showErrors whether to show errors
+     * @param boolean $showLabels whether to show labels
+     * @param boolean $showErrors whether to show errors
      */
     protected function buildLayoutParts($showLabels, $showErrors)
     {
         if (!$showErrors) {
             $this->_settings['error'] = '';
         }
+        $this->parts['{beginWrapper}'] = '';
+        $this->parts['{endWrapper}'] = '';
         if ($this->skipFormLayout) {
             $this->mergeSettings($showLabels, $showErrors);
-            $this->parts['{beginWrapper}'] = '';
-            $this->parts['{endWrapper}'] = '';
             $this->parts['{beginLabel}'] = '';
             $this->parts['{labelTitle}'] = '';
             $this->parts['{endLabel}'] = '';
             return;
         }
-        $inputDivClass = '';
         if (!empty($this->_inputCss)) {
             $offsetDivClass = $this->_offsetCss . " " . $this->_inputCss;
             $inputDivClass = ($this->_offset) ? $offsetDivClass : $this->_inputCss;
             if ($showLabels === false || $showLabels === ActiveForm::SCREEN_READER) {
                 $inputDivClass = "col-{$this->deviceSize}-{$this->form->fullSpan}";
             }
+            $this->parts['{beginWrapper}'] = Html::beginTag('div', ['class' => $inputDivClass]);
+            $this->parts['{endWrapper}'] = Html::endTag('div');
         }
-        $this->parts['{beginWrapper}'] = Html::beginTag('div', ['class' => $inputDivClass]);
-        $this->parts['{endWrapper}'] = Html::endTag('div');
         $this->mergeSettings($showLabels, $showErrors);
     }
 
@@ -1140,7 +1133,7 @@ class ActiveField extends YiiActiveField
      *
      * @param string $type the layout element type
      * @param string $css the css class for the container
-     * @param bool   $chk whether to create the container for the layout element
+     * @param boolean $chk whether to create the container for the layout element
      */
     protected function setLayoutContainer($type, $css = '', $chk = true)
     {
@@ -1165,7 +1158,7 @@ class ActiveField extends YiiActiveField
             'showIcon' => true,
             'iconBesideInput' => false,
             'labelTemplate' => '{label}{help}',
-            'inputTemplate' => '<table style="width:100%"' . '{id}' . '><tr><td>{input}</td>'.
+            'inputTemplate' => '<table style="width:100%"' . '{id}' . '><tr><td>{input}</td>' .
                 '<td style="width:5%">{help}</td></tr></table>',
             'onLabelClick' => false,
             'onLabelHover' => true,
@@ -1219,7 +1212,7 @@ class ActiveField extends YiiActiveField
      * Gets a hint configuration setting value
      *
      * @param string $key the hint setting key to fetch
-     * @param mixed  $default the default value if not set
+     * @param mixed $default the default value if not set
      *
      * @return mixed
      */
@@ -1252,7 +1245,7 @@ class ActiveField extends YiiActiveField
 
     /**
      * Builds the final template based on the bootstrap form type, display settings for label, error, and hint, and
-     * content before and after label, input, error, and hint
+     * content before and after label, input, error, and hint.
      */
     protected function buildTemplate()
     {
@@ -1269,27 +1262,21 @@ class ActiveField extends YiiActiveField
         }
         if ($this->_isHintSpecial && $this->getHintData('iconBesideInput') && $this->getHintData('showIcon')) {
             $id = $this->_hintPopoverContainer ? ' id="' . $this->_hintPopoverContainer . '"' : '';
-            $help = strtr($this->getHintData('inputTemplate'), [
-                '{help}' => $this->getHintIcon(),
-                '{id}' =>  $id,
-            ]);
+            $help = strtr($this->getHintData('inputTemplate'), ['{help}' => $this->getHintIcon(), '{id}' => $id,]);
             $input = str_replace('{input}', $help, $input);
         }
-        $newInput = $this->contentBeforeInput . $this->generateAddon() . $this->renderFeedbackIcon(
-            ) . $this->contentAfterInput;
+        $newInput = $this->contentBeforeInput . $this->generateAddon() . $this->renderFeedbackIcon() .
+            $this->contentAfterInput;
         $newError = "{$this->contentBeforeError}{error}{$this->contentAfterError}";
-        $this->template = strtr(
-            $this->template,
-            [
-                '{beginLabel}' => $showLabels ? '{beginLabel}' : "",
-                '{endLabel}' => $showLabels ? '{endLabel}' : "",
-                '{label}' => $showLabels ? "{$this->contentBeforeLabel}{label}{$this->contentAfterLabel}" : "",
-                '{labelTitle}' => $showLabels ? "{$this->contentBeforeLabel}{labelTitle}{$this->contentAfterLabel}" : "",
-                '{input}' => str_replace('{input}', $newInput, $input),
-                '{error}' => $showErrors ? str_replace('{error}', $newError, $error) : '',
-            ]
-        );
-
+        $config = [
+            '{beginLabel}' => $showLabels ? '{beginLabel}' : "",
+            '{endLabel}' => $showLabels ? '{endLabel}' : "",
+            '{label}' => $showLabels ? "{$this->contentBeforeLabel}{label}{$this->contentAfterLabel}" : "",
+            '{labelTitle}' => $showLabels ? "{$this->contentBeforeLabel}{labelTitle}{$this->contentAfterLabel}" : "",
+            '{input}' => str_replace('{input}', $newInput, $input),
+            '{error}' => $showErrors ? str_replace('{error}', $newError, $error) : '',
+        ];
+        $this->template = strtr($this->template, $config);
     }
 
     /**
@@ -1339,7 +1326,7 @@ class ActiveField extends YiiActiveField
      * Render the label parts
      *
      * @param string|null $label the label or null to use model label
-     * @param array       $options the tag options
+     * @param array $options the tag options
      */
     protected function renderLabelParts($label = null, $options = [])
     {
@@ -1366,7 +1353,7 @@ class ActiveField extends YiiActiveField
     /**
      * Generates a feedback icon
      *
-     * @param array  $config the feedback icon configuration
+     * @param array $config the feedback icon configuration
      * @param string $cat the feedback icon category
      * @param string $type the feedback icon type
      * @param string $prefix the feedback icon prefix
@@ -1397,10 +1384,10 @@ class ActiveField extends YiiActiveField
      * value of the model attribute.
      *
      * @param string $type the toggle input type 'checkbox' or 'radio'.
-     * @param array  $items the data item used to generate the checkbox / radio buttons. The array keys are the labels,
+     * @param array $items the data item used to generate the checkbox / radio buttons. The array keys are the labels,
      * while the array values are the corresponding checkbox / radio button values. Note that the labels will NOT
      * be HTML-encoded, while the values will be encoded.
-     * @param array  $options options (name => config) for the checkbox / radio button list. The following options are
+     * @param array $options options (name => config) for the checkbox / radio button list. The following options are
      * specially handled:
      *
      * - `unselect`: _string_, the value that should be submitted when none of the checkbox / radio buttons is selected. By
@@ -1420,7 +1407,7 @@ class ActiveField extends YiiActiveField
      * the checkbox/ radio button; and $name, $value and $checked represent the name, value and the checked status
      * of the checkbox/ radio button input.
      *
-     * @param bool   $asButtonGroup whether to generate the toggle list as a bootstrap button group
+     * @param boolean $asButtonGroup whether to generate the toggle list as a bootstrap button group
      *
      * @return ActiveField object
      */
@@ -1438,13 +1425,13 @@ class ActiveField extends YiiActiveField
         }
         $inline = ArrayHelper::remove($options, 'inline', false);
         $inputType = "{$type}List";
-        $this->initDisability($options['itemOptions']);
+        $opts = ArrayHelper::getValue($options, 'itemOptions', []);
+        $this->initDisability($opts);
         $css = $this->form->disabled ? ' disabled' : '';
         $css .= $this->form->readonly ? ' readonly' : '';
         if ($inline && !isset($options['itemOptions']['labelOptions']['class'])) {
             $options['itemOptions']['labelOptions']['class'] = "{$type}-inline{$css}";
         } elseif (!isset($options['item'])) {
-            $opts = ArrayHelper::getValue($options, 'itemOptions', []);
             $labelOptions = ArrayHelper::getValue($opts, 'labelOptions', []);
             $options['item'] = function ($index, $label, $name, $checked, $value)
             use ($type, $css, $disabled, $readonly, $asButtonGroup, $labelOptions, $opts) {

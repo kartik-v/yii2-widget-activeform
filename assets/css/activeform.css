@@ -4,7 +4,7 @@
  * @subpackage yii2-widget-activeform
  * @version 1.4.9
  *
- * Active Form Styling for Bootstrap 3.0
+ * Active Form Styling for Bootstrap 3.x
  * Built for Yii Framework 2.0
  * Author: Kartik Visweswaran
  * Year: 2015
@@ -73,9 +73,7 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 }
 
 /**
- * input group buttons styling change for 
- * has-success and has-danger states
- * added by Kartik Visweswaran
+ * input group buttons styling change for `has-success` and `has-danger` states
  */
 .has-success .input-group-btn .btn-default {
     color: #3c763d;
@@ -101,15 +99,15 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 }
 
 .has-success .input-group-btn .btn-default.disabled,
-.has-success .input-group-btn .btn-default[disabled]
+.has-success .input-group-btn .btn-default[disabled],
 .has-success .input-group-btn .btn-default.disabled:hover,
-.has-success .input-group-btn .btn-default[disabled]:hover
+.has-success .input-group-btn .btn-default[disabled]:hover,
 .has-success .input-group-btn .btn-default.disabled:focus,
-.has-success .input-group-btn .btn-default[disabled]:focus
+.has-success .input-group-btn .btn-default[disabled]:focus,
 .has-success .input-group-btn .btn-default.disabled.focus,
-.has-success .input-group-btn .btn-default[disabled].focus
+.has-success .input-group-btn .btn-default[disabled].focus,
 .has-success .input-group-btn .btn-default.disabled:active,
-.has-success .input-group-btn .btn-default[disabled]:active
+.has-success .input-group-btn .btn-default[disabled]:active,
 .has-success .input-group-btn .btn-default.disabled.active,
 .has-success .input-group-btn .btn-default[disabled].active {
     background-color: #5cb85c;
@@ -147,13 +145,13 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 .has-error .input-group-btn .btn-default.disabled,
 .has-error .input-group-btn .btn-default[disabled]
 .has-error .input-group-btn .btn-default.disabled:hover,
-.has-error .input-group-btn .btn-default[disabled]:hover
+.has-error .input-group-btn .btn-default[disabled]:hover,
 .has-error .input-group-btn .btn-default.disabled:focus,
-.has-error .input-group-btn .btn-default[disabled]:focus
+.has-error .input-group-btn .btn-default[disabled]:focus,
 .has-error .input-group-btn .btn-default.disabled.focus,
-.has-error .input-group-btn .btn-default[disabled].focus
+.has-error .input-group-btn .btn-default[disabled].focus,
 .has-error .input-group-btn .btn-default.disabled:active,
-.has-error .input-group-btn .btn-default[disabled]:active
+.has-error .input-group-btn .btn-default[disabled]:active,
 .has-error .input-group-btn .btn-default.disabled.active,
 .has-error .input-group-btn .btn-default[disabled].active {
     background-color: #d9534f;
@@ -180,9 +178,13 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     display: inline;
 }
 
-/** multiple addons border fix
- copied from Bootstrap 4 code **/
-.input-group .form-control:not(:first-child):not(:last-child), .input-group-addon:not(:first-child):not(:last-child), .input-group-btn:not(:first-child):not(:last-child) {
+/**
+ * multiple addons border fix
+ * (based on Bootstrap 4 code)
+ **/
+.input-group .form-control:not(:first-child):not(:last-child),
+.input-group-addon:not(:first-child):not(:last-child),
+.input-group-btn:not(:first-child):not(:last-child) {
     border-radius: 0;
 }
 
@@ -190,7 +192,13 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     border-right: 0;
 }
 
-.input-group .form-control:not(:first-child), .input-group-addon:not(:first-child), .input-group-btn:not(:first-child) > .btn, .input-group-btn:not(:first-child) > .btn-group > .btn, .input-group-btn:not(:first-child) > .dropdown-toggle, .input-group-btn:not(:last-child) > .btn-group:not(:first-child) > .btn, .input-group-btn:not(:last-child) > .btn:not(:first-child) {
+.input-group .form-control:not(:first-child),
+.input-group-addon:not(:first-child),
+.input-group-btn:not(:first-child) > .btn,
+.input-group-btn:not(:first-child) > .btn-group > .btn,
+.input-group-btn:not(:first-child) > .dropdown-toggle,
+.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > .btn,
+.input-group-btn:not(:last-child) > .btn:not(:first-child) {
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
 }
@@ -199,12 +207,24 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     border-left: 0;
 }
 
-.input-group .form-control:last-child, .input-group-addon:last-child, .input-group-btn:first-child > .btn-group:not(:first-child) > .btn, .input-group-btn:first-child > .btn:not(:first-child), .input-group-btn:last-child > .btn, .input-group-btn:last-child > .btn-group > .btn, .input-group-btn:last-child > .dropdown-toggle {
+.input-group .form-control:last-child,
+.input-group-addon:last-child,
+.input-group-btn:first-child > .btn-group:not(:first-child) > .btn,
+.input-group-btn:first-child > .btn:not(:first-child),
+.input-group-btn:last-child > .btn,
+.input-group-btn:last-child > .btn-group > .btn,
+.input-group-btn:last-child > .dropdown-toggle {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
 
-.input-group .form-control:first-child, .input-group-addon:first-child, .input-group-btn:first-child > .btn, .input-group-btn:first-child > .btn-group > .btn, .input-group-btn:first-child > .dropdown-toggle, .input-group-btn:last-child > .btn-group:not(:last-child) > .btn, .input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle) {
+.input-group .form-control:first-child,
+.input-group-addon:first-child,
+.input-group-btn:first-child > .btn,
+.input-group-btn:first-child > .btn-group > .btn,
+.input-group-btn:first-child > .dropdown-toggle,
+.input-group-btn:last-child > .btn-group:not(:last-child) > .btn,
+.input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }

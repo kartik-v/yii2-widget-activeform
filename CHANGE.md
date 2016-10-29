@@ -29,6 +29,7 @@ Change Log: `yii2-widget-activeform`
 - (enh #79, #80): Allow configuration of multiple addons.
 - (enh #81): Change visibility of `$_pluginHintKeys`.
 - (enh #82): Allow configuration of `itemOptions` for `checkboxButtonGroup` and `radioButtonGroup`.
+- CSS enhancements for addons and other styling validation enhancements.
 
 ## Version 1.4.8
 
