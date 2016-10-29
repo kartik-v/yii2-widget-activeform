@@ -1315,7 +1315,7 @@ class ActiveField extends YiiActiveField
     }
 
     /**
-     * Renders the bootstrap feedback icon.
+     * Render the bootstrap feedback icon
      *
      * @see http://getbootstrap.com/css/#with-optional-icons
      *
@@ -1336,6 +1336,8 @@ class ActiveField extends YiiActiveField
     }
 
     /**
+     * Render the label parts
+     *
      * @param string|null $label the label or null to use model label
      * @param array       $options the tag options
      */
@@ -1438,14 +1440,15 @@ class ActiveField extends YiiActiveField
         $inputType = "{$type}List";
         $this->initDisability($options['itemOptions']);
         $css = $this->form->disabled ? ' disabled' : '';
-        $css = $this->form->readonly ? $css . ' readonly' : $css;
+        $css .= $this->form->readonly ? ' readonly' : '';
         if ($inline && !isset($options['itemOptions']['labelOptions']['class'])) {
             $options['itemOptions']['labelOptions']['class'] = "{$type}-inline{$css}";
         } elseif (!isset($options['item'])) {
-            $labelOptions = ArrayHelper::getValue($options, 'itemOptions.labelOptions');
+            $opts = ArrayHelper::getValue($options, 'itemOptions', []);
+            $labelOptions = ArrayHelper::getValue($opts, 'labelOptions', []);
             $options['item'] = function ($index, $label, $name, $checked, $value)
-            use ($type, $css, $disabled, $readonly, $asButtonGroup, $labelOptions) {
-                $opts = [
+            use ($type, $css, $disabled, $readonly, $asButtonGroup, $labelOptions, $opts) {
+                $opts += [
                     'data-index' => $index,
                     'label' => $label,
                     'value' => $value,
