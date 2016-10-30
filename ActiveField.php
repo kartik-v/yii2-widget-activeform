@@ -22,12 +22,13 @@ use yii\widgets\ActiveField as YiiActiveField;
  * Usage example with addons:
  *
  * ```php
- * echo $this->form->field($model, 'email', ['addon' => ['type'=>'prepend', 'content'=>'@']]);
- * echo $this->form->field($model, 'amount_paid', ['addon' => ['type'=>'append', 'content'=>'.00']]);
- * echo $this->form->field($model, 'phone', [
+ * // $form is your active form instance
+ * echo $form->field($model, 'email', ['addon' => ['type'=>'prepend', 'content'=>'@']]);
+ * echo $form->field($model, 'amount_paid', ['addon' => ['type'=>'append', 'content'=>'.00']]);
+ * echo $form->field($model, 'phone', [
  *     'addon' => [
  *         'type'=>'prepend',
- *         'content'=>'<i class="glyphicon glyphicon-phone'
+ *         'content'=>'<i class="glyphicon glyphicon-phone"></i>'
  *     ]
  * ]);
  * ```
@@ -35,17 +36,15 @@ use yii\widgets\ActiveField as YiiActiveField;
  * Usage example with horizontal form and advanced field layout CSS configuration:
  *
  * ```php
- * echo $this->form->field($model, 'email', ['labelSpan' => 2, 'deviceSize' => ActiveForm::SIZE_SMALL]]);
- * echo $this->form->field($model, 'amount_paid', ['horizontalCssClasses' => ['wrapper' => 'hidden-xs']]);
- * echo $this->form->field($model, 'phone', [
+ * echo $form->field($model, 'email', ['labelSpan' => 2, 'deviceSize' => ActiveForm::SIZE_SMALL]]);
+ * echo $form->field($model, 'amount_paid', ['horizontalCssClasses' => ['wrapper' => 'hidden-xs']]);
+ * echo $form->field($model, 'phone', [
  *     'horizontalCssClasses' => ['label' => 'col-md-2 col-sm-3 col-xs-12 myRedClass']
  * ]);
- * echo $this->form->field($model, 'special', [
+ * echo $form->field($model, 'special', [
  *     'template' => '{beginLabel}For: {labelTitle}{endLabel}\n{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}'
  * ]);
  * ```
- *
- * @property ActiveForm $form
  *
  * @author Kartik Visweswaran <kartikv2@gmail.com>
  * @since  1.0
@@ -275,10 +274,13 @@ class ActiveField extends YiiActiveField
 
     /**
      * @var string inherits and overrides values from parent class. The value can be overridden within
-     * [[ActiveForm::field()]] method. The following tags are supported:
-     * - `{beginLabel}`: Container begin tag for labels
-     * - `{labelTitle}`: Label content without tags
-     * - `{endLabel}`: Container end tag for labels
+     * [[ActiveForm::field()]] method. The following tokens are supported:
+     * - `{beginLabel}`: Container begin tag for labels (to be used typically along with `{labelTitle}` token
+     *   when you do not wish to directly use the `{label}` token)
+     * - `{labelTitle}`: Label content without tags (to be used typically when you do not wish to directly use 
+     *   the `{label` token)
+     * - `{endLabel}`: Container end tag for labels (to be used typically along with `{labelTitle}` token
+     *   when you do not wish to directly use the `{label}` token)
      * - `{label}`: Full label tag with begin tag, content and end tag
      * - `{beginWrapper}`: Container for input,error and hint start tag. Uses a `<div>` tag if there is a input wrapper
      *    CSS detected, else defaults to empty string.
@@ -409,11 +411,8 @@ class ActiveField extends YiiActiveField
         foreach ($addon as $addonItem) {
             $content = ArrayHelper::getValue($addonItem, 'content', '');
             $options = ArrayHelper::getValue($addonItem, 'options', []);
-            if (ArrayHelper::getValue($addonItem, 'asButton', false)) {
-                Html::addCssClass($options, 'input-group-btn');
-            } else {
-                Html::addCssClass($options, 'input-group-addon');
-            }
+            $suffix = ArrayHelper::getValue($addonItem, 'asButton', false) ? 'btn' : 'addon';
+            Html::addCssClass($options, 'input-group-' . $suffix);
             $html .= Html::tag('span', $content, $options);
         }
         return $html;
@@ -428,6 +427,15 @@ class ActiveField extends YiiActiveField
             Html::addCssClass($this->options, 'has-feedback');
         }
         return parent::begin();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+        $this->initActiveField();
     }
 
     /**
@@ -515,15 +523,6 @@ class ActiveField extends YiiActiveField
             Html::addCssClass($options, 'kv-hint-block');
         }
         return parent::hint($this->generateHint($content), $options);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function init()
-    {
-        parent::init();
-        $this->initActiveField();
     }
 
     /**

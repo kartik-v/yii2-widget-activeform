@@ -19,6 +19,7 @@ Extends and enhances the [Yii ActiveForm widget](https://github.com/yiisoft/yii2
     * Segmented Button Addon
     * Prepend & Append
     * Input Group Settings
+    * Multiple Addons Configuration (_new_ since v1.4.9)
 - Input Feedback Icons
 - Input Hints Management
 - Inputs
