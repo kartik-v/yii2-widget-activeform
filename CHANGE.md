@@ -30,6 +30,7 @@ Change Log: `yii2-widget-activeform`
 - (enh #81): Change visibility of `$_pluginHintKeys`.
 - (enh #82): Allow configuration of `itemOptions` for `checkboxButtonGroup` and `radioButtonGroup`.
 - CSS enhancements for addons and other styling validation enhancements.
+- (enh #83): Correct PHPDoc to ensure correct return value for `ActiveForm::field()` method.
 
 ## Version 1.4.8
 
