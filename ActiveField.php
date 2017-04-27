@@ -410,6 +410,9 @@ class ActiveField extends YiiActiveField
         $html = "";
         foreach ($addon as $addonItem) {
             $content = ArrayHelper::getValue($addonItem, 'content', '');
+            // Avoid rendering the container if the content is null
+            if (empty($content))
+                continue;
             $options = ArrayHelper::getValue($addonItem, 'options', []);
             $suffix = ArrayHelper::getValue($addonItem, 'asButton', false) ? 'btn' : 'addon';
             Html::addCssClass($options, 'input-group-' . $suffix);
