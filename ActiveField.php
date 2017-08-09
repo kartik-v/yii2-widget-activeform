@@ -1327,7 +1327,10 @@ class ActiveField extends YiiActiveField
         Html::addCssClass($group, 'input-group');
         $contentBefore = ArrayHelper::getValue($addon, 'contentBefore', '');
         $contentAfter = ArrayHelper::getValue($addon, 'contentAfter', '');
-        $content = Html::tag('div', $contentBefore . $content . $contentAfter, $group);
+        $content = $contentBefore . $content . $contentAfter;
+        if ($this->withContainer) {
+            $content = Html::tag('div', $content, $group);
+        }
         return $content;
     }
 
