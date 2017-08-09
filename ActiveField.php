@@ -327,6 +327,11 @@ class ActiveField extends YiiActiveField
      */
     public $horizontalCssClasses;
 
+     /**
+     * @var boolean whether the current input should include a surrounding div container
+     */
+    public $enableContainer = true;
+
     /**
      * @var boolean whether the input is to be offset (like for checkbox or radio).
      */
@@ -423,10 +428,36 @@ class ActiveField extends YiiActiveField
      */
     public function begin()
     {
-        if ($this->_hasFeedback) {
-            Html::addCssClass($this->options, 'has-feedback');
+        if ($this->enableContainer) {
+            if ($this->_hasFeedback) {
+                Html::addCssClass($this->options, 'has-feedback');
+            }
+            return parent::begin();
         }
-        return parent::begin();
+        
+        return "";
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public function end()
+    {
+        if ($this->enableContainer) {
+            return parent::begin();
+        }
+        
+        return "";
+    }
+    
+    /**
+     * Switch to enable methtod chaining on setting container preference.
+     * Refer to $enableContainer property on more information.
+     */
+    public function enableContainer($withContainer=true)
+    {
+        $this->enableContainer = $withContainer;
+        return $this;
     }
 
     /**
