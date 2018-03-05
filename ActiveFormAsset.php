@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2016
+ * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
  * @version    1.4.9

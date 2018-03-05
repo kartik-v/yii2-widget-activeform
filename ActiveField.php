@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2016
+ * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
  * @version    1.4.9
@@ -410,6 +410,9 @@ class ActiveField extends YiiActiveField
         $html = "";
         foreach ($addon as $addonItem) {
             $content = ArrayHelper::getValue($addonItem, 'content', '');
+            if (empty($content)) {
+                continue;
+            }
             $options = ArrayHelper::getValue($addonItem, 'options', []);
             $suffix = ArrayHelper::getValue($addonItem, 'asButton', false) ? 'btn' : 'addon';
             Html::addCssClass($options, 'input-group-' . $suffix);
@@ -1451,9 +1454,6 @@ class ActiveField extends YiiActiveField
                 if (!empty($readonly) && in_array($value, $readonly) || $this->form->readonly) {
                     Html::addCssClass($labelOptions, 'disabled');
                     $opts['readonly'] = true;
-                }
-                if ($checked && $asButtonGroup) {
-                    Html::addCssClass($labelOptions, 'active');
                 }
                 $opts['labelOptions'] = $labelOptions;
                 $out = Html::$type($name, $checked, $opts);
