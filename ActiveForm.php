@@ -187,8 +187,8 @@ class ActiveForm extends YiiActiveForm
     public function getFormLayoutStyle()
     {
         $config = $this->formConfig;
-        $span = isset($config['labelSpan']) ? $config['labelSpan'] : null;
-        $size = isset($config['deviceSize']) ? $config['deviceSize'] : null;
+        $span = isset($config['labelSpan']) ? $config['labelSpan'] : ActiveField::NOT_SET;
+        $size = isset($config['deviceSize']) ? $config['deviceSize'] : ActiveField::NOT_SET;
         $labelCss = $inputCss = $offsetCss = ActiveField::NOT_SET;
         $iSpan = intval($span);
         if ($span != ActiveField::NOT_SET && $iSpan > 0) {

@@ -1,6 +1,12 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.5.0
+
+**Date**: _under development_
+
+- (enh #91, #92): Correct validation for getting form layout style.
+
 ## Version 1.4.9
 
 **Date**: 05-Mar-2018
