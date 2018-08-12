@@ -8,10 +8,6 @@
  * Built for Yii Framework 2.0
  * For more Yii related demos visit http://demos.krajee.com
  */
-.form-inline-block .btn-default {
-    margin-top: -10px;
-}
-
 .kv-hint-icon {
     display: inline-block;
     float: right;
@@ -70,6 +66,11 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     margin-top: 1rem;
 }
 
+.kv-form-bs4.tooltip-feedback .form-group.has-error {
+    position: relative;
+    margin-bottom: 2rem;
+}
+    
 /**
  * input group buttons styling change for `has-success` and `has-danger` states
  */
@@ -165,10 +166,10 @@ label.disabled, label.readonly, .disabled label, .readonly label {
  * feedback icon styling
  */
  
-.has-feedback-bs4 {
+.kv-form-bs4 .has-feedback {
   position: relative;
 }
-.has-feedback-bs4 .form-control {
+.kv-form-bs4 .has-feedback .form-control {
   padding-right: 2.65625rem;
 }
 .form-control-feedback {
@@ -203,11 +204,11 @@ label.disabled, label.readonly, .disabled label, .readonly label {
   color: #a94442;
 }
 
-.has-feedback-bs4 label ~ .form-control-feedback {
+.kv-form-bs4 .has-feedback label ~ .form-control-feedback {
   top: 2.125rem;
 }
 
-.has-feedback-bs4 label.sr-only ~ .form-control-feedback {
+.kv-form-bs4 .has-feedback label.sr-only ~ .form-control-feedback {
   top: 0;
 }
  
@@ -224,12 +225,12 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 }
 
 @media (min-width: 768px) {
-  .form-inline .has-feedback-bs4 .form-control-feedback,
-  .navbar-form .has-feedback-bs4 .form-control-feedback {
+  .kv-form-bs4.form-inline .has-feedback .form-control-feedback,
+  .kv-form-bs4.navbar-form .has-feedback .form-control-feedback {
     top: 0;
   }
 }
-.form-horizontal .has-feedback-bs4 .form-control-feedback {
+.kv-form-bs4.form-horizontal .has-feedback .form-control-feedback {
   right: 0.9375rem;
 }
 

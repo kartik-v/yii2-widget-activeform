@@ -416,7 +416,7 @@ class ActiveField extends YiiActiveField
     public function begin()
     {
         if ($this->_hasFeedback) {
-            Html::addCssClass($this->options, 'has-feedback' . ($this->form->isBs4() ? '-bs4' : ''));
+            Html::addCssClass($this->options, 'has-feedback');
         }
         return parent::begin();
     }
@@ -715,7 +715,8 @@ class ActiveField extends YiiActiveField
     {
         $content = isset($this->staticValue) ? $this->staticValue :
             Html::getAttributeValue($this->model, $this->attribute);
-        Html::addCssClass($options, 'form-control-static');
+        $css = $this->form->isBs4() ? 'form-control-plaintext' : 'form-control-static';
+        Html::addCssClass($options, $css);
         $this->parts['{input}'] = Html::tag('div', $content, $options);
         $this->_isStatic = true;
         return $this;
@@ -967,6 +968,10 @@ class ActiveField extends YiiActiveField
         }
         if (isset($this->enableLabel)) {
             $this->showLabels = $this->enableLabel;
+        }
+        if ($this->form->isBs4()) {
+            $errCss = $this->form->tooltipStyleFeedback ? 'invalid-tooltip' : 'invalid-feedback';
+            Html::addCssClass($this->errorOptions, $errCss);
         }
         $showLabels = $this->getConfigParam('showLabels');
         $this->_isHintSpecial = $this->hintType === self::HINT_SPECIAL;
@@ -1283,12 +1288,16 @@ class ActiveField extends YiiActiveField
     {
         $showLabels = $showErrors = $input = $error = null;
         extract($this->_settings);
-        if ($this->_isStatic && $this->showErrors !== true) {
+        if ($this->_isStatic  || (isset($this->showErrors) && !$this->showErrors) || 
+            (!$this->skipFormLayout && !$this->getConfigParam('showErrors'))) {
             $showErrors = false;
         }
         $showLabels = $showLabels && $this->hasLabels();
         $this->buildLayoutParts($showLabels, $showErrors);
         extract($this->_settings);
+        if (!$showErrors) {
+            Html::addCssClass($this->options, 'hide-errors');
+        }
         if (!empty($this->_multiselect)) {
             $input = str_replace('{input}', $this->_multiselect, $input);
         }

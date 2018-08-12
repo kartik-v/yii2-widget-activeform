@@ -57,12 +57,18 @@ class ActiveForm extends YiiActiveForm
      * This property can be set up globally in Yii application params in your Yii2 application config file.
      *
      * For example:
-     * `Yii::$app->params['bsVarsion'] = '4.x'` to use with Bootstrap 4.x globally
+     * `Yii::$app->params['bsVersion'] = '4.x'` to use with Bootstrap 4.x globally
      *
      * If this property is set, this setting will override the `Yii::$app->params['bsVersion']`. If this is not set, and
      * `Yii::$app->params['bsVersion']` is also not set, this will default to `3.x` (Bootstrap 3.x version).
      */
     public $bsVersion;
+    
+    /**
+     * @var bool whether to render tooltip styled error and success messages. Applicable only for [[bsVersion]] 4.x 
+     * and above.
+     */
+    public $tooltipStyleFeedback = false;
 
     /**
      * The default label span. This will offset the adjacent input accordingly.
@@ -242,7 +248,11 @@ class ActiveForm extends YiiActiveForm
         $view = $this->getView();
         ActiveFormAsset::register($view);
         $id = 'jQuery("#' . $this->options['id'] . ' .kv-hint-special")';
-        $view->registerJs('var $el=' . $id . ';if($el.length){$el.each(function(){$(this).activeFieldHint()});}');
+        $js = 'var $el=' . $id . ';if($el.length){$el.each(function(){$(this).activeFieldHint()});}';
+        if ($this->isBs4()) {
+            $js .= "kvBs4InitForm();";
+        }
+        $view->registerJs($js);
     }
 
     /**
@@ -259,14 +269,15 @@ class ActiveForm extends YiiActiveForm
             throw new InvalidConfigException('Invalid layout type: ' . $this->type);
         }
         $this->formConfig = array_replace_recursive($this->_config[$this->type], $this->formConfig);
-        $prefix = 'form-' . $this->type;
-        $css = [$prefix];
-        /* Fixes the button alignment for inline forms containing error block */
-        if ($this->type === self::TYPE_INLINE && $this->formConfig['showErrors']) {
-            $css[] = $prefix . '-block';
-        }
+        $css = ["form-{$this->type}"];
         if ($this->type === self::TYPE_HORIZONTAL) {
             $css[] = 'kv-form-horizontal';
+        }
+        if ($this->isBs4()) {
+            $css[] = 'kv-form-bs4';
+            if ($this->tooltipStyleFeedback) {
+                $css[] = 'tooltip-feedback';
+            }
         }
         Html::addCssClass($this->options, $css);
     }
