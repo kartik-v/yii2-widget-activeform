@@ -28,7 +28,7 @@ use yii\widgets\ActiveField as YiiActiveField;
  * echo $form->field($model, 'phone', [
  *     'addon' => [
  *         'type'=>'prepend',
- *         'content'=>'<i class="glyphicon glyphicon-phone"></i>'
+ *         'content'=>'<i class="fas fa-mobile-alt"></i>'
  *     ]
  * ]);
  * ```
@@ -51,7 +51,6 @@ use yii\widgets\ActiveField as YiiActiveField;
  */
 class ActiveField extends YiiActiveField
 {
-
     /**
      * An empty string value
      */
@@ -64,10 +63,6 @@ class ActiveField extends YiiActiveField
      * HTML checkbox input type
      */
     const TYPE_CHECKBOX = 'checkbox';
-    /**
-     * Inline style flag for rendering checkboxes (as per bootstrap styling)
-     */
-    const STYLE_INLINE = 'inline';
     /**
      * The default height for the Krajee multi select input
      */
@@ -128,8 +123,9 @@ class ActiveField extends YiiActiveField
      * @var array the settings for displaying the hint. These settings are parsed only if `hintType` is set to
      * `self::HINT_SPECIAL`. The following properties are supported:
      * - `showIcon`: _boolean_, whether to display the hint via a help icon indicator. Defaults to `true`.
-     * - `icon`: _string_, the markup to display the help icon. Defaults to `<i class="glyphicon glyphicon-question-sign
-     *   text-info"></i>`.
+     * - `icon`: _string_, the markup to display the help icon. Defaults to 
+     *    - `<i class="glyphicon glyphicon-question-sign text-info"></i>` for Bootstrap 3.x.
+     *    - `<i class="fas fa-question-circle text-info"></i>` for Bootstrap 4.x.
      * - `iconBesideInput`: _boolean_, whether to display the icon beside the input. Defaults to `false`. The following
      *   actions will be taken based on this setting:
      *   - if set to `false` the help icon is displayed beside the label and the `labelTemplate` setting is used to
@@ -176,7 +172,8 @@ class ActiveField extends YiiActiveField
      * - `type`: _string_, the icon type to use. Should be one of `raw` or `icon`. Defaults to `icon`, where the `default`,
      *   `error` and `success` settings will be treated as an icon CSS suffix name. If set to `raw`, they will be
      *   treated as a raw content markup.
-     * - `prefix`: _string_, the icon CSS class prefix to use if `type` is `icon`. Defaults to `glyphicon glyphicon-`.
+     * - `prefix`: _string_, the icon CSS class prefix to use if `type` is `icon`. Defaults to `glyphicon glyphicon-` for 
+     *    Bootstrap 3.x and `fas fa-` for Bootstrap 4.x.
      * - `default`: _string_, the icon (CSS class suffix name or raw markup) to show by default. If not set will not be
      *   shown.
      * - `error`: _string_, the icon (CSS class suffix name or raw markup) to use when input has an error validation. If
@@ -1188,6 +1185,7 @@ class ActiveField extends YiiActiveField
         if ($container === '') {
             $container = $this->_iconBesideInput ? 'table' : 'form';
         }
+        $iconCss = $this->form->isBs4() ? 'fas fa fa-question-circle' : 'glyphicon glyphicon-question-sign';
         $defaultSettings = [
             'showIcon' => true,
             'iconBesideInput' => false,
@@ -1201,7 +1199,7 @@ class ActiveField extends YiiActiveField
             'labelCssClass' => 'kv-hint-label',
             'iconCssClass' => 'kv-hint-icon',
             'contentCssClass' => 'kv-hint-content',
-            'icon' => '<i class="glyphicon glyphicon-question-sign text-info"></i>',
+            'icon' => '<i class="' . $iconCss . ' text-info"></i>',
             'hideOnEscape' => true,
             'hideOnClickOut' => true,
             'placement' => 'top',
@@ -1349,7 +1347,7 @@ class ActiveField extends YiiActiveField
         }
         $config = $this->feedbackIcon;
         $type = ArrayHelper::getValue($config, 'type', 'icon');
-        $prefix = ArrayHelper::getValue($config, 'prefix', 'glyphicon glyphicon-');
+        $prefix = ArrayHelper::getValue($config, 'prefix', $this->form->isBs4() ? 'fas fa-' : 'glyphicon glyphicon-');
         $id = Html::getInputId($this->model, $this->attribute);
         return $this->getFeedbackIcon($config, 'default', $type, $prefix, $id) .
             $this->getFeedbackIcon($config, 'success', $type, $prefix, $id) .

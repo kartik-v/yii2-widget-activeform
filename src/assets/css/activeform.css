@@ -67,7 +67,7 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 }
 
 .kv-form-horizontal .form-group + .form-group {
-    margin-top: 5px;
+    margin-top: 1rem;
 }
 
 /**

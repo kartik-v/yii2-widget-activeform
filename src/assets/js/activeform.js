@@ -143,7 +143,7 @@
         hideOnClickOut: false,
         title: '',
         placement: 'right',
-        container: 'form',
+        container: 'body',
         delay: 0,
         animation: true,
         selector: false,

@@ -265,7 +265,7 @@ class ActiveForm extends YiiActiveForm
         if ($this->type === self::TYPE_INLINE && $this->formConfig['showErrors']) {
             $css[] = $prefix . '-block';
         }
-        if ($this->type === self::TYPE_HORIZONTAL && !$this->isBs4()) {
+        if ($this->type === self::TYPE_HORIZONTAL) {
             $css[] = 'kv-form-horizontal';
         }
         Html::addCssClass($this->options, $css);
