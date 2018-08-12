@@ -5,6 +5,9 @@ Change Log: `yii2-widget-activeform`
 
 **Date**: _under development_
 
+- (enh #95): Add Bootstrap 4.x Support.
+- (bug #94): Add missing comma in activeform css.
+- Reorganize source code in `src` directory.
 - (enh #91, #92): Correct validation for getting form layout style.
 
 ## Version 1.4.9

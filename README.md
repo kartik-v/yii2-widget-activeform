@@ -1,7 +1,8 @@
 yii2-widget-activeform
 ======================
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/kartik-v/yii2-widget-activeform.svg)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
+[![Stable Version](https://poser.pugx.org/kartik-v/yii2-widget-activeform/v/stable)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
+[![Unstable Version](https://poser.pugx.org/kartik-v/yii2-widget-activeform/v/unstable)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
 [![License](https://poser.pugx.org/kartik-v/yii2-widget-activeform/license)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
 [![Total Downloads](https://poser.pugx.org/kartik-v/yii2-widget-activeform/downloads)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
 [![Monthly Downloads](https://poser.pugx.org/kartik-v/yii2-widget-activeform/d/monthly)](https://packagist.org/packages/kartik-v/yii2-widget-activeform)
