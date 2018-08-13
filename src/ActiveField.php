@@ -12,6 +12,7 @@ namespace kartik\form;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Inflector;
+use kartik\base\AddonTrait;
 use yii\widgets\ActiveField as YiiActiveField;
 
 /**
@@ -51,6 +52,7 @@ use yii\widgets\ActiveField as YiiActiveField;
  */
 class ActiveField extends YiiActiveField
 {
+    use AddonTrait;
     /**
      * An empty string value
      */
@@ -1330,14 +1332,15 @@ class ActiveField extends YiiActiveField
         if (empty($this->addon)) {
             return '{input}';
         }
-        $addonItem = $this->addon;
-        $prepend = $this->getAddonContent('prepend');
-        $append = $this->getAddonContent('append');
+        $addon = $this->addon;
+        $isBs4 = $this->form->isBs4();
+        $prepend = $this->getAddonContent('prepend', $isBs4);
+        $append = $this->getAddonContent('append', $isBs4);
         $content = $prepend . '{input}' . $append;
-        $group = ArrayHelper::getValue($addonItem, 'groupOptions', []);
+        $group = ArrayHelper::getValue($addon, 'groupOptions', []);
         Html::addCssClass($group, 'input-group');
-        $contentBefore = ArrayHelper::getValue($addonItem, 'contentBefore', '');
-        $contentAfter = ArrayHelper::getValue($addonItem, 'contentAfter', '');
+        $contentBefore = ArrayHelper::getValue($addon, 'contentBefore', '');
+        $contentAfter = ArrayHelper::getValue($addon, 'contentAfter', '');
         $content = Html::tag('div', $contentBefore . $content . $contentAfter, $group);
         return $content;
     }
@@ -1389,48 +1392,6 @@ class ActiveField extends YiiActiveField
         if (!isset($this->parts['{labelTitle}'])) {
             $this->parts['{labelTitle}'] = $label;
         }
-    }
-
-    /**
-     * Parses and returns addon content.
-     *
-     * @param string $type the addon type
-     *
-     * @return string
-     */
-    protected function getAddonContent($type)
-    {
-        $addon = ArrayHelper::getValue($this->addon, $type, '');
-        if (!is_array($addon)) {
-            return $addon;
-        }
-        $getAddon = function ($addonItem) use ($type) {
-            $content = ArrayHelper::getValue($addonItem, 'content', '');
-            $options = ArrayHelper::getValue($addonItem, 'options', []);
-            $asButton = ArrayHelper::getValue($addonItem, 'asButton', false);
-            if ($this->form->isBs4()) {
-                $pos = $type === 'append' ? $type : 'prepend';
-                if ($asButton) {
-                    $out = $content;
-                } else {
-                    Html::addCssClass($options, 'input-group-text');
-                    $out = Html::tag('span', $content, $options);
-                }
-                return Html::tag('div', $out, ['class' => "input-group-{$pos}"]);
-            }
-            Html::addCssClass($options, 'input-group-' . ($asButton ? 'btn' : 'addon'));
-            return Html::tag('span', $content, $options);
-        };
-        if (isset($addon['content'])) {
-            return $getAddon($addon);
-        }
-        $out = '';
-        foreach ($addon as $item) {
-            if (is_array($item) && isset($item['content'])) {
-                $out .= $getAddon($item);
-            }
-        }
-        return $out;
     }
 
     /**
