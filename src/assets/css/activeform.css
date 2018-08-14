@@ -58,12 +58,8 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     min-height: 145px !important;
 }
 
-.kv-form-horizontal .form-group {
-    margin-bottom: 0;
-}
-
 .kv-form-horizontal .form-group + .form-group {
-    margin-top: 1rem;
+    margin-bottom: 0;
 }
 
 .kv-form-bs4.tooltip-feedback .form-group.has-error {
