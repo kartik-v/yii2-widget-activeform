@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.0
+ * @version    1.5.1
  */
 
 namespace kartik\form;
@@ -47,6 +47,7 @@ use yii\widgets\ActiveField as YiiActiveField;
  * ]);
  * ```
  *
+ * @property ActiveForm $form
  * @author Kartik Visweswaran <kartikv2@gmail.com>
  * @since  1.0
  */
@@ -125,7 +126,7 @@ class ActiveField extends YiiActiveField
      * @var array the settings for displaying the hint. These settings are parsed only if `hintType` is set to
      * `self::HINT_SPECIAL`. The following properties are supported:
      * - `showIcon`: _boolean_, whether to display the hint via a help icon indicator. Defaults to `true`.
-     * - `icon`: _string_, the markup to display the help icon. Defaults to 
+     * - `icon`: _string_, the markup to display the help icon. Defaults to
      *    - `<i class="glyphicon glyphicon-question-sign text-info"></i>` for Bootstrap 3.x.
      *    - `<i class="fas fa-question-circle text-info"></i>` for Bootstrap 4.x.
      * - `iconBesideInput`: _boolean_, whether to display the icon beside the input. Defaults to `false`. The following
@@ -174,7 +175,7 @@ class ActiveField extends YiiActiveField
      * - `type`: _string_, the icon type to use. Should be one of `raw` or `icon`. Defaults to `icon`, where the `default`,
      *   `error` and `success` settings will be treated as an icon CSS suffix name. If set to `raw`, they will be
      *   treated as a raw content markup.
-     * - `prefix`: _string_, the icon CSS class prefix to use if `type` is `icon`. Defaults to `glyphicon glyphicon-` for 
+     * - `prefix`: _string_, the icon CSS class prefix to use if `type` is `icon`. Defaults to `glyphicon glyphicon-` for
      *    Bootstrap 3.x and `fas fa-` for Bootstrap 4.x.
      * - `default`: _string_, the icon (CSS class suffix name or raw markup) to show by default. If not set will not be
      *   shown.
@@ -1290,7 +1291,7 @@ class ActiveField extends YiiActiveField
     {
         $showLabels = $showErrors = $input = $error = null;
         extract($this->_settings);
-        if ($this->_isStatic  || (isset($this->showErrors) && !$this->showErrors) || 
+        if ($this->_isStatic || (isset($this->showErrors) && !$this->showErrors) ||
             (!$this->skipFormLayout && !$this->getConfigParam('showErrors'))) {
             $showErrors = false;
         }

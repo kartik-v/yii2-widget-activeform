@@ -1,6 +1,12 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.5.1
+
+**Date**: 16-Aug-2018
+
+- (bug #98): Correct ActiveForm css variables init.
+
 ## Version 1.5.0
 
 **Date**: 16-Aug-2018

@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.0
+ * @version    1.5.1
  */
 
 namespace kartik\form;
@@ -63,9 +63,9 @@ class ActiveForm extends YiiActiveForm
      * `Yii::$app->params['bsVersion']` is also not set, this will default to `3.x` (Bootstrap 3.x version).
      */
     public $bsVersion;
-    
+
     /**
-     * @var bool whether to render tooltip styled error and success messages. Applicable only for [[bsVersion]] 4.x 
+     * @var bool whether to render tooltip styled error and success messages. Applicable only for [[bsVersion]] 4.x
      * and above.
      */
     public $tooltipStyleFeedback = false;
@@ -189,7 +189,7 @@ class ActiveForm extends YiiActiveForm
             'showHints' => true,
         ],
     ];
-    
+
     /**
      * @var bool flag to detect whether bootstrap 4.x version is set
      */
@@ -220,7 +220,7 @@ class ActiveForm extends YiiActiveForm
         $config = $this->formConfig;
         $span = isset($config['labelSpan']) ? $config['labelSpan'] : ActiveField::NOT_SET;
         $size = isset($config['deviceSize']) ? $config['deviceSize'] : ActiveField::NOT_SET;
-        $labelCss = $inputCss = $ActiveField::NOT_SET;
+        $labelCss = $inputCss = ActiveField::NOT_SET;
         $iSpan = intval($span);
         if ($span != ActiveField::NOT_SET && $iSpan > 0) {
             // validate if invalid `labelSpan` is passed else set to [[DEFAULT_LABEL_SPAN]]

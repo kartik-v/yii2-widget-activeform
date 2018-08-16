@@ -58,9 +58,9 @@ or add
 
 to the ```require``` section of your `composer.json` file.
 
-## Latest Release
+## Release Changes
 
-> NOTE: The latest version of the module is v1.5.0. Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-widget-activeform/blob/master/CHANGE.md) for details.
+> NOTE: Refer the [CHANGE LOG](https://github.com/kartik-v/yii2-widget-activeform/blob/master/CHANGE.md) for details on changes to various releases.
 
 ## Demo
 

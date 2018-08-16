@@ -4,10 +4,11 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.0
+ * @version    1.5.1
  */
 
 namespace kartik\form;
+
 use kartik\base\PluginAssetBundle;
 
 /**
@@ -24,7 +25,7 @@ class ActiveFormAsset extends PluginAssetBundle
     public function init()
     {
         $this->depends = array_merge($this->depends, [
-            'yii\widgets\ActiveFormAsset'
+            'yii\widgets\ActiveFormAsset',
         ]);
         $this->setSourcePath(__DIR__ . '/assets');
         $this->setupAssets('css', ['css/activeform']);
