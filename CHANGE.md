@@ -3,13 +3,14 @@ Change Log: `yii2-widget-activeform`
 
 ## Version 1.5.0
 
-**Date**: _under development_
+**Date**: 16-Aug-2018
 
 - Implement AddonTrait.
 - (enh #95): Add Bootstrap 4.x Support.
 - (bug #94): Add missing comma in activeform css.
 - Reorganize source code in `src` directory.
 - (enh #91, #92): Correct validation for getting form layout style.
+- Set krajee base dependency to v1.9.x.
 
 ## Version 1.4.9
 
