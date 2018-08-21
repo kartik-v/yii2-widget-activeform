@@ -1142,8 +1142,6 @@ class ActiveField extends YiiActiveField
         }
         if ($this->skipFormLayout) {
             $this->mergeSettings($showLabels, $showErrors);
-            $this->parts['{beginWrapper}'] = '';
-            $this->parts['{endWrapper}'] = '';
             $this->parts['{beginLabel}'] = '';
             $this->parts['{labelTitle}'] = '';
             $this->parts['{endLabel}'] = '';
