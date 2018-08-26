@@ -1,6 +1,13 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.5.2
+
+**Date**: _under development_
+
+- (enh #100): Control ActiveField addons highlight for success & error states.
+- (enh #99): Correct ActiveField wrapper templates when `skipFormLayout` is set to `true`.
+
 ## Version 1.5.1
 
 **Date**: 16-Aug-2018

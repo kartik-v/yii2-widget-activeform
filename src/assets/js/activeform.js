@@ -2,7 +2,7 @@
  * @package   yii2-widget-activeform
  * @author    Kartik Visweswaran <kartikv2@gmail.com>
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
- * @version   1.5.1
+ * @version   1.5.2
  *
  * Active Field Hints Display Module
  *
@@ -11,7 +11,7 @@
  * For more JQuery plugins visit http://plugins.krajee.com
  * For more Yii related demos visit http://demos.krajee.com
  */
-var kvBs4InitForm = function() {
+var kvBs4InitForm = function () {
 };
 (function ($) {
     "use strict";
@@ -26,21 +26,21 @@ var kvBs4InitForm = function() {
                 self[key] = val;
             });
             self.init();
-        };    
-    kvBs4InitForm = function() {
-        var resetControls = function($form) {
+        };
+    kvBs4InitForm = function () {
+        var resetControls = function ($form) {
             $form.find('.form-control,.custom-control').removeClass('is-valid is-invalid');
         };
-        $('form').on('afterValidateAttribute', function (e, attr, msg) {
+        $('form').on('afterValidateAttribute', function () {
             var $form = $(this);
             resetControls($form);
             if ($form.find('.has-error').length || $form.find('.has-success').length) {
                 $form.find('.has-error .form-control,.has-error .custom-control').addClass('is-invalid');
                 $form.find('.has-success .form-control,.has-success .custom-control').addClass('is-valid');
             }
-        }).on('reset', function() {
+        }).on('reset', function () {
             var $form = $(this);
-            setTimeout(function() {
+            setTimeout(function () {
                 resetControls($form);
             }, 100);
         });

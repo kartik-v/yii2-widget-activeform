@@ -4,11 +4,12 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.1
+ * @version    1.5.2
  */
 
 namespace kartik\form;
 
+use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Inflector;
@@ -259,6 +260,11 @@ class ActiveField extends YiiActiveField
      * - `contentAfter`: _string_, content placed after addon
      */
     public $addon = [];
+
+    /**
+     * @var bool whether to highlight error and success states on input group addons automatically
+     */
+    public $highlightAddon = true;
 
     /**
      * @var string CSS classname to add to the input
@@ -989,6 +995,9 @@ class ActiveField extends YiiActiveField
         if ($showLabels === ActiveForm::SCREEN_READER) {
             Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
         }
+        if ($this->highlightAddon) {
+            Html::addCssClass($this->options, 'highlight-addon');
+        }
         if ($this->form->type === ActiveForm::TYPE_HORIZONTAL) {
             $this->initHorizontal();
         }
@@ -1329,6 +1338,7 @@ class ActiveField extends YiiActiveField
      * Generates the addon markup
      *
      * @return string
+     * @throws InvalidConfigException
      */
     protected function generateAddon()
     {
