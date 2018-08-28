@@ -242,6 +242,7 @@ class ActiveForm extends YiiActiveForm
 
     /**
      * Registers the assets for the [[ActiveForm]] widget.
+     * @throws InvalidConfigException
      */
     public function registerAssets()
     {

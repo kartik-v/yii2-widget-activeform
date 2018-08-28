@@ -5,6 +5,7 @@ Change Log: `yii2-widget-activeform`
 
 **Date**: _under development_
 
+- (bug #101): Correct `addClass` assignment for HTML5 inputs.
 - (enh #100): Control ActiveField addons highlight for success & error states.
 - (enh #99): Correct ActiveField wrapper templates when `skipFormLayout` is set to `true`.
 
