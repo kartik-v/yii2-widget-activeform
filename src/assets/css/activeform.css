@@ -66,7 +66,6 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 /**
  * feedback icon styling
  */
-
 .kv-form-bs4 .has-feedback {
     position: relative;
 }
@@ -75,12 +74,11 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     padding-right: 2.65625rem;
 }
 
-.form-control-feedback {
+.kv-form-bs4 .form-control-feedback {
     position: absolute;
     top: 0;
     right: 0;
     z-index: 2;
-    display: block;
     width: 2.125rem;
     height: 2.125rem;
     line-height: 2.125rem;
@@ -88,20 +86,27 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     pointer-events: none;
 }
 
-.form-control-lg + .form-control-feedback,
-.input-group-lg + .form-control-feedback,
-.form-group-lg .form-control + .form-control-feedback {
+.has-feedback.has-size-lg .form-control-feedback {
+    font-size: 18px;
+    top: 31px;
+}
+
+.has-feedback.has-size-sm .form-control-feedback {
+    font-size: 12px;
+}
+
+.kv-form-bs4 .has-feedback.has-size-lg .form-control-feedback {
     width: 2.875rem;
     height: 2.875rem;
     line-height: 2.875rem;
+    font-size: 1.25rem;
 }
 
-.form-control-sm + .form-control-feedback,
-.input-group-sm + .form-control-feedback,
-.form-group-sm .form-control + .form-control-feedback {
-    width: 1.875rem;
-    height: 1.875rem;
-    line-height: 1.875rem;
+.kv-form-bs4 .has-feedback.has-size-sm .form-control-feedback {
+    width: 1.75rem;
+    height: 1.75rem;
+    line-height: 1.75rem;
+    font-size: 0.875rem;
 }
 
 .has-error .form-control-feedback {
@@ -125,7 +130,7 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 
 .has-error .kv-feedback-error,
 .has-success .kv-feedback-success {
-    display: inline;
+    display: inline-block;
 }
 
 @media (min-width: 768px) {

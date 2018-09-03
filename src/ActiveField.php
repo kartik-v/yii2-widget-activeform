@@ -531,10 +531,11 @@ class ActiveField extends YiiActiveField
 
     /**
      * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function input($type, $options = [])
     {
-        $this->initPlaceholder($options);
+        $this->initFieldOptions($options);
         if ($type !== 'range' && $type !== 'color') {
             Html::addCssClass($options, $this->addClass);
         }
@@ -587,10 +588,11 @@ class ActiveField extends YiiActiveField
 
     /**
      * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function passwordInput($options = [])
     {
-        $this->initPlaceholder($options);
+        $this->initFieldOptions($options);
         Html::addCssClass($options, $this->addClass);
         $this->initDisability($options);
         return parent::passwordInput($options);
@@ -679,7 +681,7 @@ class ActiveField extends YiiActiveField
             $this->buildTemplate();
             $this->staticInput();
         } else {
-            $this->initPlaceholder($this->inputOptions);
+            $this->initFieldOptions($this->inputOptions);
             $this->initDisability($this->inputOptions);
             $this->buildTemplate();
         }
@@ -688,10 +690,11 @@ class ActiveField extends YiiActiveField
 
     /**
      * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function textInput($options = [])
     {
-        $this->initPlaceholder($options);
+        $this->initFieldOptions($options);
         Html::addCssClass($options, $this->addClass);
         $this->initDisability($options);
         return parent::textInput($options);
@@ -699,10 +702,11 @@ class ActiveField extends YiiActiveField
 
     /**
      * @inheritdoc
+     * @throws InvalidConfigException
      */
     public function textarea($options = [])
     {
-        $this->initPlaceholder($options);
+        $this->initFieldOptions($options);
         Html::addCssClass($options, $this->addClass);
         $this->initDisability($options);
         return parent::textarea($options);
@@ -1261,16 +1265,36 @@ class ActiveField extends YiiActiveField
     }
 
     /**
-     * Initializes placeholder based on $autoPlaceholder
+     * Initializes sizes and placeholder based on $autoPlaceholder
      *
      * @param array $options the HTML attributes for the input
+     * @throws InvalidConfigException
      */
-    protected function initPlaceholder(&$options)
+    protected function initFieldOptions(&$options)
     {
+        $this->initFieldSize($options, 'lg');
+        $this->initFieldSize($options, 'sm');
         if ($this->autoPlaceholder) {
             $label = $this->model->getAttributeLabel(Html::getAttributeName($this->attribute));
             $this->inputOptions['placeholder'] = $label;
             $options['placeholder'] = $label;
+        }
+    }
+
+    /**
+     * Initializes field by detecting the bootstrap CSS size and sets a size modifier CSS to the field container
+     * @param array $options the HTML options
+     * @param string $size the size to init
+     * @throws InvalidConfigException
+     */
+    protected function initFieldSize($options, $size)
+    {
+        $isBs4 = $this->form->isBs4();
+        if ($isBs4 && static::hasCssClass($options, "form-control-{$size}") ||
+            !$isBs4 && static::hasCssClass($options, "input-{$size}") ||
+            isset($this->addon['groupOptions']) &&
+            static::hasCssClass($this->addon['groupOptions'], "input-group-{$size}")) {
+            Html::addCssClass($this->options, "has-size-{$size}");
         }
     }
 
@@ -1449,6 +1473,7 @@ class ActiveField extends YiiActiveField
             $this->inputOptions['aria-describedby'] . ' ' . $key;
         Html::addCssClass($options, 'form-control-feedback');
         Html::addCssClass($options, 'kv-feedback-' . $cat);
+
         $icon = $type === 'raw' ? $markup : Html::tag('i', '', ['class' => $prefix . $markup]);
         return Html::tag('span', $icon, $options) . Html::tag('span', $desc, ['id' => $key, 'class' => 'sr-only']);
     }
@@ -1552,5 +1577,21 @@ class ActiveField extends YiiActiveField
             };
         }
         return parent::$inputType($items, $options);
+    }
+
+    /**
+     * Check if HTML options has specified CSS class
+     * @param array $options the HTML options
+     * @param string $cssClass the css class to test
+     * @return bool
+     */
+    protected static function hasCssClass($options, $cssClass)
+    {
+        if (!isset($options['class'])) {
+            return false;
+        }
+        $classes = is_array($options['class']) ? $options['class'] : 
+            preg_split('/\s+/', $options['class'], -1, PREG_SPLIT_NO_EMPTY);
+        return in_array($cssClass, $classes);
     }
 }
