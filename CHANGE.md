@@ -5,6 +5,7 @@ Change Log: `yii2-widget-activeform`
 
 **Date**: _under development_
 
+- Add Bootstrap button default CSS and icon prefix parsing.
 - (enh #102): Enhance size modifier detection and input feedback icons.
 - (bug #101): Correct `addClass` assignment for HTML5 inputs.
 - (enh #100): Control ActiveField addons highlight for success & error states.

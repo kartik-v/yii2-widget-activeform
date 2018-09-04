@@ -1413,7 +1413,7 @@ class ActiveField extends YiiActiveField
         }
         $config = $this->feedbackIcon;
         $type = ArrayHelper::getValue($config, 'type', 'icon');
-        $prefix = ArrayHelper::getValue($config, 'prefix', $this->form->isBs4() ? 'fas fa-' : 'glyphicon glyphicon-');
+        $prefix = ArrayHelper::getValue($config, 'prefix', $this->form->getDefaultIconPrefix());
         $id = Html::getInputId($this->model, $this->attribute);
         return $this->getFeedbackIcon($config, 'default', $type, $prefix, $id) .
             $this->getFeedbackIcon($config, 'success', $type, $prefix, $id) .
@@ -1521,7 +1521,7 @@ class ActiveField extends YiiActiveField
             $options['data-toggle'] = 'buttons';
             $options['inline'] = true;
             if (!isset($options['itemOptions']['labelOptions']['class'])) {
-                $options['itemOptions']['labelOptions']['class'] = 'btn btn-' . ($isBs4 ? 'secondary' : 'default');
+                $options['itemOptions']['labelOptions']['class'] = 'btn ' . $this->form->getDefaultBtnCss();
             }
         }
         $inline = ArrayHelper::remove($options, 'inline', false);
