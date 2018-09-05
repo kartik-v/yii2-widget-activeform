@@ -3,8 +3,10 @@ Change Log: `yii2-widget-activeform`
 
 ## Version 1.5.2
 
-**Date**: _under development_
+**Date**: 05-Sep-2018
 
+- Add BS4 custom checkbox & custom radio controls support.
+- (kartik-v/yii2-krajee-base#94): Refactor code and consolidate / optimize properties within traits.
 - Add Bootstrap button default CSS and icon prefix parsing.
 - (enh #102): Enhance size modifier detection and input feedback icons.
 - (bug #101): Correct `addClass` assignment for HTML5 inputs.

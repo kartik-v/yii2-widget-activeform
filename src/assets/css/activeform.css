@@ -241,3 +241,7 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 .kv-form-bs4 .has-error.highlight-addon .input-group .btn:not(:disabled):not(.disabled):focus {
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5);
 }
+
+.kv-form-bs4 .has-error .invalid-feedback {
+    display: block;
+}

@@ -15,35 +15,20 @@ var kvBs4InitForm = function () {
 };
 (function ($) {
     "use strict";
-    var isEmpty = function (value, trim) {
-            return value === null || value === undefined || value === [] || value === '' || trim && $.trim(value) === '';
-        },
-        NAMESPACE = '.kvActiveField',
-        ActiveFieldHint = function (element, options) {
-            var self = this;
-            self.$element = $(element);
-            $.each(options, function (key, val) {
-                self[key] = val;
-            });
-            self.init();
-        };
-    kvBs4InitForm = function () {
-        var resetControls = function ($form) {
-            $form.find('.form-control,.custom-control').removeClass('is-valid is-invalid');
-        };
-        $('form').on('afterValidateAttribute', function () {
-            var $form = $(this);
-            resetControls($form);
-            if ($form.find('.has-error').length || $form.find('.has-success').length) {
-                $form.find('.has-error .form-control,.has-error .custom-control').addClass('is-invalid');
-                $form.find('.has-success .form-control,.has-success .custom-control').addClass('is-valid');
-            }
-        }).on('reset', function () {
-            var $form = $(this);
-            setTimeout(function () {
-                resetControls($form);
-            }, 100);
+    var $h, ActiveFieldHint;
+    $h = {
+        NAMESPACE: '.kvActiveField',
+        isEmpty: function (val, trim) {
+            return val === undefined || val === [] || val === null || val === '' || trim && $.trim(val) === '';
+        }
+    };
+    ActiveFieldHint = function (element, options) {
+        var self = this;
+        self.$element = $(element);
+        $.each(options, function (key, val) {
+            self[key] = val;
         });
+        self.init();
     };
     ActiveFieldHint.prototype = {
         constructor: ActiveFieldHint,
@@ -51,10 +36,10 @@ var kvBs4InitForm = function () {
             var self = this, $el = self.$element, $block = $el.find('.kv-hint-block'), content = $block.html(),
                 $hints = $el.find('.kv-hintable'), $span;
             $block.hide();
-            if (isEmpty(content)) {
+            if ($h.isEmpty(content)) {
                 return;
             }
-            if (!isEmpty(self.contentCssClass)) {
+            if (!$h.isEmpty(self.contentCssClass)) {
                 $span = $(document.createElement('span')).addClass(self.contentCssClass).append(content);
                 $span = $(document.createElement('span')).append($span);
                 content = $span.html();
@@ -107,10 +92,10 @@ var kvBs4InitForm = function () {
                 delay: self.delay,
                 selector: self.selector
             };
-            if (!isEmpty(self.template)) {
+            if (!$h.isEmpty(self.template)) {
                 opts.template = self.template;
             }
-            if (!isEmpty(self.viewport)) {
+            if (!$h.isEmpty(self.viewport)) {
                 opts.viewport = self.viewport;
             }
             $src.popover(opts);
@@ -129,7 +114,7 @@ var kvBs4InitForm = function () {
             });
         },
         raise: function ($elem, event, callback) {
-            event = event + NAMESPACE;
+            event = event + $h.NAMESPACE;
             $elem.off(event).on(event, callback);
         }
     };
@@ -168,5 +153,28 @@ var kvBs4InitForm = function () {
         selector: false,
         template: '',
         viewport: ''
+    };
+
+    kvBs4InitForm = function () {
+        var controls = ['.form-control', '.custom-control-input', '.custom-select', '.custom-range', '.custom-file-input'],
+            validControls = controls.join(','),
+            errorControls = '.has-error ' + controls.join(',.has-error '),
+            successControls = '.has-success ' + controls.join(',.has-success '),
+            resetControls = function ($form) {
+                $form.find(validControls).removeClass('is-valid is-invalid');
+            };
+        $('form').on('afterValidateAttribute', function () {
+            var $form = $(this);
+            resetControls($form);
+            if ($form.find('.has-error').length || $form.find('.has-success').length) {
+                $form.find(errorControls).addClass('is-invalid');
+                $form.find(successControls).addClass('is-valid');
+            }
+        }).on('reset', function () {
+            var $form = $(this);
+            setTimeout(function () {
+                resetControls($form);
+            }, 100);
+        });
     };
 })(window.jQuery);
