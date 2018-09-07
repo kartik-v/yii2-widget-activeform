@@ -1,6 +1,14 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.5.3
+
+**Date**: _under development_
+
+- (enh #109): Correct BS3 label styling and rendering for checkboxes and radios.
+- (enh #108): Add bootstrap grid column css size map configuration.
+- (enh #107): Add bootstrap 4 CSS highlight class for server validation errors.
+
 ## Version 1.5.2
 
 **Date**: 05-Sep-2018

@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.2
+ * @version    1.5.3
  */
 
 namespace kartik\form;
@@ -103,6 +103,27 @@ class ActiveField extends YiiActiveField
         'template',
         'selector',
         'viewport',
+    ];
+
+    /**
+     * @var array the bootstrap grid column css prefixes mapping, the key is the bootstrap versions, and the value is
+     * an array containing the sizes and their corresponding grid column css prefixes
+     */
+    protected static $bsColCssPrefixes = [
+        '3' => [
+            ActiveForm::SIZE_X_SMALL => 'col-xs-',
+            ActiveForm::SIZE_SMALL => 'col-sm-',
+            ActiveForm::SIZE_MEDIUM => 'col-md-',
+            ActiveForm::SIZE_LARGE => 'col-lg-',
+            ActiveForm::SIZE_X_LARGE => 'col-lg-',
+        ],
+        '4' => [
+            ActiveForm::SIZE_X_SMALL => 'col-',
+            ActiveForm::SIZE_SMALL => 'col-sm-',
+            ActiveForm::SIZE_MEDIUM => 'col-md-',
+            ActiveForm::SIZE_LARGE => 'col-lg-',
+            ActiveForm::SIZE_X_LARGE => 'col-xl-',
+        ],
     ];
 
     /**
@@ -930,6 +951,22 @@ class ActiveField extends YiiActiveField
     }
 
     /**
+     * Gets bootstrap grid column CSS based on size
+     * @param string $size
+     * @return string
+     * @throws InvalidConfigException
+     */
+    protected function getColCss($size)
+    {
+        $bsVer = $this->form->isBs4() ? '4' : '3';
+        $sizes = ArrayHelper::getValue(static::$bsColCssPrefixes, $bsVer, []);
+        if ($size == self::NOT_SET || !isset($sizes[$size])) {
+            return 'col-' . ActiveForm::SIZE_MEDIUM . '-';
+        }
+        return $sizes[$size];
+    }
+
+    /**
      * Generates a toggle field (checkbox or radio)
      *
      * @param string $type the toggle input type 'checkbox' or 'radio'.
@@ -966,7 +1003,7 @@ class ActiveField extends YiiActiveField
             if ($this->form->type === ActiveForm::TYPE_HORIZONTAL) {
                 Html::removeCssClass(
                     $this->labelOptions,
-                    ['control-label', 'col-form-label', "col-{$this->deviceSize}-{$this->labelSpan}"]
+                    ['control-label', 'col-form-label', $this->getColCss($this->deviceSize) . $this->labelSpan]
                 );
                 if ($this->autoOffset) {
                     $this->template = Html::tag('div', '', ['class' => $this->_labelCss]) .
@@ -1010,6 +1047,9 @@ class ActiveField extends YiiActiveField
         if (is_array($container)) {
             $tag = ArrayHelper::remove($container, 'tag', 'div');
             $input = Html::tag($tag, $input, $container);
+        }
+        if ($this->form->type !== ActiveForm::TYPE_HORIZONTAL) {
+            $this->parts['{label}'] = '';
         }
         $this->parts['{input}'] = $input;
         $this->adjustLabelFor($options);
@@ -1185,8 +1225,7 @@ class ActiveField extends YiiActiveField
             }
 
             $this->labelSpan = $span;
-
-            $prefix = "col-{$size}-";
+            $prefix = $this->getColCss($size);
             $this->_labelCss = $prefix . $span;
             $this->_inputCss = $prefix . ($this->form->fullSpan - $span);
         }
@@ -1212,6 +1251,7 @@ class ActiveField extends YiiActiveField
 
     /**
      * Initialize layout settings for label, input, error and hint blocks and for various bootstrap 3 form layouts
+     * @throws InvalidConfigException
      */
     protected function initLayout()
     {
@@ -1238,6 +1278,7 @@ class ActiveField extends YiiActiveField
      *
      * @param boolean $showLabels whether to show labels
      * @param boolean $showErrors whether to show errors
+     * @throws InvalidConfigException
      */
     protected function buildLayoutParts($showLabels, $showErrors)
     {
@@ -1256,7 +1297,7 @@ class ActiveField extends YiiActiveField
         if (!empty($this->_inputCss)) {
             $inputDivClass = $this->_inputCss;
             if ($showLabels === false || $showLabels === ActiveForm::SCREEN_READER) {
-                $inputDivClass = "col-{$this->deviceSize}-{$this->form->fullSpan}";
+                $inputDivClass = $this->getColCss($this->deviceSize) . $this->form->fullSpan;
             }
             Html::addCssClass($this->wrapperOptions, $inputDivClass);
         }
@@ -1356,6 +1397,7 @@ class ActiveField extends YiiActiveField
             $this->inputOptions['placeholder'] = $label;
             $options['placeholder'] = $label;
         }
+        $this->addErrorClassBS4($options);
     }
 
     /**
@@ -1669,6 +1711,21 @@ class ActiveField extends YiiActiveField
             };
         }
         return parent::$inputType($items, $options);
+    }
+
+    /**
+     * Adds Bootstrap 4 validation class to the input options if needed.
+     * @param array $options
+     * @throws InvalidConfigException
+     */
+    protected function addErrorClassBS4(&$options)
+    {
+        $attributeName = Html::getAttributeName($this->attribute);
+        if ($this->form->isBs4() &&
+            $this->model->hasErrors($attributeName) &&
+            $this->form->validationStateOn === ActiveForm::VALIDATION_STATE_ON_CONTAINER) {
+            Html::addCssClass($options, 'is-invalid');
+        }
     }
 
     /**
