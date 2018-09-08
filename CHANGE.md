@@ -5,6 +5,7 @@ Change Log: `yii2-widget-activeform`
 
 **Date**: _under development_
 
+- Better styling for Bootstrap 4.x hint block.
 - (enh #109): Correct BS3 label styling and rendering for checkboxes and radios.
 - (enh #108): Add bootstrap grid column css size map configuration.
 - (enh #107): Add bootstrap 4 CSS highlight class for server validation errors.

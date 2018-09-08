@@ -245,3 +245,9 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 .kv-form-bs4 .has-error .invalid-feedback {
     display: block;
 }
+
+.kv-form-bs4 .hint-block {
+    font-size: 0.75rem;
+    margin-top: 0.375rem;
+    color: #999;
+}
