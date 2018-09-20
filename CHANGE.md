@@ -3,8 +3,11 @@ Change Log: `yii2-widget-activeform`
 
 ## Version 1.5.3
 
-**Date**: _under development_
+**Date**: 20-Sep-2018
 
+- (enh #112): Enhance checkbox styling for enclosed label for both BS4 and BS3.
+- (enh #111): Enhance BS3 checkbox styling.
+- Enhance to use `Config::hasCssClass`.
 - Better styling for Bootstrap 4.x hint block.
 - (enh #109): Correct BS3 label styling and rendering for checkboxes and radios.
 - (enh #108): Add bootstrap grid column css size map configuration.

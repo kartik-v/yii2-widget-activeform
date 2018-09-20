@@ -9,6 +9,7 @@
 
 namespace kartik\form;
 
+use kartik\base\Config;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -979,81 +980,54 @@ class ActiveField extends YiiActiveField
     protected function getToggleField($type = self::TYPE_CHECKBOX, $options = [], $enclosedByLabel = null)
     {
         $this->initDisability($options);
-        $inputType = 'active' . ucfirst($type);
-        $disabled = ArrayHelper::getValue($options, 'disabled', false);
         $custom = $this->isCustomControl($options);
         $isBs4 = $this->form->isBs4();
         if ($enclosedByLabel === null) {
             $enclosedByLabel = !$isBs4 && !$custom;
         }
-        if ($isBs4) {
-            if (!isset($options['template'])) {
-                $this->template = $enclosedByLabel ? $this->checkEnclosedTemplate : $this->checkTemplate;
-            } else {
-                $this->template = $options['template'];
-                unset($options['template']);
-            }
-            $prefix = $custom ? 'custom-control' : 'form-check';
-            Html::addCssClass($this->checkWrapperOptions, $custom ? [$prefix, "custom-{$type}"] : $prefix);
-            $this->template = Html::tag('div', $this->template, $this->checkWrapperOptions);
-            Html::removeCssClass($options, 'form-control');
-            Html::removeCssClass($this->labelOptions, 'control-label');
-            Html::addCssClass($options, "{$prefix}-input");
-            Html::addCssClass($this->labelOptions, "{$prefix}-label");
-            if ($this->form->type === ActiveForm::TYPE_HORIZONTAL) {
-                Html::removeCssClass(
-                    $this->labelOptions,
-                    ['control-label', 'col-form-label', $this->getColCss($this->deviceSize) . $this->labelSpan]
-                );
-                if ($this->autoOffset) {
-                    $this->template = Html::tag('div', '', ['class' => $this->_labelCss]) .
-                        Html::tag('div', $this->template, ['class' => $this->_inputCss]);
-                } else {
-                    Html::removeCssClass($this->options, 'row');
-                }
-            }
-            if ($this->form->type === ActiveForm::TYPE_INLINE) {
-                Html::removeCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
-            }
-            if ($enclosedByLabel) {
-                if (isset($options['label'])) {
-                    $this->parts['{labelTitle}'] = $options['label'];
-                }
-            }
-            return parent::$type($options, false);
-        }
-        $css = $disabled ? $type . ' disabled' : $type;
-        $container = ArrayHelper::remove($options, 'container', ['class' => $css]);
-        if ($enclosedByLabel) {
-            $this->_offset = true;
-            $showLabels = $this->hasLabels();
-            if ($showLabels === false) {
-                $options['label'] = '';
-                $this->showLabels = true;
-            }
+        if (!isset($options['template'])) {
+            $this->template = $enclosedByLabel ? $this->checkEnclosedTemplate : $this->checkTemplate;
         } else {
-            $this->_offset = false;
-            if (isset($options['label']) && !isset($this->parts['{label}'])) {
-                $this->parts['label'] = $options['label'];
-                if (!empty($options['labelOptions'])) {
-                    $this->labelOptions = $options['labelOptions'];
-                }
+            $this->template = $options['template'];
+            unset($options['template']);
+        }
+        $prefix = $isBs4 ? ($custom ? 'custom-control' : 'form-check') : $type;
+        Html::addCssClass($this->checkWrapperOptions, $prefix);
+        if ($isBs4) {
+            Html::removeCssClass($this->labelOptions, 'control-label');
+            Html::addCssClass($this->labelOptions, "{$prefix}-label");
+            Html::addCssClass($options, "{$prefix}-input");
+            if ($custom) {
+                Html::addCssClass($this->checkWrapperOptions, "custom-{$type}");
             }
-            $options['label'] = null;
-            $container = false;
-            unset($options['labelOptions']);
+            Html::removeCssClass($options, 'form-control');
+        } elseif (!$enclosedByLabel) {
+            Html::addCssClass($this->checkWrapperOptions, "not-enclosed");
         }
-        $input = Html::$inputType($this->model, $this->attribute, $options);
-        if (is_array($container)) {
-            $tag = ArrayHelper::remove($container, 'tag', 'div');
-            $input = Html::tag($tag, $input, $container);
+        $this->template = Html::tag('div', $this->template, $this->checkWrapperOptions);
+        if ($this->form->type === ActiveForm::TYPE_HORIZONTAL) {
+            Html::removeCssClass(
+                $this->labelOptions,
+                ['control-label', 'col-form-label', $this->getColCss($this->deviceSize) . $this->labelSpan]
+            );
+            if ($this->autoOffset) {
+                $this->template = Html::tag('div', '', ['class' => $this->_labelCss]) .
+                    Html::tag('div', $this->template, ['class' => $this->_inputCss]);
+            } else {
+                Html::removeCssClass($this->options, 'row');
+            }
         }
-        if ($this->form->type !== ActiveForm::TYPE_HORIZONTAL) {
-            $this->parts['{label}'] = '';
+        if ($this->form->type === ActiveForm::TYPE_INLINE) {
+            Html::removeCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
         }
-        $this->parts['{input}'] = $input;
-        $this->adjustLabelFor($options);
-        return $this;
+        if ($enclosedByLabel) {
+            if (isset($options['label'])) {
+                $this->parts['{labelTitle}'] = $options['label'];
+            }
+            $this->parts['{beginLabel}'] = Html::beginTag('label', $this->labelOptions);
+            $this->parts['{endLabel}'] = Html::endTag('label');
+        }
+        return parent::$type($options, false);
     }
 
     /**
@@ -1409,10 +1383,10 @@ class ActiveField extends YiiActiveField
     protected function initFieldSize($options, $size)
     {
         $isBs4 = $this->form->isBs4();
-        if ($isBs4 && static::hasCssClass($options, "form-control-{$size}") ||
-            !$isBs4 && static::hasCssClass($options, "input-{$size}") ||
+        if ($isBs4 && Config::hasCssClass($options, "form-control-{$size}") ||
+            !$isBs4 && Config::hasCssClass($options, "input-{$size}") ||
             isset($this->addon['groupOptions']) &&
-            static::hasCssClass($this->addon['groupOptions'], "input-group-{$size}")) {
+            Config::hasCssClass($this->addon['groupOptions'], "input-group-{$size}")) {
             Html::addCssClass($this->options, "has-size-{$size}");
         }
     }
@@ -1726,21 +1700,5 @@ class ActiveField extends YiiActiveField
             $this->form->validationStateOn === ActiveForm::VALIDATION_STATE_ON_CONTAINER) {
             Html::addCssClass($options, 'is-invalid');
         }
-    }
-
-    /**
-     * Check if HTML options has specified CSS class
-     * @param array $options the HTML options
-     * @param string $cssClass the css class to test
-     * @return bool
-     */
-    protected static function hasCssClass($options, $cssClass)
-    {
-        if (!isset($options['class'])) {
-            return false;
-        }
-        $classes = is_array($options['class']) ? $options['class'] :
-            preg_split('/\s+/', $options['class'], -1, PREG_SPLIT_NO_EMPTY);
-        return in_array($cssClass, $classes);
     }
 }

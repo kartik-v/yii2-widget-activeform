@@ -251,3 +251,24 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     margin-top: 0.375rem;
     color: #999;
 }
+
+.checkbox.not-enclosed,
+.radio.not-enclosed {
+    padding-left: 20px;
+}
+
+.checkbox.not-enclosed label,
+.radio.not-enclosed label {
+    padding-left: 2px;
+}
+
+.form-inline .checkbox.not-enclosed,
+.form-inline .radio.not-enclosed {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.form-inline .checkbox.not-enclosed label,
+.form-inline .radio.not-enclosed label {
+    margin-top: -5px;
+}
