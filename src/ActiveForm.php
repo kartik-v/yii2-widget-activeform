@@ -4,11 +4,12 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.3
+ * @version    1.5.4
  */
 
 namespace kartik\form;
 
+use kartik\base\BootstrapInterface;
 use kartik\base\BootstrapTrait;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
@@ -45,7 +46,7 @@ use yii\widgets\ActiveForm as YiiActiveForm;
  * @author Kartik Visweswaran <kartikv2@gmail.com>
  * @since  1.0
  */
-class ActiveForm extends YiiActiveForm
+class ActiveForm extends YiiActiveForm implements BootstrapInterface
 {
     use BootstrapTrait;
 
@@ -79,36 +80,6 @@ class ActiveForm extends YiiActiveForm
      * @var string bootstrap styled inline form layout
      */
     const TYPE_INLINE = 'inline';
-
-    /**
-     * @var string bootstrap **extra small** size modifier - **deprecated** - use [[SIZE_X_SMALL]] instead
-     */
-    const SIZE_TINY = 'xs';
-
-    /**
-     * @var string bootstrap **extra small** size modifier
-     */
-    const SIZE_X_SMALL = 'xs';
-
-    /**
-     * @var string bootstrap **small** size modifier
-     */
-    const SIZE_SMALL = 'sm';
-
-    /**
-     * @var string bootstrap **medium** size modifier (this is the default size)
-     */
-    const SIZE_MEDIUM = 'md';
-
-    /**
-     * @var string bootstrap **large** size modifier
-     */
-    const SIZE_LARGE = 'lg';
-
-    /**
-     * @var string bootstrap **large** size modifier
-     */
-    const SIZE_X_LARGE = 'xl';
 
     /**
      * @var string bootstrap screen reader style for labels

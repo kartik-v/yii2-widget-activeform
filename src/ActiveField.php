@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.3
+ * @version    1.5.4
  */
 
 namespace kartik\form;
@@ -104,27 +104,6 @@ class ActiveField extends YiiActiveField
         'template',
         'selector',
         'viewport',
-    ];
-
-    /**
-     * @var array the bootstrap grid column css prefixes mapping, the key is the bootstrap versions, and the value is
-     * an array containing the sizes and their corresponding grid column css prefixes
-     */
-    protected static $bsColCssPrefixes = [
-        '3' => [
-            ActiveForm::SIZE_X_SMALL => 'col-xs-',
-            ActiveForm::SIZE_SMALL => 'col-sm-',
-            ActiveForm::SIZE_MEDIUM => 'col-md-',
-            ActiveForm::SIZE_LARGE => 'col-lg-',
-            ActiveForm::SIZE_X_LARGE => 'col-lg-',
-        ],
-        '4' => [
-            ActiveForm::SIZE_X_SMALL => 'col-',
-            ActiveForm::SIZE_SMALL => 'col-sm-',
-            ActiveForm::SIZE_MEDIUM => 'col-md-',
-            ActiveForm::SIZE_LARGE => 'col-lg-',
-            ActiveForm::SIZE_X_LARGE => 'col-xl-',
-        ],
     ];
 
     /**
@@ -960,7 +939,7 @@ class ActiveField extends YiiActiveField
     protected function getColCss($size)
     {
         $bsVer = $this->form->isBs4() ? '4' : '3';
-        $sizes = ArrayHelper::getValue(static::$bsColCssPrefixes, $bsVer, []);
+        $sizes = ArrayHelper::getValue($this->form->bsColCssPrefixes, $bsVer, []);
         if ($size == self::NOT_SET || !isset($sizes[$size])) {
             return 'col-' . ActiveForm::SIZE_MEDIUM . '-';
         }
@@ -993,8 +972,8 @@ class ActiveField extends YiiActiveField
         }
         $prefix = $isBs4 ? ($custom ? 'custom-control' : 'form-check') : $type;
         Html::addCssClass($this->checkWrapperOptions, $prefix);
+        Html::removeCssClass($this->labelOptions, 'control-label');
         if ($isBs4) {
-            Html::removeCssClass($this->labelOptions, 'control-label');
             Html::addCssClass($this->labelOptions, "{$prefix}-label");
             Html::addCssClass($options, "{$prefix}-input");
             if ($custom) {
@@ -1006,10 +985,8 @@ class ActiveField extends YiiActiveField
         }
         $this->template = Html::tag('div', $this->template, $this->checkWrapperOptions);
         if ($this->form->type === ActiveForm::TYPE_HORIZONTAL) {
-            Html::removeCssClass(
-                $this->labelOptions,
-                ['control-label', 'col-form-label', $this->getColCss($this->deviceSize) . $this->labelSpan]
-            );
+            $css = $this->getColCss($this->deviceSize) . $this->labelSpan;
+            Html::removeCssClass($this->labelOptions, ['control-label', 'col-form-label', $css]);
             if ($this->autoOffset) {
                 $this->template = Html::tag('div', '', ['class' => $this->_labelCss]) .
                     Html::tag('div', $this->template, ['class' => $this->_inputCss]);

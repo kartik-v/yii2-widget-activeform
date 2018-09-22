@@ -1,6 +1,13 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.5.4
+
+**Date**: 22-Sep-2018
+
+- Refactor code via `kartik\base\BootstrapInterface`. 
+- (enh #113): Enhance checkbox styling for BS3.
+
 ## Version 1.5.3
 
 **Date**: 20-Sep-2018
