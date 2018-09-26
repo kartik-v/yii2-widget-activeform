@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.4
+ * @version    1.5.5
  */
 
 namespace kartik\form;
@@ -227,6 +227,33 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
     }
 
     /**
+     * Whether an inline layout form
+     * @return bool
+     */
+    public function isInline()
+    {
+        return $this->type === self::TYPE_INLINE;
+    }
+
+    /**
+     * Whether a horizontal layout form
+     * @return bool
+     */
+    public function isHorizontal()
+    {
+        return $this->type === self::TYPE_HORIZONTAL;
+    }
+
+    /**
+     * Whether a vertical layout form
+     * @return bool
+     */
+    public function isVertical()
+    {
+        return !$this->isHorizontal() && !$this->isInline();
+    }
+
+    /**
      * Initializes the form configuration array and parameters for the form.
      *
      * @throws InvalidConfigException
@@ -241,7 +268,7 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
         }
         $this->formConfig = array_replace_recursive($this->_config[$this->type], $this->formConfig);
         $css = ["form-{$this->type}"];
-        if ($this->type === self::TYPE_HORIZONTAL) {
+        if ($this->isHorizontal()) {
             $css[] = 'kv-form-horizontal';
         }
         if ($this->isBs4()) {

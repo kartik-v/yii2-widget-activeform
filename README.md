@@ -123,7 +123,7 @@ echo $form->field($model, 'amount_paid', [
 echo $form->field($model, 'phone', [
     'addon' => [
         'prepend' => [
-            'content' => '<i class="glyphicon glyphicon-phone"></i>'
+            'content' => '<i class="fas fa-phone"></i>'
         ]
     ]
 ]);

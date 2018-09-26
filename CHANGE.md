@@ -1,6 +1,13 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.5.5
+
+**Date**: 26-Sep-2018
+
+- New `ActiveForm` methods `isHorizontal`, `isInline`, `isVertical` for easy layout detection.
+- Label styling enhancements.
+
 ## Version 1.5.4
 
 **Date**: 22-Sep-2018
