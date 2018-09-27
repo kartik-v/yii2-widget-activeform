@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.6
+ * @version    1.5.7
  */
 
 namespace kartik\form;
@@ -246,6 +246,12 @@ class ActiveField extends YiiActiveField
      * @var string content to be placed after hint block
      */
     public $contentAfterHint = '';
+
+    /**
+     * @var string the template for rendering the Bootstrap 4.x custom file browser control
+     * @see https://getbootstrap.com/docs/4.1/components/forms/#file-browser
+     */
+    public $customFileTemplate = "<div class=\"custom-file\">\n{input}\n{label}\n</div>\n{error}\n{hint}";
 
     /**
      * @var string the template for rendering checkboxes and radios for a default Bootstrap markup without an enclosed
@@ -538,8 +544,7 @@ class ActiveField extends YiiActiveField
     public function dropDownList($items, $options = [])
     {
         $this->initDisability($options);
-        $custom = $this->isCustomControl($options);
-        Html::addCssClass($options, $custom ? 'custom-select' : $this->addClass);
+        Html::addCssClass($options, $this->isCustomControl($options) ? 'custom-select' : $this->addClass);
         return parent::dropDownList($items, $options);
     }
 
@@ -575,20 +580,13 @@ class ActiveField extends YiiActiveField
      */
     public function fileInput($options = [])
     {
-        $custom = $this->isCustomControl($options);
-        if (!$custom) {
-            return parent::fileInput($options);
+        if ($this->isCustomControl($options)) {
+            Html::removeCssClass($options, 'form-control');
+            Html::addCssClass($options, 'custom-file-input');
+            Html::addCssClass($this->labelOptions, 'custom-file-label');
+            $this->template = $this->customFileTemplate;
         }
-        Html::removeCssClass($options, 'form-control');
-        Html::addCssClass($options, 'custom-file-input');
-        Html::addCssClass($this->labelOptions, 'custom-file-label');
-        $this->template = "{beginWrapper}\n{input}\n{hint}\n{error}\n{endWrapper}";
-        parent::fileInput($options);
-        $this->label();
-        $parts = $this->parts['{input}'] . $this->parts['{label}'];
-        $this->parts['{input}'] = Html::tag('div', $parts, ['class' => 'custom-file']);
-        $this->parts['{label}'] = '';
-        return $this;
+        return parent::fileInput($options);
     }
 
     /**
@@ -598,8 +596,7 @@ class ActiveField extends YiiActiveField
     public function input($type, $options = [])
     {
         $this->initFieldOptions($options);
-        $custom = $this->isCustomControl($options);
-        if ($custom && $type === 'range') {
+        if ($this->isCustomControl($options) && $type === 'range') {
             Html::addCssClass($options, 'custom-range');
         }
         if ($type !== 'range' && $type !== 'color') {
@@ -649,8 +646,7 @@ class ActiveField extends YiiActiveField
     public function listBox($items, $options = [])
     {
         $this->initDisability($options);
-        $custom = $this->isCustomControl($options);
-        Html::addCssClass($options, $custom ? 'custom-select' : $this->addClass);
+        Html::addCssClass($options, $this->isCustomControl($options) ? 'custom-select' : $this->addClass);
         return parent::listBox($items, $options);
     }
 

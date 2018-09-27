@@ -1,6 +1,12 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.5.7
+
+**Date**: 27-Sep-2018
+
+- (enh #115): Enhance rendering of Bootstrap 4.x custom file control.
+
 ## Version 1.5.6
 
 **Date**: 27-Sep-2018
