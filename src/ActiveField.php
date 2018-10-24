@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.7
+ * @version    1.5.8
  */
 
 namespace kartik\form;
@@ -330,6 +330,15 @@ class ActiveField extends YiiActiveField
      * @var boolean whether to show hints for the field
      */
     public $showHints;
+
+    /**
+     * @var boolean whether to show required asterisk/star indicator after each field label when the model attribute is
+     * set to have a `required` validation rule. This will add a CSS class `has-star` to the label and show the required
+     * asterisk/star after the label based on CSS `::after` styles. If you want any other label markup to show a
+     * required asterisk for a required model attribute field, then just add the CSS class `has-star` to the label/span
+     * markup element within the active field container with CSS class `form-group`.
+     */
+    public $showRequiredIndicator = true;
 
     /**
      * @var boolean whether the label is to be hidden and auto-displayed as a placeholder
@@ -1099,6 +1108,9 @@ class ActiveField extends YiiActiveField
         }
         if ($showLabels === ActiveForm::SCREEN_READER) {
             Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
+        }
+        if ($this->showRequiredIndicator) {
+            Html::addCssClass($this->labelOptions, 'has-star');
         }
         if ($this->highlightAddon) {
             Html::addCssClass($this->options, 'highlight-addon');

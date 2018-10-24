@@ -2,7 +2,7 @@
  * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version 1.5.7
+ * @version 1.5.8
  *
  * Active Form Styling for Bootstrap 3.x & Bootstrap 4.x
  * Built for Yii Framework 2.0
@@ -271,4 +271,12 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 .form-inline .checkbox.not-enclosed label,
 .form-inline .radio.not-enclosed label {
     margin-top: -5px;
+}
+
+.form-group.required .has-star::after {
+    content: "*";
+    margin-left: 3px;
+    font-weight: normal;
+    font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    color: tomato;
 }

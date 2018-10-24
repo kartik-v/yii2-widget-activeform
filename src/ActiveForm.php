@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.7
+ * @version    1.5.8
  */
 
 namespace kartik\form;
