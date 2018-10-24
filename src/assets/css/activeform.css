@@ -273,7 +273,8 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     margin-top: -5px;
 }
 
-.form-group.required .has-star::after {
+.form-group.required .has-star::after,
+.is-required::after {
     content: "*";
     margin-left: 3px;
     font-weight: normal;
