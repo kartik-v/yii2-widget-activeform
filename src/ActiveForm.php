@@ -42,7 +42,7 @@ use yii\widgets\ActiveForm as YiiActiveForm;
  * ]);
  * ~~~
  *
- * @method ActiveField field(Model $model, string $attribute, array $options = [])
+ * @method ActiveField field(Model $model, \string $attribute, array $options = [])
  * @author Kartik Visweswaran <kartikv2@gmail.com>
  * @since  1.0
  */

@@ -208,6 +208,16 @@ class ActiveField extends YiiActiveField
     public $feedbackIcon = [];
 
     /**
+     * @var string content to be placed before field within the form group at the beginning
+     */
+    public $contentBeforeField = '';
+
+    /**
+     * @var string content to be placed after field within the form group at the end
+     */
+    public $contentAfterField = '';
+
+    /**
      * @var string content to be placed before label
      */
     public $contentBeforeLabel = '';
@@ -453,7 +463,15 @@ class ActiveField extends YiiActiveField
         if ($this->_hasFeedback) {
             Html::addCssClass($this->options, 'has-feedback');
         }
-        return parent::begin();
+        return parent::begin() . $this->contentBeforeField;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function end()
+    {
+        return $this->contentAfterField . parent::end();
     }
 
     /**
