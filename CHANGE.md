@@ -3,7 +3,7 @@ Change Log: `yii2-widget-activeform`
 
 ## Version 1.5.8
 
-**Date**: _under development_
+**Date**: 24-Feb-2019
 
 - (enh #119): Correct required star styling for BS custom checkbox control label.
 - (enh #118): Add feature to show star indicator for required field labels.
