@@ -1,5 +1,5 @@
 /*!
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2019
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2018
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
  * @version 1.5.8
@@ -273,16 +273,11 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     margin-top: -5px;
 }
 
-.form-group.required .has-star::after,
+.form-group.required .has-star:not(.custom-control-label)::after,
 .is-required::after {
     content: "*";
     margin-left: 3px;
     font-weight: normal;
     font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     color: tomato;
-}
-
-.form-group.required .has-star.custom-control-label::after {
-    position: absolute;
-    left: 100%;
 }
