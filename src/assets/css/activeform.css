@@ -281,3 +281,8 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     color: tomato;
 }
+
+.form-group.required .has-star.custom-control-label::after {
+    position: absolute;
+    left: 100%;
+}
