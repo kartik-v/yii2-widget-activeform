@@ -1,6 +1,10 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.5.9
+
+**Date**: _under development_
+
 ## Version 1.5.8
 
 **Date**: 24-Feb-2019
