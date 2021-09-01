@@ -3,8 +3,9 @@ Change Log: `yii2-widget-activeform`
 
 ## Version 1.5.9
 
-**Date**: _under development_
+**Date**: 01-Sep-2021
 
+- (enh #121): Fixed type hinting error. 
 - (enh #120): BS4 Custom Controls Enhancements: Switch and File.
 
 ## Version 1.5.8
