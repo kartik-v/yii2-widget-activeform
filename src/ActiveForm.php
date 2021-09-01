@@ -4,11 +4,12 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2021
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.9
+ * @version    1.6.0
  */
 
 namespace kartik\form;
 
+use Exception;
 use kartik\base\BootstrapInterface;
 use kartik\base\BootstrapTrait;
 use yii\base\InvalidConfigException;
@@ -82,6 +83,11 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
     const TYPE_INLINE = 'inline';
 
     /**
+     * @var string floating labels form layout (supported only for bootstrap 5.x)
+     */
+    const TYPE_FLOATING = 'floating';
+
+    /**
      * @var string bootstrap screen reader style for labels
      */
     const SCREEN_READER = 'sr-only';
@@ -130,6 +136,13 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
     public $options = ['role' => 'form'];
 
     /**
+     * @var array|string CSS classes that will be appended for inline form.
+     * Defaults to `['row', 'row-cols-lg-auto', 'g-3', 'align-items-center']` for Bootstrap 5.x and
+     * empty string for others.
+     */
+    public $inlineFormCssClass;
+
+    /**
      * @var boolean whether all data in form are to be static inputs
      */
     public $staticOnly = false;
@@ -163,6 +176,11 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
             'showErrors' => false,
             'showHints' => true,
         ],
+        self::TYPE_FLOATING => [
+            'showLabels' => true,
+            'showErrors' => true,
+            'showHints' => true,
+        ],
     ];
 
     /**
@@ -188,8 +206,8 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
     public function getFormLayoutStyle()
     {
         $config = $this->formConfig;
-        $span = isset($config['labelSpan']) ? $config['labelSpan'] : ActiveField::NOT_SET;
-        $size = isset($config['deviceSize']) ? $config['deviceSize'] : ActiveField::NOT_SET;
+        $span = $config['labelSpan'] ?? ActiveField::NOT_SET;
+        $size = $config['deviceSize'] ?? ActiveField::NOT_SET;
         $labelCss = $inputCss = ActiveField::NOT_SET;
         $iSpan = intval($span);
         if ($span != ActiveField::NOT_SET && $iSpan > 0) {
@@ -204,23 +222,24 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
             }
 
             $prefix = "col-{$size}-";
-            $labelCss = $prefix . $iSpan;
-            $inputCss = $prefix . ($this->fullSpan - $iSpan);
+            $labelCss = $prefix.$iSpan;
+            $inputCss = $prefix.($this->fullSpan - $iSpan);
         }
+
         return ['labelCss' => $labelCss, 'inputCss' => $inputCss];
     }
 
     /**
      * Registers the assets for the [[ActiveForm]] widget.
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|Exception
      */
     public function registerAssets()
     {
         $view = $this->getView();
         ActiveFormAsset::register($view);
-        $id = 'jQuery("#' . $this->options['id'] . ' .kv-hint-special")';
-        $js = 'var $el=' . $id . ';if($el.length){$el.each(function(){$(this).activeFieldHint()});}';
-        if ($this->isBs4()) {
+        $id = 'jQuery("#'.$this->options['id'].' .kv-hint-special")';
+        $js = 'var $el='.$id.';if($el.length){$el.each(function(){$(this).activeFieldHint()});}';
+        if (!$this->isBs(3)) {
             $js .= "kvBs4InitForm();";
         }
         $view->registerJs($js);
@@ -263,20 +282,40 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
         if (empty($this->type)) {
             $this->type = self::TYPE_VERTICAL;
         }
-        if (!in_array($this->type, [self::TYPE_VERTICAL, self::TYPE_HORIZONTAL, self::TYPE_INLINE])) {
-            throw new InvalidConfigException('Invalid layout type: ' . $this->type);
+        if (!in_array($this->type,
+            [self::TYPE_VERTICAL, self::TYPE_HORIZONTAL, self::TYPE_INLINE, self::TYPE_FLOATING])) {
+            throw new InvalidConfigException('Invalid layout type: '.$this->type);
         }
+        $bsVer = $this->getBsVer();
         $this->formConfig = array_replace_recursive($this->_config[$this->type], $this->formConfig);
+        if ($this->isInline()) {
+            if ($bsVer === 5 && !isset($this->inlineFormCssClass)) {
+                $this->inlineFormCssClass = ['row', 'row-cols-lg-auto', 'g-3', 'align-items-center'];
+            }
+            if (!empty($this->inlineFormCssClass)) {
+                Html::addCssClass($this->options, $this->inlineFormCssClass);
+            }
+        }
         $css = ["form-{$this->type}"];
         if ($this->isHorizontal()) {
             $css[] = 'kv-form-horizontal';
         }
-        if ($this->isBs4()) {
+        if ($bsVer !== 3) {
             $css[] = 'kv-form-bs4';
             if ($this->tooltipStyleFeedback) {
                 $css[] = 'tooltip-feedback';
             }
         }
         Html::addCssClass($this->options, $css);
+    }
+
+    /**
+     * Gets Screen Reader Only CSS class
+     * @return string
+     * @throws Exception
+     */
+    public function getSrOnlyCss()
+    {
+        return $this->getCssClass(self::BS_SR_ONLY);
     }
 }

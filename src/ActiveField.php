@@ -4,11 +4,12 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2021
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.5.9
+ * @version    1.6.0
  */
 
 namespace kartik\form;
 
+use Exception;
 use kartik\base\Config;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
@@ -141,7 +142,7 @@ class ActiveField extends YiiActiveField
      * - `showIcon`: _boolean_, whether to display the hint via a help icon indicator. Defaults to `true`.
      * - `icon`: _string_, the markup to display the help icon. Defaults to
      *    - `<i class="glyphicon glyphicon-question-sign text-info"></i>` for Bootstrap 3.x.
-     *    - `<i class="fas fa-question-circle text-info"></i>` for Bootstrap 4.x.
+     *    - `<i class="fas fa-question-circle text-info"></i>` for Bootstrap 4.x and above.
      * - `iconBesideInput`: _boolean_, whether to display the icon beside the input. Defaults to `false`. The following
      *   actions will be taken based on this setting:
      *   - if set to `false` the help icon is displayed beside the label and the `labelTemplate` setting is used to
@@ -189,7 +190,7 @@ class ActiveField extends YiiActiveField
      *   `error` and `success` settings will be treated as an icon CSS suffix name. If set to `raw`, they will be
      *   treated as a raw content markup.
      * - `prefix`: _string_, the icon CSS class prefix to use if `type` is `icon`. Defaults to `glyphicon glyphicon-` for
-     *    Bootstrap 3.x and `fas fa-` for Bootstrap 4.x.
+     *    Bootstrap 3.x and `fas fa-` for Bootstrap 4.x and above.
      * - `default`: _string_, the icon (CSS class suffix name or raw markup) to show by default. If not set will not be
      *   shown.
      * - `error`: _string_, the icon (CSS class suffix name or raw markup) to use when input has an error validation. If
@@ -465,6 +466,79 @@ class ActiveField extends YiiActiveField
     private $_hintPopoverContainer;
 
     /**
+     * {@inheritdoc}
+     */
+    public function __construct($config = [])
+    {
+        $layoutConfig = $this->createLayoutConfig($config);
+        $config = ArrayHelper::merge($layoutConfig, $config);
+        /*
+        if ($config['form']->type === ActiveForm::TYPE_HORIZONTAL) {
+            unset($config['model'], $config['form']);
+            die('<p>Layout Config</p><pre>'.print_r($layoutConfig, true).'</pre><p>Config</p><pre>'.print_r($config,
+                    true).'</pre>');
+        }
+        */
+        parent::__construct($config);
+    }
+
+    /**
+     * Create layout specific configuration
+     * @param  array  $instanceConfig  the configuration passed to this instance's constructor
+     * @return array the layout specific default configuration for this instance
+     */
+    protected function createLayoutConfig($instanceConfig = [])
+    {
+        $form = $instanceConfig['form'];
+        $layout = $form->type;
+        $bsVer = $form->getBsVer();
+        $config = [
+            'hintOptions' => ['tag' => 'div', 'class' => ['form-text', 'text-muted', 'small']],
+            'errorOptions' => ['tag' => 'div', 'class' => 'invalid-feedback'],
+            'inputOptions' => ['class' => 'form-control'],
+            'labelOptions' => ['class' => ['form-label']],
+            'options' => ['class' => $bsVer === 5 ? 'mb-3' : 'form-group'],
+        ];
+        if ($bsVer === 4) {
+            $config['labelOptions'] = ['class' => []];
+        } elseif ($bsVer === 3) {
+            $config = [
+                'hintOptions' => ['tag' => 'p', 'class' => ['help-block']],
+                'errorOptions' => ['tag' => 'p', 'class' => 'help-block help-block-error'],
+                'inputOptions' => ['class' => 'form-control'],
+            ];
+        }
+        if ($layout === ActiveForm::TYPE_HORIZONTAL) {
+            $config['template'] = "{label}\n{beginWrapper}\n{input}\n{error}\n{hint}\n{endWrapper}";
+            $config['wrapperOptions'] = $config['labelOptions'] = [];
+            $cssClasses = [
+                'offset' => $bsVer === 3 ? 'col-sm-offset-3' : ['col-sm-10', 'offset-sm-2'],
+                'field' => $bsVer > 3 ? 'row' : 'form-group',
+            ];
+            if (isset($instanceConfig['horizontalCssClasses'])) {
+                $cssClasses = ArrayHelper::merge($cssClasses, $instanceConfig['horizontalCssClasses']);
+            }
+            $config['horizontalCssClasses'] = $cssClasses;
+            foreach (array_keys($cssClasses) as $cfg) {
+                $key = $cfg === 'field' ? 'options' : "{$cfg}Options";
+                if ($cfg !== 'offset' && !empty($cssClasses[$cfg])) {
+                    Html::addCssClass($config[$key], $cssClasses[$cfg]);
+                }
+            }
+        } elseif ($layout === ActiveForm::TYPE_INLINE) {
+            $config['inputOptions']['placeholder'] = true;
+            Html::addCssClass($config['options'], 'col-12');
+            Html::addCssClass($config['labelOptions'], ['screenreader' => $form->getSrOnlyCss()]);
+        } elseif ($bsVer === 5 && $layout === ActiveForm::TYPE_FLOATING) {
+            $config['inputOptions']['placeholder'] = true;
+            $config['template'] = "{input}\n{label}\n{error}\n{hint}";
+            Html::addCssClass($config['options'], ['layout' => 'form-floating mt-3']);
+        }
+
+        return $config;
+    }
+
+    /**
      * @inheritdoc
      */
     public function begin()
@@ -472,7 +546,8 @@ class ActiveField extends YiiActiveField
         if ($this->_hasFeedback) {
             Html::addCssClass($this->options, 'has-feedback');
         }
-        return parent::begin() . $this->contentBeforeField;
+
+        return parent::begin().$this->contentBeforeField;
     }
 
     /**
@@ -480,7 +555,7 @@ class ActiveField extends YiiActiveField
      */
     public function end()
     {
-        return $this->contentAfterField . parent::end();
+        return $this->contentAfterField.parent::end();
     }
 
     /**
@@ -496,13 +571,19 @@ class ActiveField extends YiiActiveField
     /**
      * Renders a checkbox. This method will generate the "checked" tag attribute according to the model attribute value.
      *
-     * @param array $options the tag options in terms of name-value pairs. The following options are specially
+     * @param  array  $options  the tag options in terms of name-value pairs. The following options are specially
      * handled:
      *
      * - `custom`: _bool_, whether to render bootstrap 4.x custom checkbox styled control. Defaults to `false`.
      *    This is applicable only for Bootstrap 4.x forms.
      * - `switch`: _bool_, whether to render bootstrap 4.x custom switch styled control. Defaults to `false`.
      *    This is applicable only for Bootstrap 4.x forms.
+     * @param  bool|null  $enclosedByLabel  whether to enclose the radio within the label. If `true`, the method will
+     * still use [[template]] to layout the checkbox and the error message except that the radio is enclosed by
+     * the label tag.
+     *
+     * @return ActiveField object
+     * @throws InvalidConfigException
      * @see https://getbootstrap.com/docs/4.1/components/forms/#checkboxes-and-radios-1
      * - `uncheck`: _string_, the value associated with the uncheck state of the checkbox. If not set, it will take
      *   the default value `0`. This method will render a hidden input so that if the checkbox is not checked and is
@@ -519,12 +600,6 @@ class ActiveField extends YiiActiveField
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will be
      * HTML-encoded using [[Html::encode()]]. If a value is null, the corresponding attribute will not be rendered.
      *
-     * @param bool|null $enclosedByLabel whether to enclose the radio within the label. If `true`, the method will
-     * still use [[template]] to layout the checkbox and the error message except that the radio is enclosed by
-     * the label tag.
-     *
-     * @return ActiveField object
-     * @throws InvalidConfigException
      */
     public function checkbox($options = [], $enclosedByLabel = null)
     {
@@ -536,14 +611,16 @@ class ActiveField extends YiiActiveField
      * corresponding submitted value is an array. The selection of the checkbox list is taken from the value of the
      * model attribute.
      *
-     * @param array $items the data item used to generate the checkboxes. The array values are the labels, while the
+     * @param  array  $items  the data item used to generate the checkboxes. The array values are the labels, while the
      * array keys are the corresponding checkbox values. Note that the labels will NOT be HTML-encoded, while the
      * values will be encoded.
-     * @param array $options options (name => config) for the checkbox list. The following options are specially
+     * @param  array  $options  options (name => config) for the checkbox list. The following options are specially
      * handled:
      *
      * - `custom`: _bool_, whether to render bootstrap 4.x custom checkbox/radio styled control. Defaults to `false`.
      *    This is applicable only for Bootstrap 4.x forms.
+     * @return ActiveField object
+     * @throws InvalidConfigException
      * @see https://getbootstrap.com/docs/4.1/components/forms/#checkboxes-and-radios-1
      * - `unselect`: _string_, the value that should be submitted when none of the checkboxes is selected. By setting this
      *   option, a hidden input will be generated.
@@ -558,8 +635,6 @@ class ActiveField extends YiiActiveField
      * where `$index` is the zero-based index of the checkbox in the whole list; `$label` is the label for the checkbox;
      * and `$name`, `$value` and `$checked` represent the name, value and the checked status of the checkbox input.
      *
-     * @return ActiveField object
-     * @throws InvalidConfigException
      */
     public function checkboxList($items, $options = [])
     {
@@ -573,7 +648,10 @@ class ActiveField extends YiiActiveField
     public function dropDownList($items, $options = [])
     {
         $this->initDisability($options);
-        Html::addCssClass($options, $this->isCustomControl($options) ? 'custom-select' : $this->addClass);
+        $newBsCss = ($this->form->isBs(5) ? 'form' : 'custom').'-select';
+        $class = $this->isCustomControl($options) ? $newBsCss : $this->addClass;
+        Html::addCssClass($options, $class);
+
         return parent::dropDownList($items, $options);
     }
 
@@ -584,23 +662,25 @@ class ActiveField extends YiiActiveField
     {
         if ($this->getConfigParam('showHints') === false) {
             $this->parts['{hint}'] = '';
+
             return $this;
         }
         if ($this->_isHintSpecial) {
             Html::addCssClass($options, 'kv-hint-block');
         }
+
         return parent::hint($this->generateHint($content), $options);
     }
 
     /**
      * Checks whether bootstrap 4.x custom control based on `options` parameter
-     * @param array $options HTML attributes for the control
+     * @param  array  $options  HTML attributes for the control
      * @return bool
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|Exception
      */
     protected function isCustomControl(&$options)
     {
-        return ArrayHelper::remove($options, 'custom', false) && $this->form->isBs4();
+        return ArrayHelper::remove($options, 'custom', false) && !$this->form->isBs(3);
     }
 
     /**
@@ -609,15 +689,23 @@ class ActiveField extends YiiActiveField
      */
     public function fileInput($options = [])
     {
+        $isBs5 = $this->form->isBs(5);
         if ($this->isCustomControl($options)) {
-            $view = $this->form->getView();
-            Bs4CustomFileInputAsset::register($view);
-            $view->registerJs('bsCustomFileInput.init();');
+            if (!$isBs5) {
+                $view = $this->form->getView();
+                Bs4CustomFileInputAsset::register($view);
+                $view->registerJs('bsCustomFileInput.init();');
+                Html::removeCssClass($options, 'form-control');
+                Html::addCssClass($options, 'custom-file-input');
+                Html::addCssClass($this->labelOptions, 'custom-file-label');
+                $this->template = $this->customFileTemplate;
+            } else {
+                Html::addCssClass($options, 'form-control');
+            }
+        } elseif ($isBs5) {
             Html::removeCssClass($options, 'form-control');
-            Html::addCssClass($options, 'custom-file-input');
-            Html::addCssClass($this->labelOptions, 'custom-file-label');
-            $this->template = $this->customFileTemplate;
         }
+
         return parent::fileInput($options);
     }
 
@@ -629,12 +717,13 @@ class ActiveField extends YiiActiveField
     {
         $this->initFieldOptions($options);
         if ($this->isCustomControl($options) && $type === 'range') {
-            Html::addCssClass($options, 'custom-range');
+            Html::addCssClass($options, $this->getCustomCss('range'));
         }
         if ($type !== 'range' && $type !== 'color') {
             Html::addCssClass($options, $this->addClass);
         }
         $this->initDisability($options);
+
         return parent::input($type, $options);
     }
 
@@ -668,6 +757,7 @@ class ActiveField extends YiiActiveField
         if ($this->_offset) {
             $label = '';
         }
+
         return parent::label($label, $options);
     }
 
@@ -678,8 +768,21 @@ class ActiveField extends YiiActiveField
     public function listBox($items, $options = [])
     {
         $this->initDisability($options);
-        Html::addCssClass($options, $this->isCustomControl($options) ? 'custom-select' : $this->addClass);
+        $newBsCss = $this->getCustomCss('select');
+        $class = $this->isCustomControl($options) ? $newBsCss : $this->addClass;
+        Html::addCssClass($options, $class);
+
         return parent::listBox($items, $options);
+    }
+
+    /**
+     * Gets custom CSS for custom controls supported in bootstrap 4.x and 5.x
+     * @param string $type
+     * @return string
+     * @throws Exception
+     */
+    protected function getCustomCss($type) {
+        return $this->form->isBs(5) ? "form-{$type}" : "custom-{$type}";
     }
 
     /**
@@ -691,6 +794,7 @@ class ActiveField extends YiiActiveField
         $this->initFieldOptions($options);
         Html::addCssClass($options, $this->addClass);
         $this->initDisability($options);
+
         return parent::passwordInput($options);
     }
 
@@ -698,11 +802,16 @@ class ActiveField extends YiiActiveField
      * Renders a radio button. This method will generate the "checked" tag attribute according to the model attribute
      * value.
      *
-     * @param array $options the tag options in terms of name-value pairs. The following options are specially
+     * @param  array  $options  the tag options in terms of name-value pairs. The following options are specially
      * handled:
      *
      * - `custom`: _bool_, whether to render bootstrap 4.x custom radio styled control. Defaults to `false`.
      *    This is applicable only for Bootstrap 4.x forms.
+     * @param  bool|null  $enclosedByLabel  whether to enclose the radio within the label. If `true`, the method will still
+     * use [[template]] to layout the checkbox and the error message except that the radio is enclosed by the label tag.
+     *
+     * @return ActiveField object
+     * @throws InvalidConfigException
      * @see https://getbootstrap.com/docs/4.1/components/forms/#checkboxes-and-radios-1
      * - `uncheck`: _string_, the value associated with the uncheck state of the radio button. If not set, it will take the
      *   default value '0'. This method will render a hidden input so that if the radio button is not checked and is
@@ -718,11 +827,6 @@ class ActiveField extends YiiActiveField
      * The rest of the options will be rendered as the attributes of the resulting tag. The values will be HTML-encoded
      *   using [[Html::encode()]]. If a value is null, the corresponding attribute will not be rendered.
      *
-     * @param bool|null $enclosedByLabel whether to enclose the radio within the label. If `true`, the method will still
-     * use [[template]] to layout the checkbox and the error message except that the radio is enclosed by the label tag.
-     *
-     * @return ActiveField object
-     * @throws InvalidConfigException
      */
     public function radio($options = [], $enclosedByLabel = null)
     {
@@ -733,15 +837,17 @@ class ActiveField extends YiiActiveField
      * Renders a list of radio buttons. A radio button list is like a checkbox list, except that it only allows single
      * selection. The selection of the radio buttons is taken from the value of the model attribute.
      *
-     * @param array $items the data item used to generate the radio buttons. The array keys are the labels, while the
+     * @param  array  $items  the data item used to generate the radio buttons. The array keys are the labels, while the
      * array values are the corresponding radio button values. Note that the labels will NOT be HTML-encoded, while
      * the values will.
-     * @param array $options options (name => config) for the radio button list. The following options are specially
+     * @param  array  $options  options (name => config) for the radio button list. The following options are specially
      * handled:
      *
      *
      * - `custom`: _bool_, whether to render bootstrap 4.x custom checkbox/radio styled control. Defaults to `false`.
      *    This is applicable only for Bootstrap 4.x forms.
+     * @return ActiveField object
+     * @throws InvalidConfigException
      * @see https://getbootstrap.com/docs/4.1/components/forms/#checkboxes-and-radios-1
      * - `unselect`: _string_, the value that should be submitted when none of the radio buttons is selected. By setting
      *   this option, a hidden input will be generated.
@@ -758,8 +864,6 @@ class ActiveField extends YiiActiveField
      * button; and `$name`, `$value` and `$checked` represent the name, value and the checked status of the radio button
      * input.
      *
-     * @return ActiveField object
-     * @throws InvalidConfigException
      */
     public function radioList($items, $options = [])
     {
@@ -789,6 +893,7 @@ class ActiveField extends YiiActiveField
             $this->initDisability($this->inputOptions);
             $this->buildTemplate();
         }
+
         return parent::render($content);
     }
 
@@ -801,6 +906,7 @@ class ActiveField extends YiiActiveField
         $this->initFieldOptions($options);
         Html::addCssClass($options, $this->addClass);
         $this->initDisability($options);
+
         return parent::textInput($options);
     }
 
@@ -813,6 +919,7 @@ class ActiveField extends YiiActiveField
         $this->initFieldOptions($options);
         Html::addCssClass($options, $this->addClass);
         $this->initDisability($options);
+
         return parent::textarea($options);
     }
 
@@ -824,24 +931,25 @@ class ActiveField extends YiiActiveField
         if (property_exists($class, 'disabled') && property_exists($class, 'readonly')) {
             $this->initDisability($config);
         }
+
         return parent::widget($class, $config);
     }
 
     /**
      * Renders a static input (display only).
      *
-     * @param array $options the tag options in terms of name-value pairs.
+     * @param  array  $options  the tag options in terms of name-value pairs.
      *
      * @return ActiveField object
-     * @throws InvalidConfigException
+     * @throws Exception
      */
     public function staticInput($options = [])
     {
-        $content = isset($this->staticValue) ? $this->staticValue :
-            Html::getAttributeValue($this->model, $this->attribute);
+        $content = $this->staticValue ?? Html::getAttributeValue($this->model, $this->attribute);
         $this->form->addCssClass($options, ActiveForm::BS_FORM_CONTROL_STATIC);
         $this->parts['{input}'] = Html::tag('div', $content, $options);
         $this->_isStatic = true;
+
         return $this;
     }
 
@@ -849,8 +957,8 @@ class ActiveField extends YiiActiveField
      * Renders a multi select list box. This control extends the checkboxList and radioList available in
      * [[YiiActiveField]] - to display a scrolling multi select list box.
      *
-     * @param array $items the data item used to generate the checkboxes or radio.
-     * @param array $options the options for checkboxList or radioList. Additional parameters
+     * @param  array  $items  the data item used to generate the checkboxes or radio.
+     * @param  array  $options  the options for checkboxList or radioList. Additional parameters
      * - `height`: _string_, the height of the multiselect control - defaults to 145px
      * - `selector`: _string_, whether checkbox or radio - defaults to checkbox
      * - `container`: _array_, options for the multiselect container
@@ -873,10 +981,11 @@ class ActiveField extends YiiActiveField
         $height = ArrayHelper::remove($opts, 'height', self::MULTI_SELECT_HEIGHT);
         $selector = ArrayHelper::remove($opts, 'selector', self::TYPE_CHECKBOX);
         $container = ArrayHelper::remove($opts, 'container', []);
-        Html::addCssStyle($container, 'height:' . $height, true);
-        Html::addCssClass($container, $this->addClass . ' input-multiselect');
+        Html::addCssStyle($container, 'height:'.$height, true);
+        Html::addCssClass($container, $this->addClass.' input-multiselect');
         $container['tabindex'] = 0;
         $this->_multiselect = Html::tag('div', '{input}', $container);
+
         return $selector == self::TYPE_RADIO ? $this->radioList($items, $opts) : $this->checkboxList($items, $opts);
     }
 
@@ -885,10 +994,10 @@ class ActiveField extends YiiActiveField
      *
      * @see http://getbootstrap.com/javascript/#buttons-checkbox-radio
      *
-     * @param array $items the data item used to generate the radios. The array values are the labels, while the array
+     * @param  array  $items  the data item used to generate the radios. The array values are the labels, while the array
      * keys are the corresponding radio values. Note that the labels will NOT be HTML-encoded, while the values
      * will be encoded.
-     * @param array $options options (name => config) for the radio button list. The following options are specially
+     * @param  array  $options  options (name => config) for the radio button list. The following options are specially
      * handled:
      *
      * - `unselect`: _string_, the value that should be submitted when none of the radios is selected. By setting this
@@ -919,10 +1028,10 @@ class ActiveField extends YiiActiveField
      *
      * @see http://getbootstrap.com/javascript/#buttons-checkbox-radio
      *
-     * @param array $items the data item used to generate the checkboxes. The array values are the labels, while the
+     * @param  array  $items  the data item used to generate the checkboxes. The array values are the labels, while the
      * array keys are the corresponding checkbox values. Note that the labels will NOT be HTML-encoded, while the
      * values will.
-     * @param array $options options (name => config) for the checkbox button list. The following options are specially
+     * @param  array  $options  options (name => config) for the checkbox button list. The following options are specially
      * handled:
      *
      * - `unselect`: _string_, the value that should be submitted when none of the checkboxes is selected. By setting this
@@ -952,6 +1061,7 @@ class ActiveField extends YiiActiveField
      * Generates the hint icon
      *
      * @return string
+     * @throws Exception
      */
     protected function getHintIcon()
     {
@@ -960,31 +1070,33 @@ class ActiveField extends YiiActiveField
         }
         $options = [];
         Html::addCssClass($options, $this->getHintIconCss('Icon'));
+
         return Html::tag('span', $this->getHintData('icon'), $options);
     }
 
     /**
      * Gets bootstrap grid column CSS based on size
-     * @param string $size
+     * @param  string  $size
      * @return string
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|Exception
      */
     protected function getColCss($size)
     {
-        $bsVer = $this->form->isBs4() ? '4' : '3';
+        $bsVer = $this->form->getBsVer();
         $sizes = ArrayHelper::getValue($this->form->bsColCssPrefixes, $bsVer, []);
         if ($size == self::NOT_SET || !isset($sizes[$size])) {
-            return 'col-' . ActiveForm::SIZE_MEDIUM . '-';
+            return 'col-'.ActiveForm::SIZE_MEDIUM.'-';
         }
+
         return $sizes[$size];
     }
 
     /**
      * Generates a toggle field (checkbox or radio)
      *
-     * @param string $type the toggle input type 'checkbox' or 'radio'.
-     * @param array $options options (name => config) for the toggle input list container tag.
-     * @param bool|null $enclosedByLabel whether the input is enclosed by the label tag
+     * @param  string  $type  the toggle input type 'checkbox' or 'radio'.
+     * @param  array  $options  options (name => config) for the toggle input list container tag.
+     * @param  bool|null  $enclosedByLabel  whether the input is enclosed by the label tag
      *
      * @return ActiveField object
      * @throws InvalidConfigException
@@ -992,11 +1104,12 @@ class ActiveField extends YiiActiveField
     protected function getToggleField($type = self::TYPE_CHECKBOX, $options = [], $enclosedByLabel = null)
     {
         $this->initDisability($options);
-        $isBs4 = $this->form->isBs4();
+        $bsVer = $this->form->getBsVer();
+        $notBs3 = $bsVer !== 3;
         $custom = $this->isCustomControl($options);
-        $switch = ArrayHelper::remove($options, 'switch', false) && $isBs4 && $type === self::TYPE_CHECKBOX;
+        $switch = ArrayHelper::remove($options, 'switch', false) && $notBs3 && $type === self::TYPE_CHECKBOX;
         if ($enclosedByLabel === null) {
-            $enclosedByLabel = !$isBs4 && !$custom;
+            $enclosedByLabel = !$notBs3 && !$custom;
         }
         if (!isset($options['template'])) {
             $this->template = $enclosedByLabel ? $this->checkEnclosedTemplate : $this->checkTemplate;
@@ -1004,31 +1117,38 @@ class ActiveField extends YiiActiveField
             $this->template = $options['template'];
             unset($options['template']);
         }
-        $prefix = $isBs4 ? ($custom ? 'custom-control' : 'form-check') : $type;
+        if ($bsVer === 4) {
+            $prefix = $custom ? 'custom-control' : 'form-check';
+        } elseif ($bsVer === 5) {
+            $prefix = $custom ? 'form-check' : 'bs4 checkbox';
+        } else {
+            $prefix = $type;
+        }
         Html::removeCssClass($options, 'form-control');
         $this->form->removeCssClass($this->labelOptions, ActiveForm::BS_CONTROL_LABEL);
         Html::addCssClass($this->checkWrapperOptions, $prefix);
-        if ($isBs4) {
+        if ($notBs3) {
             Html::addCssClass($this->labelOptions, "{$prefix}-label");
             Html::addCssClass($options, "{$prefix}-input");
             if ($custom) {
-                Html::addCssClass($this->checkWrapperOptions, 'custom-' . ($switch ? 'switch' : $type));
+                $prefix = $this->form->isBs(5) ? 'form-' : 'custom-';
+                Html::addCssClass($this->checkWrapperOptions, $prefix.($switch ? 'switch' : $type));
             }
         } elseif (!$enclosedByLabel) {
             Html::addCssClass($this->checkWrapperOptions, "not-enclosed");
         }
         $this->template = Html::tag('div', $this->template, $this->checkWrapperOptions);
         if ($this->form->isHorizontal()) {
-            Html::removeCssClass($this->labelOptions, $this->getColCss($this->deviceSize) . $this->labelSpan);
+            Html::removeCssClass($this->labelOptions, $this->getColCss($this->deviceSize).$this->labelSpan);
             if ($this->autoOffset) {
-                $this->template = Html::tag('div', '', ['class' => $this->_labelCss]) .
+                $this->template = Html::tag('div', '', ['class' => $this->_labelCss]).
                     Html::tag('div', $this->template, ['class' => $this->_inputCss]);
             } else {
                 Html::removeCssClass($this->options, 'row');
             }
         }
         if ($this->form->isInline()) {
-            Html::removeCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
+            Html::removeCssClass($this->labelOptions, $this->form->getSrOnlyCss());
         }
         if ($enclosedByLabel) {
             if (isset($options['label'])) {
@@ -1037,13 +1157,14 @@ class ActiveField extends YiiActiveField
             $this->parts['{beginLabel}'] = Html::beginTag('label', $this->labelOptions);
             $this->parts['{endLabel}'] = Html::endTag('label');
         }
+
         return parent::$type($options, false);
     }
 
     /**
      * Validates and sets disabled or readonly inputs
      *
-     * @param array $options the HTML attributes for the input
+     * @param  array  $options  the HTML attributes for the input
      */
     protected function initDisability(&$options)
     {
@@ -1058,20 +1179,21 @@ class ActiveField extends YiiActiveField
     /**
      * Gets configuration parameter from formConfig
      *
-     * @param string $param the parameter name
-     * @param mixed $default the default parameter value
+     * @param  string  $param  the parameter name
+     * @param  mixed  $default  the default parameter value
      *
-     * @return bool the parsed parameter value
+     * @return string|bool the parsed parameter value
+     * @throws Exception
      */
     protected function getConfigParam($param, $default = true)
     {
-        return isset($this->$param) ? $this->$param : ArrayHelper::getValue($this->form->formConfig, $param, $default);
+        return $this->$param ?? ArrayHelper::getValue($this->form->formConfig, $param, $default);
     }
 
     /**
      * Generates the hint.
      *
-     * @param string $content the hint content
+     * @param  string  $content  the hint content
      *
      * @return string
      */
@@ -1080,7 +1202,8 @@ class ActiveField extends YiiActiveField
         if ($content === null && method_exists($this->model, 'getAttributeHint')) {
             $content = $this->model->getAttributeHint($this->attribute);
         }
-        return $this->contentBeforeHint . $content . $this->contentAfterHint;
+
+        return $this->contentBeforeHint.$content.$this->contentAfterHint;
     }
 
     /**
@@ -1095,10 +1218,10 @@ class ActiveField extends YiiActiveField
         if (isset($this->enableLabel)) {
             $this->showLabels = $this->enableLabel;
         }
-        $isBs4 = $this->form->isBs4();
+        $bsVer = $this->form->getBsVer();
         $isInline = $this->form->isInline();
         $isHorizontal = $this->form->isHorizontal();
-        if ($isBs4) {
+        if ($bsVer > 3) {
             $errCss = $this->form->tooltipStyleFeedback ? 'invalid-tooltip' : 'invalid-feedback';
             Html::addCssClass($this->errorOptions, $errCss);
         }
@@ -1109,11 +1232,11 @@ class ActiveField extends YiiActiveField
         } elseif (!isset($this->autoPlaceholder)) {
             $this->autoPlaceholder = false;
         }
-        if (!isset($this->labelOptions['class']) && ($isHorizontal || !$isBs4 && !$isInline)) {
+        if (!isset($this->labelOptions['class']) && ($isHorizontal || $bsVer === 3 && !$isInline)) {
             $this->labelOptions['class'] = $this->form->getCssClass(ActiveForm::BS_CONTROL_LABEL);
         }
         if ($showLabels === ActiveForm::SCREEN_READER) {
-            Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
+            Html::addCssClass($this->labelOptions, $this->form->getSrOnlyCss());
         }
         if ($this->showRequiredIndicator) {
             Html::addCssClass($this->labelOptions, 'has-star');
@@ -1127,7 +1250,7 @@ class ActiveField extends YiiActiveField
         $this->initLabels();
         $this->initHints();
         $this->_hasFeedback = !empty($this->feedbackIcon) && is_array($this->feedbackIcon);
-        $this->_iconBesideInput = ArrayHelper::getValue($this->hintSettings, 'iconBesideInput') ? true : false;
+        $this->_iconBesideInput = (bool)ArrayHelper::getValue($this->hintSettings, 'iconBesideInput');
         if ($this->_iconBesideInput) {
             $id = ArrayHelper::getValue($this->options, 'id', '');
             $this->_hintPopoverContainer = $id ? "#{$id}-table" : '';
@@ -1144,7 +1267,7 @@ class ActiveField extends YiiActiveField
     {
         $labelCss = $this->_labelCss;
         if ($this->hasLabels() === ActiveForm::SCREEN_READER) {
-            Html::addCssClass($this->labelOptions, ActiveForm::SCREEN_READER);
+            Html::addCssClass($this->labelOptions, $this->form->getSrOnlyCss());
         } elseif ($labelCss != self::NOT_SET) {
             Html::addCssClass($this->labelOptions, $labelCss);
         }
@@ -1154,6 +1277,7 @@ class ActiveField extends YiiActiveField
      * Validate label display status
      *
      * @return boolean|string whether labels are to be shown
+     * @throws Exception
      */
     protected function hasLabels()
     {
@@ -1161,6 +1285,7 @@ class ActiveField extends YiiActiveField
         if ($this->autoPlaceholder && $showLabels !== ActiveForm::SCREEN_READER) {
             $showLabels = false;
         }
+
         return $showLabels;
     }
 
@@ -1181,7 +1306,8 @@ class ActiveField extends YiiActiveField
         $hor = $this->horizontalCssClasses;
         $span = $this->getConfigParam('labelSpan', '');
         $size = $this->getConfigParam('deviceSize', '');
-        if ($this->form->isBs4()) {
+        $bsVer = $this->form->getBsVer();
+        if ($bsVer > 3) {
             Html::addCssClass($this->options, 'row');
         }
         // check horizontalCssClasses['wrapper'] if there is a col- class
@@ -1195,7 +1321,9 @@ class ActiveField extends YiiActiveField
             $size = ArrayHelper::getValue($this->_settings, 'deviceSize');
         }
         $this->deviceSize = $size;
-
+        if (empty($span)) {
+            $span = ActiveForm::DEFAULT_LABEL_SPAN;
+        }
         if ($span != self::NOT_SET && intval($span) > 0) {
             $span = intval($span);
 
@@ -1212,22 +1340,22 @@ class ActiveField extends YiiActiveField
 
             $this->labelSpan = $span;
             $prefix = $this->getColCss($size);
-            $this->_labelCss = $prefix . $span;
-            $this->_inputCss = $prefix . ($this->form->fullSpan - $span);
+            $this->_labelCss = $prefix.$span;
+            $this->_inputCss = $prefix.($this->form->fullSpan - $span);
         }
 
         if (isset($hor['wrapper'])) {
             if ($span !== self::NOT_SET) {
                 $this->_inputCss .= " ";
             }
-            $this->_inputCss .= $hor['wrapper'];
+            $this->_inputCss .= implode(' ', (array)$hor['wrapper']);
         }
 
         if (isset($hor['label'])) {
             if ($span !== self::NOT_SET) {
                 $this->_labelCss .= " ";
             }
-            $this->_labelCss .= $hor['label'];
+            $this->_labelCss .= implode(' ', (array)$hor['label']);
         }
 
         if (isset($hor['error'])) {
@@ -1250,8 +1378,8 @@ class ActiveField extends YiiActiveField
     /**
      * Merges the parameters for layout settings
      *
-     * @param boolean $showLabels whether to show labels
-     * @param boolean $showErrors whether to show errors
+     * @param  boolean  $showLabels  whether to show labels
+     * @param  boolean  $showErrors  whether to show errors
      */
     protected function mergeSettings($showLabels, $showErrors)
     {
@@ -1262,8 +1390,8 @@ class ActiveField extends YiiActiveField
     /**
      * Builds the field layout parts
      *
-     * @param boolean $showLabels whether to show labels
-     * @param boolean $showErrors whether to show errors
+     * @param  boolean  $showLabels  whether to show labels
+     * @param  boolean  $showErrors  whether to show errors
      * @throws InvalidConfigException
      */
     protected function buildLayoutParts($showLabels, $showErrors)
@@ -1278,12 +1406,13 @@ class ActiveField extends YiiActiveField
             $this->parts['{beginLabel}'] = '';
             $this->parts['{labelTitle}'] = '';
             $this->parts['{endLabel}'] = '';
+
             return;
         }
         if (!empty($this->_inputCss)) {
             $inputDivClass = $this->_inputCss;
             if ($showLabels === false || $showLabels === ActiveForm::SCREEN_READER) {
-                $inputDivClass = $this->getColCss($this->deviceSize) . $this->form->fullSpan;
+                $inputDivClass = $this->getColCss($this->deviceSize).$this->form->fullSpan;
             }
             Html::addCssClass($this->wrapperOptions, $inputDivClass);
         }
@@ -1303,9 +1432,9 @@ class ActiveField extends YiiActiveField
     /**
      * Sets the layout element container
      *
-     * @param string $type the layout element type
-     * @param string $css the css class for the container
-     * @param boolean $chk whether to create the container for the layout element
+     * @param  string  $type  the layout element type
+     * @param  string  $css  the css class for the container
+     * @param  boolean  $chk  whether to create the container for the layout element
      */
     protected function setLayoutContainer($type, $css = '', $chk = true)
     {
@@ -1316,7 +1445,7 @@ class ActiveField extends YiiActiveField
 
     /**
      * Initialize hint settings
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|Exception
      */
     protected function initHints()
     {
@@ -1327,13 +1456,13 @@ class ActiveField extends YiiActiveField
         if ($container === '') {
             $container = $this->_iconBesideInput ? 'table' : 'form';
         }
-        $iconCss = $this->form->isBs4() ? 'fas fa fa-question-circle' : 'glyphicon glyphicon-question-sign';
+        $iconCss = !$this->form->isBs(3) ? 'fas fa fa-question-circle' : 'glyphicon glyphicon-question-sign';
         $attr = 'style="width:100%"{id}';
         $defaultSettings = [
             'showIcon' => true,
             'iconBesideInput' => false,
             'labelTemplate' => '{label}{help}',
-            'inputTemplate' => "<table {$attr}><tr><td>{input}</td>" . '<td style="width:5%">{help}</td></tr></table>',
+            'inputTemplate' => "<table {$attr}><tr><td>{input}</td>".'<td style="width:5%">{help}</td></tr></table>',
             'onLabelClick' => false,
             'onLabelHover' => true,
             'onIconClick' => true,
@@ -1341,7 +1470,7 @@ class ActiveField extends YiiActiveField
             'labelCssClass' => 'kv-hint-label',
             'iconCssClass' => 'kv-hint-icon',
             'contentCssClass' => 'kv-hint-content',
-            'icon' => '<i class="' . $iconCss . ' text-info"></i>',
+            'icon' => '<i class="'.$iconCss.' text-info"></i>',
             'hideOnEscape' => true,
             'hideOnClickOut' => true,
             'placement' => 'top',
@@ -1358,20 +1487,20 @@ class ActiveField extends YiiActiveField
     /**
      * Sets a hint property setting as a data attribute within `self::$options`
      *
-     * @param string $key the hint property key
+     * @param  string  $key  the hint property key
      */
     protected function setHintData($key)
     {
         if (isset($this->hintSettings[$key])) {
             $value = $this->hintSettings[$key];
-            $this->options['data-' . Inflector::camel2id($key)] = is_bool($value) ? (int)$value : $value;
+            $this->options['data-'.Inflector::camel2id($key)] = is_bool($value) ? (int)$value : $value;
         }
     }
 
     /**
      * Initializes sizes and placeholder based on $autoPlaceholder
      *
-     * @param array $options the HTML attributes for the input
+     * @param  array  $options  the HTML attributes for the input
      * @throws InvalidConfigException
      */
     protected function initFieldOptions(&$options)
@@ -1388,15 +1517,15 @@ class ActiveField extends YiiActiveField
 
     /**
      * Initializes field by detecting the bootstrap CSS size and sets a size modifier CSS to the field container
-     * @param array $options the HTML options
-     * @param string $size the size to init
-     * @throws InvalidConfigException
+     * @param  array  $options  the HTML options
+     * @param  string  $size  the size to init
+     * @throws InvalidConfigException|Exception
      */
     protected function initFieldSize($options, $size)
     {
-        $isBs4 = $this->form->isBs4();
-        if ($isBs4 && Config::hasCssClass($options, "form-control-{$size}") ||
-            !$isBs4 && Config::hasCssClass($options, "input-{$size}") ||
+        $notBs3 = !$this->form->isBs(3);
+        if ($notBs3 && Config::hasCssClass($options, "form-control-{$size}") ||
+            !$notBs3 && Config::hasCssClass($options, "input-{$size}") ||
             isset($this->addon['groupOptions']) &&
             Config::hasCssClass($this->addon['groupOptions'], "input-group-{$size}")) {
             Html::addCssClass($this->options, "has-size-{$size}");
@@ -1406,10 +1535,11 @@ class ActiveField extends YiiActiveField
     /**
      * Gets a hint configuration setting value
      *
-     * @param string $key the hint setting key to fetch
-     * @param mixed $default the default value if not set
+     * @param  string  $key  the hint setting key to fetch
+     * @param  mixed  $default  the default value if not set
      *
      * @return mixed
+     * @throws Exception
      */
     protected function getHintData($key, $default = null)
     {
@@ -1419,7 +1549,7 @@ class ActiveField extends YiiActiveField
     /**
      * Gets the hint icon css based on `hintSettings`
      *
-     * @param string $type whether `Label` or `Icon`
+     * @param  string  $type  whether `Label` or `Icon`
      *
      * @return array the css to be applied
      */
@@ -1435,6 +1565,7 @@ class ActiveField extends YiiActiveField
         if (!empty($this->hintSettings["on{$type}Hover"])) {
             $css[] = "kv-hint-hover";
         }
+
         return $css;
     }
 
@@ -1461,11 +1592,11 @@ class ActiveField extends YiiActiveField
             $input = str_replace('{input}', $this->_multiselect, $input);
         }
         if ($this->_isHintSpecial && $this->getHintData('iconBesideInput') && $this->getHintData('showIcon')) {
-            $id = $this->_hintPopoverContainer ? ' id="' . $this->_hintPopoverContainer . '"' : '';
+            $id = $this->_hintPopoverContainer ? ' id="'.$this->_hintPopoverContainer.'"' : '';
             $help = strtr($this->getHintData('inputTemplate'), ['{help}' => $this->getHintIcon(), '{id}' => $id,]);
             $input = str_replace('{input}', $help, $input);
         }
-        $newInput = $this->contentBeforeInput . $this->generateAddon() . $this->renderFeedbackIcon() .
+        $newInput = $this->contentBeforeInput.$this->generateAddon().$this->renderFeedbackIcon().
             $this->contentAfterInput;
         $newError = "{$this->contentBeforeError}{error}{$this->contentAfterError}";
         $config = [
@@ -1483,7 +1614,7 @@ class ActiveField extends YiiActiveField
      * Generates the addon markup
      *
      * @return string
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|Exception
      */
     protected function generateAddon()
     {
@@ -1491,16 +1622,16 @@ class ActiveField extends YiiActiveField
             return '{input}';
         }
         $addon = $this->addon;
-        $isBs4 = $this->form->isBs4();
-        $prepend = $this->getAddonContent('prepend', $isBs4);
-        $append = $this->getAddonContent('append', $isBs4);
-        $content = $prepend . '{input}' . $append;
+        $ver = $this->form->getBsVer();
+        $prepend = $this->getAddonContent('prepend', $ver);
+        $append = $this->getAddonContent('append', $ver);
+        $content = $prepend.'{input}'.$append;
         $group = ArrayHelper::getValue($addon, 'groupOptions', []);
         Html::addCssClass($group, 'input-group');
         $contentBefore = ArrayHelper::getValue($addon, 'contentBefore', '');
         $contentAfter = ArrayHelper::getValue($addon, 'contentAfter', '');
-        $content = Html::tag('div', $contentBefore . $content . $contentAfter, $group);
-        return $content;
+
+        return Html::tag('div', $contentBefore.$content.$contentAfter, $group);
     }
 
     /**
@@ -1509,6 +1640,7 @@ class ActiveField extends YiiActiveField
      * @see http://getbootstrap.com/css/#with-optional-icons
      *
      * @return string
+     * @throws Exception
      */
     protected function renderFeedbackIcon()
     {
@@ -1519,16 +1651,17 @@ class ActiveField extends YiiActiveField
         $type = ArrayHelper::getValue($config, 'type', 'icon');
         $prefix = ArrayHelper::getValue($config, 'prefix', $this->form->getDefaultIconPrefix());
         $id = Html::getInputId($this->model, $this->attribute);
-        return $this->getFeedbackIcon($config, 'default', $type, $prefix, $id) .
-            $this->getFeedbackIcon($config, 'success', $type, $prefix, $id) .
+
+        return $this->getFeedbackIcon($config, 'default', $type, $prefix, $id).
+            $this->getFeedbackIcon($config, 'success', $type, $prefix, $id).
             $this->getFeedbackIcon($config, 'error', $type, $prefix, $id);
     }
 
     /**
      * Render the label parts
      *
-     * @param string|null $label the label or null to use model label
-     * @param array $options the tag options
+     * @param  string|null  $label  the label or null to use model label
+     * @param  array  $options  the tag options
      */
     protected function renderLabelParts($label = null, $options = [])
     {
@@ -1555,45 +1688,51 @@ class ActiveField extends YiiActiveField
     /**
      * Generates a feedback icon
      *
-     * @param array $config the feedback icon configuration
-     * @param string $cat the feedback icon category
-     * @param string $type the feedback icon type
-     * @param string $prefix the feedback icon prefix
-     * @param string $id the input attribute identifier
+     * @param  array  $config  the feedback icon configuration
+     * @param  string  $cat  the feedback icon category
+     * @param  string  $type  the feedback icon type
+     * @param  string  $prefix  the feedback icon prefix
+     * @param  string  $id  the input attribute identifier
      *
      * @return string
+     * @throws Exception
      */
     protected function getFeedbackIcon($config, $cat, $type, $prefix, $id)
     {
-        $markup = ArrayHelper::getValue($config, $cat, null);
+        $markup = ArrayHelper::getValue($config, $cat);
         if ($markup === null) {
             return '';
         }
         $desc = ArrayHelper::remove($options, 'description', "({$cat})");
-        $options = ArrayHelper::getValue($config, $cat . 'Options', []);
+        $options = ArrayHelper::getValue($config, $cat.'Options', []);
         $options['aria-hidden'] = true;
-        $key = $id . '-' . $cat;
+        $key = $id.'-'.$cat;
         $this->inputOptions['aria-describedby'] = empty($this->inputOptions['aria-describedby']) ? $key :
-            $this->inputOptions['aria-describedby'] . ' ' . $key;
+            $this->inputOptions['aria-describedby'].' '.$key;
         Html::addCssClass($options, ['form-control-feedback', "kv-feedback-{$cat}"]);
-        $icon = $type === 'raw' ? $markup : Html::tag('i', '', ['class' => $prefix . $markup]);
-        return Html::tag('span', $icon, $options) .
-            Html::tag('span', $desc, ['id' => $key, 'class' => ActiveForm::SCREEN_READER]);
+        $icon = $type === 'raw' ? $markup : Html::tag('i', '', ['class' => $prefix.$markup]);
+
+        return Html::tag('span', $icon, $options).
+            Html::tag('span', $desc, ['id' => $key, 'class' => $this->form->getSrOnlyCss()]);
     }
 
     /**
      * Renders a list of checkboxes / radio buttons. The selection of the checkbox / radio buttons is taken from the
      * value of the model attribute.
      *
-     * @param string $type the toggle input type 'checkbox' or 'radio'.
-     * @param array $items the data item used to generate the checkbox / radio buttons. The array keys are the labels,
+     * @param  string  $type  the toggle input type 'checkbox' or 'radio'.
+     * @param  array  $items  the data item used to generate the checkbox / radio buttons. The array keys are the labels,
      * while the array values are the corresponding checkbox / radio button values. Note that the labels will NOT
      * be HTML-encoded, while the values will be encoded.
-     * @param array $options options (name => config) for the checkbox / radio button list. The following options are
+     * @param  array  $options  options (name => config) for the checkbox / radio button list. The following options are
      * specially handled:
      *
      * - `custom`: _bool_, whether to render bootstrap 4.x custom checkbox/radio styled control. Defaults to `false`.
      *    This is applicable only for Bootstrap 4.x forms.
+     * @param  boolean  $asBtnGrp  whether to generate the toggle list as a bootstrap button group
+     *
+     * @return ActiveField object
+     * @throws InvalidConfigException
      * @see https://getbootstrap.com/docs/4.1/components/forms/#checkboxes-and-radios-1
      * - `unselect`: _string_, the value that should be submitted when none of the checkbox / radio buttons is selected. By
      *   setting this option, a hidden input will be generated.
@@ -1612,24 +1751,25 @@ class ActiveField extends YiiActiveField
      * the checkbox/ radio button; and $name, $value and $checked represent the name, value and the checked status
      * of the checkbox/ radio button input.
      *
-     * @param boolean $asBtnGrp whether to generate the toggle list as a bootstrap button group
-     *
-     * @return ActiveField object
-     * @throws InvalidConfigException
      */
     protected function getToggleFieldList($type, $items, $options = [], $asBtnGrp = false)
     {
-        $isBs4 = $this->form->isBs4();
+        $isBs5 = $this->form->isBs(5);
+        $notBs3 = !$this->form->isBs(3);
         $disabled = ArrayHelper::remove($options, 'disabledItems', []);
         $readonly = ArrayHelper::remove($options, 'readonlyItems', []);
         $cust = $this->isCustomControl($options);
-        $pre = $cust ? 'custom-control' : 'form-check';
+        $pre = $cust && !$isBs5 ? 'custom-control' : 'form-check';
         if ($asBtnGrp) {
-            Html::addCssClass($options, ['btn-group', 'btn-group-toggle']);
+            $css = ['btn-group'];
+            if (!$isBs5) {
+                $css[] = 'btn-group-toggle';
+            }
+            Html::addCssClass($options, $css);
             $options['data-toggle'] = 'buttons';
             $options['inline'] = true;
             if (!isset($options['itemOptions']['labelOptions']['class'])) {
-                $options['itemOptions']['labelOptions']['class'] = 'btn ' . $this->form->getDefaultBtnCss();
+                $options['itemOptions']['labelOptions']['class'] = 'btn '.$this->form->getDefaultBtnCss();
             }
         }
         $in = ArrayHelper::remove($options, 'inline', false);
@@ -1638,24 +1778,38 @@ class ActiveField extends YiiActiveField
         $this->initDisability($opts);
         $css = $this->form->disabled ? ' disabled' : '';
         $css .= $this->form->readonly ? ' readonly' : '';
-        if ($isBs4) {
+        if ($notBs3) {
             Html::addCssClass($this->labelOptions, 'pt-0');
         }
-        if (!$isBs4 && $in && !isset($options['itemOptions']['labelOptions']['class'])) {
+        if (!$notBs3 && $in && !isset($options['itemOptions']['labelOptions']['class'])) {
             $options['itemOptions']['labelOptions']['class'] = "{$type}-inline{$css}";
         } elseif (!isset($options['item'])) {
             $labelOpts = ArrayHelper::getValue($opts, 'labelOptions', []);
             $options['item'] = function ($index, $label, $name, $checked, $value)
-            use ($type, $css, $disabled, $readonly, $asBtnGrp, $labelOpts, $opts, $in, $isBs4, $cust, $pre, $options) {
-                $id = isset($options['id']) ? $options['id'] . '-' . $index :
-                    strtolower(preg_replace('/[^a-zA-Z0-9=\s—–-]+/u', '-', $name)) . '-' . $index;
+            use (
+                $isBs5,
+                $type,
+                $css,
+                $disabled,
+                $readonly,
+                $asBtnGrp,
+                $labelOpts,
+                $opts,
+                $in,
+                $notBs3,
+                $cust,
+                $pre,
+                $options
+            ) {
+                $id = isset($options['id']) ? $options['id'].'-'.$index :
+                    strtolower(preg_replace('/[^a-zA-Z0-9=\s—–-]+/u', '-', $name)).'-'.$index;
                 $opts += [
                     'data-index' => $index,
                     'value' => $value,
                     'disabled' => $this->form->disabled,
                     'readonly' => $this->form->readonly,
                 ];
-                $enclosedLabel = !$cust && !$isBs4 || $asBtnGrp;
+                $enclosedLabel = (!$cust && !$notBs3) || ($asBtnGrp && !$isBs5);
                 if ($enclosedLabel) {
                     $opts += ['label' => $label];
                 }
@@ -1663,15 +1817,15 @@ class ActiveField extends YiiActiveField
                     $opts['id'] = $id;
                 }
                 $wrapperOptions = [];
-                if ($isBs4 && !$asBtnGrp) {
+                if ($notBs3 && !$asBtnGrp) {
                     $opts += ['class' => "{$pre}-input"];
                     Html::addCssClass($labelOpts, "{$pre}-label");
-                    $wrapperOptions = ['class' => [$pre . ($cust ? ' custom-' . $type : '')]];
+                    $wrapperOptions = ['class' => [$pre.($cust ? ' custom-'.$type : '')]];
                     if ($in) {
                         Html::addCssClass($wrapperOptions, "{$pre}-inline");
                     }
-                } elseif (!$isBs4) {
-                    $wrapperOptions = ['class' => [$type . $css]];
+                } elseif (!$notBs3) {
+                    $wrapperOptions = ['class' => [$type.$css]];
                 }
                 if ($asBtnGrp) {
                     if ($checked) {
@@ -1687,26 +1841,32 @@ class ActiveField extends YiiActiveField
                     Html::addCssClass($labelOpts, 'disabled');
                     $opts['readonly'] = true;
                 }
-                $opts['labelOptions'] = $labelOpts;
+                if ($isBs5 && $asBtnGrp) {
+                    Html::addCssClass($opts, 'btn-check');
+                } else {
+                    $opts['labelOptions'] = $labelOpts;
+                }
                 $out = Html::$type($name, $checked, $opts);
                 if (!$enclosedLabel) {
                     $out .= Html::label($label, $opts['id'], $labelOpts);
                 }
+
                 return $asBtnGrp ? $out : Html::tag('div', $out, $wrapperOptions);
             };
         }
+
         return parent::$inputType($items, $options);
     }
 
     /**
      * Adds Bootstrap 4 validation class to the input options if needed.
-     * @param array $options
-     * @throws InvalidConfigException
+     * @param  array  $options
+     * @throws Exception
      */
     protected function addErrorClassBS4(&$options)
     {
         $attributeName = Html::getAttributeName($this->attribute);
-        if ($this->form->isBs4() &&
+        if (!$this->form->isBs(3) &&
             $this->model->hasErrors($attributeName) &&
             $this->form->validationStateOn === ActiveForm::VALIDATION_STATE_ON_CONTAINER) {
             Html::addCssClass($options, 'is-invalid');
