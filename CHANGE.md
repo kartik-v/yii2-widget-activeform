@@ -1,6 +1,12 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.6.1
+
+**Date**: _under development_
+
+- (enh #129): Enhance radioList and checkboxList styles.
+
 ## Version 1.6.0
 
 **Date**: 01-Sep-2021

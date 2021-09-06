@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2021
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.6.0
+ * @version    1.6.1
  */
 
 namespace kartik\form;
@@ -777,11 +777,12 @@ class ActiveField extends YiiActiveField
 
     /**
      * Gets custom CSS for custom controls supported in bootstrap 4.x and 5.x
-     * @param string $type
+     * @param  string  $type
      * @return string
      * @throws Exception
      */
-    protected function getCustomCss($type) {
+    protected function getCustomCss($type)
+    {
         return $this->form->isBs(5) ? "form-{$type}" : "custom-{$type}";
     }
 
@@ -1759,7 +1760,7 @@ class ActiveField extends YiiActiveField
         $disabled = ArrayHelper::remove($options, 'disabledItems', []);
         $readonly = ArrayHelper::remove($options, 'readonlyItems', []);
         $cust = $this->isCustomControl($options);
-        $pre = $cust && !$isBs5 ? 'custom-control' : 'form-check';
+        $pre = $cust ? ($isBs5 ? 'form-check' : 'custom-control') : ($notBs3 ? "me-1 mr-1 bs-{$type}" : '');
         if ($asBtnGrp) {
             $css = ['btn-group'];
             if (!$isBs5) {
