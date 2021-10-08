@@ -206,8 +206,8 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
     public function getFormLayoutStyle()
     {
         $config = $this->formConfig;
-        $span = $config['labelSpan'] ?? ActiveField::NOT_SET;
-        $size = $config['deviceSize'] ?? ActiveField::NOT_SET;
+        $span = isset($config['labelSpan']) ? $config['labelSpan'] : ActiveField::NOT_SET;
+        $size = isset($config['deviceSize']) ? $config['deviceSize'] : ActiveField::NOT_SET;
         $labelCss = $inputCss = ActiveField::NOT_SET;
         $iSpan = intval($span);
         if ($span != ActiveField::NOT_SET && $iSpan > 0) {

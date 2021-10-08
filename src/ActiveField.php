@@ -946,7 +946,7 @@ class ActiveField extends YiiActiveField
      */
     public function staticInput($options = [])
     {
-        $content = $this->staticValue ?? Html::getAttributeValue($this->model, $this->attribute);
+        $content = $this->staticValue ?: Html::getAttributeValue($this->model, $this->attribute);
         $this->form->addCssClass($options, ActiveForm::BS_FORM_CONTROL_STATIC);
         $this->parts['{input}'] = Html::tag('div', $content, $options);
         $this->_isStatic = true;
@@ -1188,7 +1188,7 @@ class ActiveField extends YiiActiveField
      */
     protected function getConfigParam($param, $default = true)
     {
-        return $this->$param ?? ArrayHelper::getValue($this->form->formConfig, $param, $default);
+        return isset($this->$param) ? $this->$param : ArrayHelper::getValue($this->form->formConfig, $param, $default);
     }
 
     /**
