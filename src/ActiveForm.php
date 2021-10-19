@@ -300,12 +300,14 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
         if ($this->isHorizontal()) {
             $css[] = 'kv-form-horizontal';
         }
+        $formCss = 'kv-form-bs3';
         if ($bsVer !== 3) {
-            $css[] = 'kv-form-bs4';
+            $formCss = 'kv-form-bs4';
             if ($this->tooltipStyleFeedback) {
                 $css[] = 'tooltip-feedback';
             }
         }
+        $css[] = $formCss;
         Html::addCssClass($this->options, $css);
     }
 

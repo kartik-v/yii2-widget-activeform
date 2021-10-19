@@ -493,7 +493,7 @@ class ActiveField extends YiiActiveField
         $layout = $form->type;
         $bsVer = $form->getBsVer();
         $config = [
-            'hintOptions' => ['tag' => 'div', 'class' => ['form-text', 'text-muted', 'small']],
+            'hintOptions' => ['tag' => 'div', 'class' => ['hint-block']],
             'errorOptions' => ['tag' => 'div', 'class' => 'invalid-feedback'],
             'inputOptions' => ['class' => 'form-control'],
             'labelOptions' => ['class' => ['form-label']],
@@ -502,11 +502,7 @@ class ActiveField extends YiiActiveField
         if ($bsVer === 4) {
             $config['labelOptions'] = ['class' => []];
         } elseif ($bsVer === 3) {
-            $config = [
-                'hintOptions' => ['tag' => 'p', 'class' => ['help-block']],
-                'errorOptions' => ['tag' => 'p', 'class' => 'help-block help-block-error'],
-                'inputOptions' => ['class' => 'form-control'],
-            ];
+            $config['errorOptions'] = ['tag' => 'div', 'class' => 'help-block help-block-error'];
         }
         if ($layout === ActiveForm::TYPE_HORIZONTAL) {
             $config['template'] = "{label}\n{beginWrapper}\n{input}\n{error}\n{hint}\n{endWrapper}";
@@ -662,13 +658,11 @@ class ActiveField extends YiiActiveField
     {
         if ($this->getConfigParam('showHints') === false) {
             $this->parts['{hint}'] = '';
-
             return $this;
         }
         if ($this->_isHintSpecial) {
             Html::addCssClass($options, 'kv-hint-block');
         }
-
         return parent::hint($this->generateHint($content), $options);
     }
 
@@ -946,7 +940,7 @@ class ActiveField extends YiiActiveField
      */
     public function staticInput($options = [])
     {
-        $content = $this->staticValue ?? Html::getAttributeValue($this->model, $this->attribute);
+        $content = isset($this->staticValue) ? $this->staticValue : Html::getAttributeValue($this->model, $this->attribute);
         $this->form->addCssClass($options, ActiveForm::BS_FORM_CONTROL_STATIC);
         $this->parts['{input}'] = Html::tag('div', $content, $options);
         $this->_isStatic = true;
@@ -1188,7 +1182,7 @@ class ActiveField extends YiiActiveField
      */
     protected function getConfigParam($param, $default = true)
     {
-        return $this->$param ?? ArrayHelper::getValue($this->form->formConfig, $param, $default);
+        return isset($this->$param) ? $this->$param : ArrayHelper::getValue($this->form->formConfig, $param, $default);
     }
 
     /**

@@ -209,6 +209,14 @@ label.disabled, label.readonly, .disabled label, .readonly label {
     margin-top: 0.375rem;
     color: #999;
 }
+.kv-form-bs3 .hint-block {
+    font-size: 12px;
+    margin-top: -5px;
+    color: #999;
+}
+.kv-form-bs3 .help-block-error {
+    font-size: 90%;
+}
 .checkbox.not-enclosed,
 .radio.not-enclosed {
     padding-left: 20px;

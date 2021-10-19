@@ -5,6 +5,8 @@ Change Log: `yii2-widget-activeform`
 
 **Date**: _under development_
 
+- (enh #131): Enhance hint block styling.
+- (enh #130): Support isset validation for older PHP versions.
 - (enh #129): Enhance radioList and checkboxList styles.
 
 ## Version 1.6.0
