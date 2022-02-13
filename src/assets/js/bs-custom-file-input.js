@@ -1,6 +1,6 @@
 /*!
  * bsCustomFileInput v1.3.2 (https://github.com/Johann-S/bs-custom-file-input)
- * Copyright 2018 - 2021 Johann-S <johann.servoire@gmail.com>
+ * Copyright 2018 - 2022 Johann-S <johann.servoire@gmail.com>
  * Licensed under MIT (https://github.com/Johann-S/bs-custom-file-input/blob/master/LICENSE)
  */
 (function (global, factory) {

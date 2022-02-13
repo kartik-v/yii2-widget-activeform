@@ -1,5 +1,5 @@
 /*!
- * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2021
+ * @copyright Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2022
  * @package yii2-widgets
  * @subpackage yii2-widget-activeform
  * @version 1.6.1
@@ -234,7 +234,7 @@ label.disabled, label.readonly, .disabled label, .readonly label {
 .form-inline .radio.not-enclosed label {
     margin-top: -5px;
 }
-.form-group.required .has-star:not(.custom-control-label):not(.custom-file-label)::after,
+.required .has-star:not(.custom-control-label):not(.custom-file-label)::after,
 .is-required::after {
     content: "*";
     margin-left: 3px;

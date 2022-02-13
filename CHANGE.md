@@ -3,8 +3,9 @@ Change Log: `yii2-widget-activeform`
 
 ## Version 1.6.1
 
-**Date**: _under development_
+**Date**: 13-Feb-2022
 
+- (enh #134): Correct form label required star styling for BS 5.x.
 - (enh #131): Enhance hint block styling.
 - (enh #130): Support isset validation for older PHP versions.
 - (enh #129): Enhance radioList and checkboxList styles.
