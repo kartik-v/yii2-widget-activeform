@@ -1,6 +1,13 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.6.2
+
+**Date**: 27-Feb-2022
+
+- PHP 8.1 enhancements for native functions.
+- (enh #135): Backward compatibility for PHP 5.6.
+
 ## Version 1.6.1
 
 **Date**: 13-Feb-2022

@@ -21,7 +21,7 @@
         }
     ],
     "require": {
-        "kartik-v/yii2-krajee-base": ">=3.0.0"
+        "kartik-v/yii2-krajee-base": ">=3.0.3"
     },
     "autoload": {
         "psr-4": {

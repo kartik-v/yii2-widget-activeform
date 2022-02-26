@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2022
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.6.1
+ * @version    1.6.2
  */
 
 namespace kartik\form;
@@ -14,6 +14,7 @@ use kartik\base\BootstrapInterface;
 use kartik\base\BootstrapTrait;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm as YiiActiveForm;
 
@@ -213,8 +214,8 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
     public function getFormLayoutStyle()
     {
         $config = $this->formConfig;
-        $span = $config['labelSpan'] ?? ActiveField::NOT_SET;
-        $size = $config['deviceSize'] ?? ActiveField::NOT_SET;
+        $span = ArrayHelper::getValue($config, 'labelSpan', ActiveField::NOT_SET);
+        $size = ArrayHelper::getValue($config, 'deviceSize', ActiveField::NOT_SET);
         $labelCss = $inputCss = ActiveField::NOT_SET;
         $iSpan = intval($span);
         if ($span != ActiveField::NOT_SET && $iSpan > 0) {
