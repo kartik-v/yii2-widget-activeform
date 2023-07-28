@@ -1,6 +1,14 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.6.3
+
+**Date**: 28-Jul-2023
+
+- (enh #138): Enhance required star for bootstrap 5 floating labels.
+- (enh #137): Overflowing labels in CheckboxList don't break correctly with Bootstrap 4.
+- (enh #136): Enhance ActiveForm to dynamically configure `enabled`, `readonly` and `staticOnly` flags.
+
 ## Version 1.6.2
 
 **Date**: 27-Feb-2022

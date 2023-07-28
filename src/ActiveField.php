@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2022
+ * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2023
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.6.2
+ * @version    1.6.3
  */
 
 namespace kartik\form;
@@ -643,11 +643,13 @@ class ActiveField extends YiiActiveField
     {
         if ($this->getConfigParam('showHints') === false) {
             $this->parts['{hint}'] = '';
+
             return $this;
         }
         if ($this->_isHintSpecial) {
             Html::addCssClass($options, 'kv-hint-block');
         }
+
         return parent::hint($this->generateHint($content), $options);
     }
 
@@ -864,8 +866,11 @@ class ActiveField extends YiiActiveField
             }
             $this->template = Lib::strtr($this->template, ['{hint}' => $this->_settings['hint']]);
         }
-
-        if ($this->form->staticOnly === true) {
+        $staticOnly = $this->form->staticOnly;
+        if (is_callable($staticOnly)) {
+            $staticOnly = call_user_func($staticOnly, [$this->model, $this]);
+        }
+        if ($staticOnly === true) {
             $this->buildTemplate();
             $this->staticInput();
         } else {
@@ -925,7 +930,8 @@ class ActiveField extends YiiActiveField
      */
     public function staticInput($options = [])
     {
-        $content = isset($this->staticValue) ? $this->staticValue : Html::getAttributeValue($this->model, $this->attribute);
+        $content = isset($this->staticValue) ? $this->staticValue : Html::getAttributeValue($this->model,
+            $this->attribute);
         $this->form->addCssClass($options, ActiveForm::BS_FORM_CONTROL_STATIC);
         $this->parts['{input}'] = Html::tag('div', $content, $options);
         $this->_isStatic = true;
@@ -1142,18 +1148,34 @@ class ActiveField extends YiiActiveField
     }
 
     /**
+     * Parses the form flag (for disabled/readonly).
+     *
+     * @param  string  $flag
+     * @param  array  $options
+     * @return void
+     */
+    protected function parseFormFlag($flag, &$options)
+    {
+        if (!property_exists($this->form, $flag)) {
+            return;
+        }
+        $action = $this->form->$flag;
+        if ($action && is_callable($action)) {
+            $options[$flag] = call_user_func_array($action, [$this->model, $this]);
+        } else {
+            $options[$flag] = $action;
+        }
+    }
+
+    /**
      * Validates and sets disabled or readonly inputs
      *
      * @param  array  $options  the HTML attributes for the input
      */
     protected function initDisability(&$options)
     {
-        if ($this->form->disabled && !isset($options['disabled'])) {
-            $options['disabled'] = true;
-        }
-        if ($this->form->readonly && !isset($options['readonly'])) {
-            $options['readonly'] = true;
-        }
+        $this->parseFormFlag('disabled', $options);
+        $this->parseFormFlag('readonly', $options);
     }
 
     /**
@@ -1739,7 +1761,12 @@ class ActiveField extends YiiActiveField
         $disabled = ArrayHelper::remove($options, 'disabledItems', []);
         $readonly = ArrayHelper::remove($options, 'readonlyItems', []);
         $cust = $this->isCustomControl($options);
-        $pre = $cust ? ($isBs5 ? 'form-check' : 'custom-control') : ($notBs3 ? "me-1 mr-1 bs-{$type}" : '');
+        if ($isBs5) {
+            $pre = ($cust ? '' : ' bs5-form-check ').'form-check';
+        } else {
+            $pre = $cust ? 'custom-control' : 'form-check';
+        }
+
         if ($asBtnGrp) {
             $css = ['btn-group'];
             if (!$isBs5) {

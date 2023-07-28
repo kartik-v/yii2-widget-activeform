@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2022
+ * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2023
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.6.2
+ * @version    1.6.3
  */
 
 namespace kartik\form;

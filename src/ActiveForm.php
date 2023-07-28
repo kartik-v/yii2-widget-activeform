@@ -1,10 +1,10 @@
 <?php
 
 /**
- * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2022
+ * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2023
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.6.2
+ * @version    1.6.3
  */
 
 namespace kartik\form;
@@ -151,17 +151,42 @@ class ActiveForm extends YiiActiveForm implements BootstrapInterface
     public $inlineFormCssClass;
 
     /**
-     * @var boolean whether all data in form are to be static inputs
+     * @var boolean|Closure whether all inputs in form are to be rendered as bootstrap 5 static text inputs. For
+     * advanced configuration (e.g. dynamically setting different flags for different fields), this can be setup as a
+     * Closure callback. When setup as a Closure callback, you can receive the model instance and the active field
+     * object instance as parameters. For example:
+     *
+     * ```
+     * 'staticOnly' => function ($model, $field) {
+     *     return in_array($field->attribute, $model->staticOnlyAttributes());
+     * }
+     * ```
      */
     public $staticOnly = false;
 
     /**
-     * @var boolean whether all inputs in form are to be disabled
+     * @var boolean|Closure whether all inputs in form are to be disabled. For advanced configuration (e.g. dynamically
+     * setting different flags for different fields), this can be setup as a Closure callback. When setup as a Closure
+     * callback, you can receive the model instance and the active field object instance as parameters. For example:
+     *
+     * ```
+     * 'disabled' => function ($model, $field) {
+     *     return in_array($field->attribute, $model->disabledAttributes());
+     * }
+     * ```
      */
     public $disabled = false;
 
     /**
-     * @var boolean whether all inputs in form are to be readonly.
+     * @var boolean|Closure whether all inputs in form are to be readonly. For advanced configuration (e.g. dynamically
+     * setting different flags for different fields), this can be setup as a Closure callback. When setup as a Closure
+     * callback, you can receive the model instance and the active field object instance as parameters. For example:
+     *
+     * ```
+     * 'readonly' => function ($model, $field) {
+     *     return in_array($field->attribute, $model->readonlyAttributes());
+     * }
+     * ```
      */
     public $readonly = false;
 
