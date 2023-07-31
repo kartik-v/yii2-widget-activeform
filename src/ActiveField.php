@@ -4,7 +4,7 @@
  * @copyright  Copyright &copy; Kartik Visweswaran, Krajee.com, 2015 - 2023
  * @package    yii2-widgets
  * @subpackage yii2-widget-activeform
- * @version    1.6.3
+ * @version    1.6.4
  */
 
 namespace kartik\form;
@@ -1156,7 +1156,7 @@ class ActiveField extends YiiActiveField
      */
     protected function parseFormFlag($flag, &$options)
     {
-        if (!property_exists($this->form, $flag)) {
+        if (!property_exists($this->form, $flag) || isset($options[$flag])) {
             return;
         }
         $action = $this->form->$flag;
@@ -1783,8 +1783,8 @@ class ActiveField extends YiiActiveField
         $inputType = "{$type}List";
         $opts = ArrayHelper::getValue($options, 'itemOptions', []);
         $this->initDisability($opts);
-        $css = $this->form->disabled ? ' disabled' : '';
-        $css .= $this->form->readonly ? ' readonly' : '';
+        $css = !empty($opts['disabled']) ? ' disabled' : '';
+        $css .= !empty($opts['readonly']) ? ' readonly' : '';
         if ($notBs3) {
             Html::addCssClass($this->labelOptions, 'pt-0');
         }
@@ -1812,9 +1812,7 @@ class ActiveField extends YiiActiveField
                     Lib::strtolower(Lib::preg_replace('/[^a-zA-Z0-9=\s—–-]+/u', '-', $name)).'-'.$index;
                 $opts += [
                     'data-index' => $index,
-                    'value' => $value,
-                    'disabled' => $this->form->disabled,
-                    'readonly' => $this->form->readonly,
+                    'value' => $value
                 ];
                 $enclosedLabel = (!$cust && !$notBs3) || ($asBtnGrp && !$isBs5);
                 if ($enclosedLabel) {
@@ -1840,13 +1838,11 @@ class ActiveField extends YiiActiveField
                     }
                     $opts['autocomplete'] = 'off';
                 }
-                if (!empty($disabled) && in_array($value, $disabled) || $this->form->disabled) {
+                if (!empty($disabled) && in_array($value, $disabled) || !empty($opts['disabled'])) {
                     Html::addCssClass($labelOpts, 'disabled');
-                    $opts['disabled'] = true;
                 }
-                if (!empty($readonly) && in_array($value, $readonly) || $this->form->readonly) {
-                    Html::addCssClass($labelOpts, 'disabled');
-                    $opts['readonly'] = true;
+                if (!empty($readonly) && in_array($value, $readonly) || !empty($opts['readonly'])) {
+                    Html::addCssClass($labelOpts, 'readonly');
                 }
                 if ($isBs5 && $asBtnGrp) {
                     Html::addCssClass($opts, 'btn-check');

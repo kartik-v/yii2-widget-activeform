@@ -1,6 +1,12 @@
 Change Log: `yii2-widget-activeform`
 ====================================
 
+## Version 1.6.4
+
+**Date**: 31-Jul-2023
+
+- (enh #139): Correct `parseFormFlag` method for `readonly` and `disabled` check.
+
 ## Version 1.6.3
 
 **Date**: 28-Jul-2023
