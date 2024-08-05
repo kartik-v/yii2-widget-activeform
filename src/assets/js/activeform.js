@@ -156,7 +156,7 @@ var kvBs4InitForm = function () {
     };
 
     kvBs4InitForm = function () {
-        var controls = ['.form-control', '.custom-control-input', '.custom-select', '.custom-range', '.custom-file-input'],
+        var controls = ['.form-control', '.custom-control-input', '.custom-select', '.custom-range', '.custom-file-input', '.form-select', '.form-check-input'],
             validControls = controls.join(','),
             errorControls = '.has-error ' + controls.join(',.has-error '),
             successControls = '.has-success ' + controls.join(',.has-success '),
